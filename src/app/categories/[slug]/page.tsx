@@ -9,6 +9,7 @@ import {
 } from "@/lib/products";
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
+import ProductCard from "@/components/ProductCard";
 
 export async function generateStaticParams() {
   const categories = await getAllCategories();
@@ -53,41 +54,26 @@ export default async function CategoryPage({
   ]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-4 py-14">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <nav className="text-sm text-neutral-500 mb-4">
-        <Link href="/categories" className="hover:text-neutral-800">
+      <nav className="label-eyebrow text-[0.68rem] text-ink-soft mb-5">
+        <Link href="/categories" className="hover:text-gold-deep transition-colors">
           Categories
         </Link>{" "}
-        / <span className="text-neutral-800">{category}</span>
+        <span className="text-line mx-1">/</span>{" "}
+        <span className="text-ink">{category}</span>
       </nav>
-      <h1 className="text-2xl font-semibold mb-2">{category}</h1>
-      <p className="text-neutral-600 mb-8 max-w-2xl">
+      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">{category}</h1>
+      <p className="text-ink-soft mb-10 max-w-2xl">
         {products.length} compound{products.length === 1 ? "" : "s"} in this
         research category. For laboratory research use only.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
         {products.map((product) => (
-          <Link
-            key={product.slug}
-            href={`/products/${product.slug}`}
-            className="block rounded-lg border border-neutral-200 p-5 hover:border-neutral-400 transition-colors"
-          >
-            <div className="font-medium">{product.name}</div>
-            {product.casNumber && (
-              <div className="text-xs text-neutral-500 mt-1">
-                CAS {product.casNumber}
-              </div>
-            )}
-            {product.price != null && (
-              <div className="text-sm text-neutral-700 mt-2">
-                ${product.price.toFixed(2)}
-              </div>
-            )}
-          </Link>
+          <ProductCard key={product.slug} product={product} />
         ))}
       </div>
     </div>

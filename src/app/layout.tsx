@@ -35,12 +35,16 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  themeColor: "#15130f",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const jsonLd = [organizationSchema(), websiteSchema()];
 
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-white text-neutral-900">
+      <body className="min-h-full flex flex-col bg-cream text-ink font-sans">
         {jsonLd.map((schema, i) => (
           <script
             key={i}

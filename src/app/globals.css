@@ -1,26 +1,64 @@
 @import "tailwindcss";
+@import "@fontsource/playfair-display/500.css";
+@import "@fontsource/playfair-display/600.css";
+@import "@fontsource/playfair-display/600-italic.css";
+@import "@fontsource/playfair-display/700.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
 
+/*
+  Design tokens sampled/derived from the Vitality Certified Peptides logo
+  (warm gold + near-black on cream/white) and the brand's original site
+  reference (vitalitycertifiedpeptides.netlify.app): cream page background,
+  near-black header/footer, gold as the single accent, serif display type
+  paired with a clean grotesque for everything functional (nav, labels,
+  buttons, data).
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-cream: #f8f4ea;
+  --color-cream-soft: #f1ebda;
+  --color-ink: #15130f;
+  --color-ink-soft: #57503f;
+  --color-gold: #c89a3e;
+  --color-gold-deep: #a67c24;
+  --color-line: #e3dac0;
+  --color-white: #ffffff;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  --color-cream: var(--color-cream);
+  --color-cream-soft: var(--color-cream-soft);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-gold: var(--color-gold);
+  --color-gold-deep: var(--color-gold-deep);
+  --color-line: var(--color-line);
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+.font-serif-display {
+  font-family: var(--font-serif);
+}
+
+/* Small-caps tracked label style used for eyebrows, nav, and badges
+   throughout the site - reusable so every "kicker" reads consistently. */
+.label-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }

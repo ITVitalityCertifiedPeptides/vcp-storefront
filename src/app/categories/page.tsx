@@ -14,9 +14,12 @@ export default async function CategoriesPage() {
   const products = await getAllProducts();
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-semibold mb-2">Research categories</h1>
-      <p className="text-neutral-600 mb-8 max-w-2xl">
+    <div className="max-w-6xl mx-auto px-4 py-14">
+      <p className="label-eyebrow text-gold-deep mb-2">The Research Catalog</p>
+      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">
+        Research categories
+      </h1>
+      <p className="text-ink-soft mb-10 max-w-2xl leading-relaxed">
         Compounds grouped by the research area they are most commonly studied
         in. Each product page lists a lot-specific Certificate of Analysis
         reference and the CAS number for verification.
@@ -28,10 +31,12 @@ export default async function CategoriesPage() {
             <Link
               key={category}
               href={`/categories/${categorySlug(category)}`}
-              className="block rounded-lg border border-neutral-200 p-5 hover:border-neutral-400 transition-colors"
+              className="group block rounded-sm border border-line bg-white p-6 hover:border-gold-deep transition-colors"
             >
-              <div className="font-medium">{category}</div>
-              <div className="text-sm text-neutral-500 mt-1">
+              <div className="font-serif-display text-lg text-ink group-hover:text-gold-deep transition-colors">
+                {category}
+              </div>
+              <div className="text-sm text-ink-soft mt-1">
                 {count} compound{count === 1 ? "" : "s"}
               </div>
             </Link>

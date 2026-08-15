@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -19,13 +20,25 @@ export async function generateMetadata({
   const product = await getProductBySlug(slug);
   if (!product) return {};
 
+  // Researchers frequently search by CAS number rather than product name,
+  // so working it into the <title> (when we have one) targets that intent
+  // directly instead of relying only on on-page text.
+  const title = product.casNumber
+    ? `${product.name} (CAS ${product.casNumber})`
+    : product.name;
+  const description =
+    product.description ||
+    `${product.name} research compound${
+      product.category ? ` in the ${product.category} category` : ""
+    }. Research use only (RUO). Certificate of Analysis available for every lot.`;
+
   return {
-    title: product.name,
-    description: product.description,
+    title,
+    description,
     alternates: { canonical: `/products/${slug}` },
     openGraph: {
-      title: `${product.name} | ${siteConfig.name}`,
-      description: product.description,
+      title: `${title} | ${siteConfig.name}`,
+      description,
     },
   };
 }
@@ -53,7 +66,7 @@ export default async function ProductPage({
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="max-w-5xl mx-auto px-4 py-12">
       {jsonLd.map((schema, i) => (
         <script
           key={i}
@@ -61,56 +74,88 @@ export default async function ProductPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
-      <nav className="text-sm text-neutral-500 mb-4">
-        <Link href="/categories" className="hover:text-neutral-800">
+      <nav className="label-eyebrow text-[0.68rem] text-ink-soft mb-6">
+        <Link href="/categories" className="hover:text-gold-deep transition-colors">
           Categories
         </Link>{" "}
-        /{" "}
+        <span className="text-line mx-1">/</span>{" "}
         <Link
           href={`/categories/${categorySlug(product.category)}`}
-          className="hover:text-neutral-800"
+          className="hover:text-gold-deep transition-colors"
         >
           {product.category}
         </Link>{" "}
-        / <span className="text-neutral-800">{product.name}</span>
+        <span className="text-line mx-1">/</span> <span className="text-ink">{product.name}</span>
       </nav>
 
-      <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
-      <p className="text-neutral-600 mb-6">{product.description}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
+        {/* Product photography isn't shot yet - see ProductCard.tsx for the
+            same placeholder treatment used in listing grids. */}
+        <div className="relative aspect-square bg-ink rounded-sm flex items-center justify-center overflow-hidden">
+          <Image
+            src="/emblem-512.png"
+            alt=""
+            width={220}
+            height={220}
+            className="h-32 w-32 md:h-44 md:w-44 opacity-25 grayscale"
+          />
+          <span className="absolute top-4 left-4 label-eyebrow text-[0.65rem] text-cream/70 border border-cream/25 rounded-sm px-2 py-0.5">
+            RUO
+          </span>
+        </div>
 
-      <dl className="grid grid-cols-2 gap-4 max-w-md mb-8 text-sm border-y border-neutral-200 py-4">
         <div>
-          <dt className="text-neutral-500">CAS Number</dt>
-          <dd className="font-medium">{product.casNumber || "N/A"}</dd>
-        </div>
-        <div>
-          <dt className="text-neutral-500">Category</dt>
-          <dd className="font-medium">{product.category}</dd>
-        </div>
-        {product.price != null && (
-          <div>
-            <dt className="text-neutral-500">Price</dt>
-            <dd className="font-medium">${product.price.toFixed(2)}</dd>
+          {product.category && (
+            <p className="label-eyebrow text-gold-deep mb-2">{product.category}</p>
+          )}
+          <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-4">
+            {product.name}
+          </h1>
+          <p className="text-ink-soft leading-relaxed mb-8">{product.description}</p>
+
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 mb-8 text-sm border-y border-line py-5">
+            <div>
+              <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">CAS Number</dt>
+              <dd className="font-medium text-ink">{product.casNumber || "N/A"}</dd>
+            </div>
+            <div>
+              <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Category</dt>
+              <dd className="font-medium text-ink">{product.category}</dd>
+            </div>
+            {product.price != null && (
+              <div>
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Price</dt>
+                <dd className="font-serif-display text-lg text-ink">
+                  ${product.price.toFixed(2)}
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Availability</dt>
+              <dd className="font-medium text-ink flex items-center gap-1.5">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    product.inStock ? "bg-gold" : "bg-ink-soft/40"
+                  }`}
+                  aria-hidden
+                />
+                {product.inStock ? "In stock" : "Available to order"}
+              </dd>
+            </div>
+          </dl>
+
+          <div className="rounded-sm bg-cream-soft border border-line p-4 text-sm text-ink-soft mb-8 leading-relaxed">
+            {product.ruoDisclaimer}
           </div>
-        )}
-        <div>
-          <dt className="text-neutral-500">Availability</dt>
-          <dd className="font-medium">
-            {product.inStock ? "In stock" : "Available to order"}
-          </dd>
+
+          <Link
+            href="/coa"
+            className="label-eyebrow text-[0.72rem] text-ink hover:text-gold-deep transition-colors underline underline-offset-4 decoration-line"
+          >
+            View Certificate of Analysis policy
+          </Link>
         </div>
-      </dl>
-
-      <div className="rounded-md bg-neutral-50 border border-neutral-200 p-4 text-sm text-neutral-600 mb-8">
-        {product.ruoDisclaimer}
       </div>
-
-      <Link
-        href="/coa"
-        className="text-sm font-medium text-neutral-900 underline underline-offset-4"
-      >
-        View Certificate of Analysis policy
-      </Link>
     </div>
   );
 }

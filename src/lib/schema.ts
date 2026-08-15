@@ -12,16 +12,30 @@ export function organizationSchema() {
 }
 
 export function websiteSchema() {
+  // No potentialAction/SearchAction here on purpose: the site has no
+  // /search route. Advertising a sitelinks searchbox for a page that
+  // 404s is exactly the kind of structured-data mismatch Search Console
+  // flags as an error, so omit it until a real search page exists.
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
     url: siteConfig.url,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${siteConfig.url}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
+  };
+}
+
+export function faqSchema(items: Array<{ question: string; answer: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
   };
 }
 

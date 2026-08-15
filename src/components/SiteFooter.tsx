@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getAllCategories, categorySlug } from "@/lib/products";
 import { siteConfig, ruoNotice } from "@/lib/site";
@@ -7,20 +8,36 @@ export default async function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-neutral-200 bg-neutral-50 mt-16">
-      <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
+    <footer className="bg-ink text-cream mt-20">
+      <div className="max-w-6xl mx-auto px-4 py-14 grid grid-cols-1 md:grid-cols-4 gap-10 text-sm">
         <div>
-          <div className="font-semibold mb-2">{siteConfig.name}</div>
-          <p className="text-neutral-600">{siteConfig.description}</p>
+          <div className="flex items-center gap-3 mb-3">
+            <Image
+              src="/emblem-512.png"
+              alt=""
+              width={36}
+              height={36}
+              className="h-9 w-9 opacity-90"
+            />
+            <span className="leading-none">
+              <span className="block font-serif-display text-base tracking-wide">
+                Vitality
+              </span>
+              <span className="block label-eyebrow text-[0.58rem] tracking-[0.2em] text-gold mt-0.5">
+                Certified Peptides
+              </span>
+            </span>
+          </div>
+          <p className="text-cream/60 leading-relaxed">{siteConfig.description}</p>
         </div>
         <div>
-          <div className="font-medium mb-2">Categories</div>
-          <ul className="space-y-1">
+          <div className="label-eyebrow text-gold mb-3">Categories</div>
+          <ul className="space-y-2">
             {categories.map((category) => (
               <li key={category}>
                 <Link
                   href={`/categories/${categorySlug(category)}`}
-                  className="text-neutral-600 hover:text-neutral-900"
+                  className="text-cream/70 hover:text-cream transition-colors"
                 >
                   {category}
                 </Link>
@@ -29,32 +46,37 @@ export default async function SiteFooter() {
           </ul>
         </div>
         <div>
-          <div className="font-medium mb-2">Trust &amp; Compliance</div>
-          <ul className="space-y-1">
+          <div className="label-eyebrow text-gold mb-3">Trust &amp; Compliance</div>
+          <ul className="space-y-2">
             <li>
-              <Link href="/coa" className="text-neutral-600 hover:text-neutral-900">
+              <Link href="/coa" className="text-cream/70 hover:text-cream transition-colors">
                 Certificates of Analysis
               </Link>
             </li>
             <li>
-              <Link href="/ruo-policy" className="text-neutral-600 hover:text-neutral-900">
+              <Link href="/ruo-policy" className="text-cream/70 hover:text-cream transition-colors">
                 RUO Policy
               </Link>
             </li>
             <li>
-              <Link href="/affiliates" className="text-neutral-600 hover:text-neutral-900">
+              <Link href="/affiliates" className="text-cream/70 hover:text-cream transition-colors">
                 Affiliate Program
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <div className="font-medium mb-2">Research Use Only</div>
-          <p className="text-neutral-500 text-xs leading-relaxed">{ruoNotice}</p>
+          <div className="label-eyebrow text-gold mb-3">Research Use Only</div>
+          <p className="text-cream/55 text-xs leading-relaxed">{ruoNotice}</p>
         </div>
       </div>
-      <div className="border-t border-neutral-200 py-4 text-center text-xs text-neutral-500">
-        &copy; {year} {siteConfig.name}. All rights reserved.
+      <div className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-cream/50">
+          <p>
+            &copy; {year} {siteConfig.name}. All rights reserved.
+          </p>
+          <p>For laboratory research use only. Not for human consumption.</p>
+        </div>
       </div>
     </footer>
   );
