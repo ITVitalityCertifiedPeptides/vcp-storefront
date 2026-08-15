@@ -9,9 +9,16 @@ export type Product = {
   casNumber: string;
   description: string;
   price: number | null;
-  active: boolean;
   ruoDisclaimer: string;
   stockLevel: number;
+  // "in_stock" | "out_of_stock" | "backorder" | "preorder" | "discontinued" | null
+  stockStatus: string | null;
+  // Every product returned by the storefront API is implicitly active -
+  // Swell excludes inactive products from this endpoint entirely, so an
+  // inactive product (e.g. SLU-PP-332, HCG 10000IU) simply won't appear
+  // here or get a page generated for it. stock_purchasable staying true
+  // even at 0 stock is what keeps a product listed with pricing.
+  inStock: boolean;
 };
 
 function slugify(name: string): string {
@@ -49,8 +56,8 @@ type SwellProduct = {
   name: string;
   description?: string;
   price?: number | null;
-  active?: boolean;
   stock_level?: number;
+  stock_status?: string | null;
   content?: {
     category?: string;
     cas_number?: string;
@@ -68,9 +75,10 @@ function mapProduct(p: SwellProduct): Product {
     casNumber: content.cas_number || "",
     description: p.description || "",
     price: p.price ?? null,
-    active: !!p.active,
     ruoDisclaimer: content.ruo_disclaimer || "",
     stockLevel: p.stock_level || 0,
+    stockStatus: p.stock_status ?? null,
+    inStock: p.stock_status === "in_stock",
   };
 }
 

@@ -96,7 +96,7 @@ export default async function ProductPage({
         <div>
           <dt className="text-neutral-500">Availability</dt>
           <dd className="font-medium">
-            {product.active ? "In stock" : "Unavailable"}
+            {product.inStock ? "In stock" : "Available to order"}
           </dd>
         </div>
       </dl>

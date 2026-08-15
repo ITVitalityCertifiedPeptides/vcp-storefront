@@ -68,9 +68,12 @@ export function productSchema(product: Product) {
           "@type": "Offer",
           price: product.price,
           priceCurrency: "USD",
-          availability: product.active
+          // stock_purchasable stays true even at 0 physical stock (products
+          // still ship, just not immediately), so BackOrder is more
+          // accurate than OutOfStock for anything not currently in_stock.
+          availability: product.inStock
             ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
+            : "https://schema.org/BackOrder",
           url: `${siteConfig.url}/products/${product.slug}`,
         }
       : undefined,
