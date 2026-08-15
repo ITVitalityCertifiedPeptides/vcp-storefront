@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ruoNotice } from "@/lib/site";
+import { ruoNotice, ruoPolicySections } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Research Use Only Policy",
@@ -15,9 +15,18 @@ export default function RuoPolicyPage() {
       <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-6">
         Research Use Only (RUO) Policy
       </h1>
-      <p className="text-ink-soft leading-relaxed mb-8">{ruoNotice}</p>
+      <p className="text-ink-soft leading-relaxed mb-10">{ruoNotice}</p>
 
-      <h2 className="font-serif-display text-xl text-ink mt-10 mb-3">
+      {ruoPolicySections.map((section) => (
+        <div key={section.heading} className="mb-8">
+          <h2 className="font-serif-display text-xl text-ink mb-3">
+            {section.heading}
+          </h2>
+          <p className="text-ink-soft leading-relaxed">{section.body}</p>
+        </div>
+      ))}
+
+      <h2 className="font-serif-display text-xl text-ink mb-3">
         How we describe compounds
       </h2>
       <p className="text-ink-soft leading-relaxed mb-8">
@@ -30,9 +39,10 @@ export default function RuoPolicyPage() {
 
       <div className="rounded-sm bg-cream-soft border border-line px-5 py-4">
         <p className="label-eyebrow text-[0.65rem] text-ink-soft leading-relaxed">
-          This page is preliminary and subject to attorney review before
-          launch. Final language pending legal sign-off on the
-          state-by-state risk matrix and label compliance review.
+          This policy reflects our current RUO practices and will be
+          reviewed by legal counsel on an ongoing basis, including the
+          state-by-state risk matrix. Language here is subject to
+          revision as that review progresses.
         </p>
       </div>
     </div>
