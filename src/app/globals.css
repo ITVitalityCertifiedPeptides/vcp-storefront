@@ -62,3 +62,11 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
+
+/* Subtle dot-grid texture for hero/section backgrounds - a stand-in for
+   product photography that reads as "lab/molecular" without being a
+   literal stock photo. Dot color follows currentColor via opacity. */
+.bg-dot-grid {
+  background-image: radial-gradient(currentColor 1.4px, transparent 1.4px);
+  background-size: 26px 26px;
+}

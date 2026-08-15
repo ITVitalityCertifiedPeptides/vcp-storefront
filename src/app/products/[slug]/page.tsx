@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllProducts, getProductBySlug, categorySlug } from "@/lib/products";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
+import VialIcon from "@/components/VialIcon";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -91,15 +91,10 @@ export default async function ProductPage({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
         {/* Product photography isn't shot yet - see ProductCard.tsx for the
             same placeholder treatment used in listing grids. */}
-        <div className="relative aspect-square bg-ink rounded-sm flex items-center justify-center overflow-hidden">
-          <Image
-            src="/emblem-512.png"
-            alt=""
-            width={220}
-            height={220}
-            className="h-32 w-32 md:h-44 md:w-44 opacity-25 grayscale"
-          />
-          <span className="absolute top-4 left-4 label-eyebrow text-[0.65rem] text-cream/70 border border-cream/25 rounded-sm px-2 py-0.5">
+        <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-dot-grid text-cream/[0.06]" aria-hidden />
+          <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
+          <span className="absolute top-4 left-4 label-eyebrow text-[0.65rem] text-cream/60">
             RUO
           </span>
         </div>
@@ -148,12 +143,10 @@ export default async function ProductPage({
             {product.ruoDisclaimer}
           </div>
 
-          <Link
-            href="/coa"
-            className="label-eyebrow text-[0.72rem] text-ink hover:text-gold-deep transition-colors underline underline-offset-4 decoration-line"
-          >
-            View Certificate of Analysis policy
-          </Link>
+          <p className="label-eyebrow text-[0.68rem] text-ink-soft">
+            Certificate of Analysis included with every order — verify your
+            lot via the QR code on your packing slip and vial label.
+          </p>
         </div>
       </div>
     </div>

@@ -46,14 +46,8 @@ export default async function SiteHeader() {
           </nav>
           <div className="hidden md:flex items-center gap-5 shrink-0">
             <Link
-              href="/coa"
-              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
-            >
-              Certificates of Analysis
-            </Link>
-            <Link
               href="/categories"
-              className="inline-flex items-center rounded-sm bg-ink text-cream px-4 py-2 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
+              className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
             >
               Shop Catalog
             </Link>
@@ -71,12 +65,6 @@ export default async function SiteHeader() {
               {category}
             </Link>
           ))}
-          <Link
-            href="/coa"
-            className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep whitespace-nowrap"
-          >
-            Certificates of Analysis
-          </Link>
         </div>
       </div>
     </header>

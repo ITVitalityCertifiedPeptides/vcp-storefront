@@ -49,11 +49,6 @@ export default async function SiteFooter() {
           <div className="label-eyebrow text-gold mb-3">Trust &amp; Compliance</div>
           <ul className="space-y-2">
             <li>
-              <Link href="/coa" className="text-cream/70 hover:text-cream transition-colors">
-                Certificates of Analysis
-              </Link>
-            </li>
-            <li>
               <Link href="/ruo-policy" className="text-cream/70 hover:text-cream transition-colors">
                 RUO Policy
               </Link>
@@ -64,6 +59,10 @@ export default async function SiteFooter() {
               </Link>
             </li>
           </ul>
+          <p className="text-cream/45 text-xs leading-relaxed mt-4">
+            A Certificate of Analysis ships with every lot, accessible via
+            the QR code on your order and vial label.
+          </p>
         </div>
         <div>
           <div className="label-eyebrow text-gold mb-3">Research Use Only</div>
