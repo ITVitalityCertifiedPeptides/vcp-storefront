@@ -10,8 +10,9 @@ import {
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
 
-export function generateStaticParams() {
-  return getAllCategories().map((category) => ({
+export async function generateStaticParams() {
+  const categories = await getAllCategories();
+  return categories.map((category) => ({
     slug: categorySlug(category),
   }));
 }
@@ -22,7 +23,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const category = categoryFromSlug(slug);
+  const category = await categoryFromSlug(slug);
   if (!category) return {};
 
   const title = `${category} Research Compounds`;
@@ -41,10 +42,10 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const category = categoryFromSlug(slug);
+  const category = await categoryFromSlug(slug);
   if (!category) notFound();
 
-  const products = getProductsByCategory(category);
+  const products = await getProductsByCategory(category);
   const jsonLd = breadcrumbSchema([
     { name: "Home", url: siteConfig.url },
     { name: "Categories", url: `${siteConfig.url}/categories` },

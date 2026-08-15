@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function HomePage() {
-  const categories = getAllCategories();
-  const products = getAllProducts();
+export default async function HomePage() {
+  const categories = await getAllCategories();
+  const products = await getAllProducts();
 
   return (
     <div>

@@ -5,6 +5,11 @@ import { organizationSchema, websiteSchema } from "@/lib/schema";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
+// Re-fetch product/category data from Swell at most once per hour instead
+// of only on a fresh deploy, so price/stock/copy edits made in the Swell
+// admin show up on the live site without Josh needing to trigger a redeploy.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {

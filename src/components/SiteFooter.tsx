@@ -2,8 +2,8 @@ import Link from "next/link";
 import { getAllCategories, categorySlug } from "@/lib/products";
 import { siteConfig, ruoNotice } from "@/lib/site";
 
-export default function SiteFooter() {
-  const categories = getAllCategories();
+export default async function SiteFooter() {
+  const categories = await getAllCategories();
   const year = new Date().getFullYear();
 
   return (

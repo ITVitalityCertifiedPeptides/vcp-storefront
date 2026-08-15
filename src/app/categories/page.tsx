@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/categories" },
 };
 
-export default function CategoriesPage() {
-  const categories = getAllCategories();
-  const products = getAllProducts();
+export default async function CategoriesPage() {
+  const categories = await getAllCategories();
+  const products = await getAllProducts();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">

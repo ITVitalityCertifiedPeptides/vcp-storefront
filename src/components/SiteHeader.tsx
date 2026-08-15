@@ -2,8 +2,8 @@ import Link from "next/link";
 import { getAllCategories, categorySlug } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 
-export default function SiteHeader() {
-  const categories = getAllCategories();
+export default async function SiteHeader() {
+  const categories = await getAllCategories();
 
   return (
     <header className="border-b border-neutral-200">
