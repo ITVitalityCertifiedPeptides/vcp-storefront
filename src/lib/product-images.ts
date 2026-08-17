@@ -2,7 +2,7 @@
 // individual product per size (Valhalla catalog + GTM pricing, per Josh
 // 2026-08-17), so keys are per-size slugs. Products without a photo yet
 // (BPC-157 5mg/10mg, MOTS-c 40mg, Kisspeptin 10mg, Tirzepatide 10/20mg,
-// AOD-9604, 5-Amino-1MQ, Thymosin Alpha-1, VIP, Bacteriostatic Water)
+// AOD-9604, 5-Amino-1MQ, Thymosin Alpha-1, VIP, BAC Water 30mL)
 // fall back to the drawn VialIcon placeholder until generated.
 export const productImages: Record<string, string> = {
   "retatrutide-10mg": "/products/retatrutide-10mg.jpg",
@@ -51,4 +51,5 @@ export const productImages: Record<string, string> = {
   "kisspeptin-5mg": "/products/kisspeptin-5mg.jpg",
   "dsip-5mg": "/products/dsip-5mg.jpg",
   "dsip-15mg": "/products/dsip-15mg.jpg",
+  "bacteriostatic-water-10ml": "/products/bacteriostatic-water-10ml.jpg",
 };

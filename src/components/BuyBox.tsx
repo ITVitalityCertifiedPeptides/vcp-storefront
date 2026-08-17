@@ -205,6 +205,11 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
           {justAdded ? "Added" : "Add to Cart"}
         </button>
       )}
+      {product.inStock && (
+        <p className="text-xs text-ink-soft mt-3">
+          In stock. Ships within 1 business day.
+        </p>
+      )}
     </div>
   );
 }

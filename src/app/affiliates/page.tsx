@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Affiliate Program",
   description:
-    "Vitality Certified Peptides affiliate program: commission structure, cookie window, compliance standards, and traffic integrity requirements.",
+    "Partner with Vitality Certified Peptides: recurring commission on referred orders, a 30-day cookie window, monthly payouts, and clear compliance standards.",
   alternates: { canonical: "/affiliates" },
 };
 
@@ -39,13 +39,55 @@ const trafficIntegrityStandards = [
   "Vitality Certified Peptides may audit referral traffic and order patterns at any time. Commission tied to a violation is reversed, and repeated or intentional violations result in immediate termination without payout of pending commission.",
 ];
 
+const steps = [
+  {
+    title: "Apply",
+    body: "Tell us who you are and where your audience lives. Applications are reviewed individually, most within 24 to 48 hours.",
+  },
+  {
+    title: "Share your link",
+    body: "Approved partners receive a unique referral link. Any visitor who arrives through it is credited to you for a full 30 days.",
+  },
+  {
+    title: "Get paid monthly",
+    body: "Earn commission on every order your referrals place, including reorders through our Restock autoship program. Payouts run monthly.",
+  },
+];
+
 export default function AffiliatesPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-14">
       <p className="label-eyebrow text-gold-deep mb-2">Partner With Us</p>
-      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-8">
+      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-6">
         Affiliate Program
       </h1>
+
+      <p className="text-ink-soft leading-relaxed mb-4">
+        Vitality Certified Peptides supplies US-made, research-use-only
+        compounds with batch documentation behind every vial and direct
+        pricing every day. If your audience follows the peptide research
+        space, that is an easy story to tell, and we built this program so
+        you are rewarded for telling it well.
+      </p>
+      <p className="text-ink-soft leading-relaxed mb-10">
+        Partners earn on every order they refer, not just the first one.
+        Because many of our customers reorder on a schedule through Restock
+        autoship, a single referral can keep earning you commission month
+        after month.
+      </p>
+
+      <h2 className="font-serif-display text-xl text-ink mb-5">How it works</h2>
+      <div className="grid gap-4 sm:grid-cols-3 mb-10">
+        {steps.map((step, i) => (
+          <div key={step.title} className="rounded-sm border border-line bg-white px-4 py-5">
+            <p className="label-eyebrow text-[0.65rem] text-gold-deep mb-2">
+              Step {i + 1}
+            </p>
+            <p className="font-medium text-ink mb-2">{step.title}</p>
+            <p className="text-sm text-ink-soft leading-relaxed">{step.body}</p>
+          </div>
+        ))}
+      </div>
 
       <h2 className="font-serif-display text-xl text-ink mb-3">Program terms</h2>
       <ul className="space-y-3 mb-10">

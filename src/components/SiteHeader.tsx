@@ -11,9 +11,11 @@ export default async function SiteHeader() {
     <header className="sticky top-0 z-40">
       <div className="bg-ink text-center py-2 px-4">
         <p className="label-eyebrow text-[0.66rem] tracking-[0.16em] text-gold">
-          Free US shipping over $250
+          Ships within 1 business day
           <span className="text-cream/40 mx-2">&#8226;</span>
-          Restock orders over $75
+          Free US shipping over $250
+          <span className="text-cream/40 mx-2 hidden sm:inline">&#8226;</span>
+          <span className="hidden sm:inline">Restock orders over $75</span>
         </p>
       </div>
       <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">
@@ -66,12 +68,6 @@ export default async function SiteHeader() {
               className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
             >
               Research Library
-            </Link>
-            <Link
-              href="/affiliates"
-              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-            >
-              Affiliate Program
             </Link>
           </nav>
           <div className="flex items-center gap-4 shrink-0">
