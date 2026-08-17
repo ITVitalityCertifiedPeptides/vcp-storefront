@@ -25,12 +25,12 @@ const benefits = [
   {
     icon: Package,
     label: "In Stock, Ships from the USA",
-    detail: "What shows in stock is on the shelf and ready to go.",
+    detail: "Free US shipping on orders over $250.",
   },
   {
     icon: Tag,
-    label: "Our Best Price, Up Front",
-    detail: "No coupon codes, no games. The price you see is the price.",
+    label: "Direct Pricing, Every Day",
+    detail: "The listed price is our best price. No codes required.",
   },
 ];
 
@@ -57,6 +57,11 @@ const faqs = [
     question: "How do I find a compound's CAS number or category?",
     answer:
       "Every product page lists its CAS number and research category. You can also browse the full catalog by category.",
+  },
+  {
+    question: "Do you offer free shipping?",
+    answer:
+      "Yes. US shipping is free on orders over $250. Below that, shipping is calculated when we confirm your order.",
   },
 ];
 
@@ -101,8 +106,8 @@ export default async function HomePage() {
             Third-party tested research peptides.
           </h1>
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-cream/85">
-            Our best price up front, no codes needed. In stock and ships
-            from the USA.
+            Direct pricing, every day: the listed price is our best price.
+            In stock and ships from the USA.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <Link
