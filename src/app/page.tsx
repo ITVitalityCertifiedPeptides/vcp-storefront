@@ -6,6 +6,7 @@ import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
 import ProductCard from "@/components/ProductCard";
 import VialIcon from "@/components/VialIcon";
+import QualityBadges from "@/components/QualityBadges";
 
 export const metadata: Metadata = {
   title: `${siteConfig.name} | Research-Grade Compounds, RUO`,
@@ -151,6 +152,24 @@ export default async function HomePage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-t border-line">
+        <div className="max-w-6xl mx-auto px-4 pt-12 pb-2 text-center">
+          <p className="label-eyebrow text-gold-deep mb-2">Quality Assurance</p>
+          <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
+            Verified at every step
+          </h2>
+        </div>
+        <QualityBadges variant="light" />
+        <div className="max-w-6xl mx-auto px-4 pb-4 text-center">
+          <Link
+            href="/quality-assurance"
+            className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
+          >
+            See how we verify what we sell &rarr;
+          </Link>
         </div>
       </section>
 

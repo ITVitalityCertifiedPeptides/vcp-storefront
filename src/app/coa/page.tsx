@@ -34,8 +34,9 @@ export default function CoaPage() {
       <div className="rounded-sm bg-cream-soft border border-line px-5 py-4">
         <p className="label-eyebrow text-[0.65rem] text-ink-soft">
           This page is reached only via QR code and is not linked from site
-          navigation. Per-lot COA document lookup by QR code is planned but
-          not yet built.
+          navigation. Each product/lot has its own lookup page at
+          /coa/[product]/[lot] — see public/coas/README.md for how to add a
+          new lot&apos;s Certificate of Analysis PDF.
         </p>
       </div>
     </div>

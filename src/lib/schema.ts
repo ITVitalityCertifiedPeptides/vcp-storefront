@@ -77,6 +77,17 @@ export function productSchema(product: Product) {
           },
         ]
       : undefined,
+    // Purely factual link to a public chemical database entry for this CAS
+    // number - not a claim of any kind, just identity verification, which
+    // is a standard, safe way to strengthen a product page's topical
+    // authority signal for search engines.
+    sameAs: product.casNumber
+      ? [
+          `https://commonchemistry.cas.org/results?q=${encodeURIComponent(
+            product.casNumber.split(" ")[0]
+          )}`,
+        ]
+      : undefined,
     offers: product.price
       ? {
           "@type": "Offer",

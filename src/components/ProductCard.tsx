@@ -1,19 +1,30 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/products";
+import { productImages } from "@/lib/product-images";
 import VialIcon from "./VialIcon";
 
-// Product photography isn't shot yet (Josh is generating it separately), so
-// the image slot renders a drawn vial icon instead of a photo or a logo
-// watermark. Swap the icon block for a real <Image src={product.image}>
-// once photos exist - the rest of the card doesn't need to change.
+// Real product photography is rolling in gradually (see product-images.ts).
+// Any product without a listed image falls back to the drawn vial icon.
 export default function ProductCard({ product }: { product: Product }) {
+  const image = productImages[product.slug];
   return (
     <Link
       href={`/products/${product.slug}`}
       className="group block bg-white border border-line hover:border-gold-deep hover:shadow-[0_8px_24px_-12px_rgba(21,19,15,0.25)] transition-all"
     >
       <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden">
-        <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />
+        {image ? (
+          <Image
+            src={image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover"
+          />
+        ) : (
+          <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />
+        )}
         <span className="absolute top-3 left-3 label-eyebrow text-[0.6rem] text-cream/60">
           RUO
         </span>

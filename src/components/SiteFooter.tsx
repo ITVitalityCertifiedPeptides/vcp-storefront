@@ -54,6 +54,14 @@ export default async function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link
+                href="/quality-assurance"
+                className="text-cream/70 hover:text-cream transition-colors"
+              >
+                Quality Assurance
+              </Link>
+            </li>
+            <li>
               <Link href="/affiliates" className="text-cream/70 hover:text-cream transition-colors">
                 Affiliate Program
               </Link>

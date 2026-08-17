@@ -1,10 +1,14 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllProducts, getProductBySlug, categorySlug } from "@/lib/products";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
+import { productImages } from "@/lib/product-images";
 import VialIcon from "@/components/VialIcon";
+import RelatedProducts from "@/components/RelatedProducts";
+import ProductFaq from "@/components/ProductFaq";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -49,8 +53,13 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, allProducts] = await Promise.all([
+    getProductBySlug(slug),
+    getAllProducts(),
+  ]);
   if (!product) notFound();
+
+  const image = productImages[product.slug];
 
   const jsonLd = [
     productSchema(product),
@@ -66,6 +75,7 @@ export default async function ProductPage({
   ];
 
   return (
+    <>
     <div className="max-w-5xl mx-auto px-4 py-12">
       {jsonLd.map((schema, i) => (
         <script
@@ -89,11 +99,25 @@ export default async function ProductPage({
       </nav>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
-        {/* Product photography isn't shot yet - see ProductCard.tsx for the
-            same placeholder treatment used in listing grids. */}
+        {/* Falls back to the drawn vial icon for any product without a real
+            photo yet - see ProductCard.tsx for the same treatment used in
+            listing grids. */}
         <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-dot-grid text-cream/[0.06]" aria-hidden />
-          <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
+          {image ? (
+            <Image
+              src={image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-dot-grid text-cream/[0.06]" aria-hidden />
+              <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
+            </>
+          )}
           <span className="absolute top-4 left-4 label-eyebrow text-[0.65rem] text-cream/60">
             RUO
           </span>
@@ -150,5 +174,9 @@ export default async function ProductPage({
         </div>
       </div>
     </div>
+
+      <ProductFaq productName={product.name} />
+      <RelatedProducts current={product} products={allProducts} />
+    </>
   );
 }
