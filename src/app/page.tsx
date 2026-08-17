@@ -10,6 +10,7 @@ import {
 } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
+import FilteredProductGrid from "@/components/FilteredProductGrid";
 import ProductCard from "@/components/ProductCard";
 import QualityBadges from "@/components/QualityBadges";
 
@@ -74,9 +75,6 @@ const faqs = [
 export default async function HomePage() {
   const categories = await getAllCategories();
   const products = await getAllProducts();
-  const featured = [...products]
-    .sort((a, b) => Number(b.inStock) - Number(a.inStock))
-    .slice(0, 9);
   const blends = products.filter((p) => BLEND_SLUGS.includes(p.slug));
 
   return (
@@ -153,10 +151,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {featured.length > 0 && (
+      {products.length > 0 && (
         <section className="py-14">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
+            <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
               <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
                 Shop peptides
               </h2>
@@ -164,23 +162,10 @@ export default async function HomePage() {
                 href="/categories"
                 className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
               >
-                View all {products.length} products &rarr;
+                Shop by research area &rarr;
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {featured.map((product) => (
-                <ProductCard key={product.slug} product={product} />
-              ))}
-            </div>
-            <div className="mt-8">
-              <Link
-                href="/categories"
-                className="inline-flex items-center gap-2 rounded-full bg-ink text-cream px-6 py-3 label-eyebrow text-[0.7rem] hover:bg-gold-deep transition-colors"
-              >
-                Shop the Full Catalog
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-              </Link>
-            </div>
+            <FilteredProductGrid products={products} />
           </div>
         </section>
       )}

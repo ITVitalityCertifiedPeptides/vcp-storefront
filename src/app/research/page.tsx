@@ -27,7 +27,7 @@ export default function ResearchLibraryPage() {
     <div className="max-w-3xl mx-auto px-4 py-14">
       <p className="label-eyebrow text-gold-deep mb-2">Research Library</p>
       <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-6">
-        The published literature, cataloged.
+        The published literature.
       </h1>
       <p className="text-ink-soft leading-relaxed mb-8">
         {researchLibrary.length} peer-reviewed publications involving

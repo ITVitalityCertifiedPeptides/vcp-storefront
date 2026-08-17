@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   getAllCategories,
-  getAllProducts,
   categorySlug,
   displayCategory,
 } from "@/lib/products";
@@ -16,7 +15,6 @@ export const metadata: Metadata = {
 
 export default async function CategoriesPage() {
   const categories = await getAllCategories();
-  const products = await getAllProducts();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-14">
@@ -30,23 +28,17 @@ export default async function CategoriesPage() {
         reference and the CAS number for verification.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {categories.map((category) => {
-          const count = products.filter((p) => p.category === category).length;
-          return (
-            <Link
-              key={category}
-              href={`/categories/${categorySlug(category)}`}
-              className="group block rounded-sm border border-line bg-white p-6 hover:border-gold-deep transition-colors"
-            >
-              <div className="font-serif-display text-lg text-ink group-hover:text-gold-deep transition-colors">
-                {displayCategory(category)}
-              </div>
-              <div className="text-sm text-ink-soft mt-1">
-                {count} compound{count === 1 ? "" : "s"}
-              </div>
-            </Link>
-          );
-        })}
+        {categories.map((category) => (
+          <Link
+            key={category}
+            href={`/categories/${categorySlug(category)}`}
+            className="group block rounded-sm border border-line bg-white p-6 hover:border-gold-deep transition-colors"
+          >
+            <div className="font-serif-display text-lg text-ink group-hover:text-gold-deep transition-colors">
+              {displayCategory(category)}
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

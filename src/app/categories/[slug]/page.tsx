@@ -10,7 +10,7 @@ import {
 } from "@/lib/products";
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
-import ProductCard from "@/components/ProductCard";
+import FilteredProductGrid from "@/components/FilteredProductGrid";
 
 export async function generateStaticParams() {
   const categories = await getAllCategories();
@@ -75,15 +75,10 @@ export default async function CategoryPage({
       <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">
         {displayCategory(category)}
       </h1>
-      <p className="text-ink-soft mb-10 max-w-2xl">
-        {products.length} compound{products.length === 1 ? "" : "s"} in this
-        research area. For laboratory research use only.
+      <p className="text-ink-soft mb-8 max-w-2xl">
+        For laboratory research use only.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
-      </div>
+      <FilteredProductGrid products={products} />
     </div>
   );
 }

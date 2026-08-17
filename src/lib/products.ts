@@ -1,89 +1,21 @@
 import "server-only";
 import swell from "swell-js";
+import type {
+  Product,
+  ProductOption,
+  SubscriptionPlan,
+} from "./catalog-shared";
 
-// NOTE: Swell option value prices are ADDITIVE - value.price is added to
-// the product's base price when that value is selected.
-export type ProductOptionValue = {
-  id: string;
-  name: string;
-  price: number | null;
-};
-
-export type ProductOption = {
-  id: string;
-  name: string;
-  values: ProductOptionValue[];
-};
-
-// A subscription plan configured on the product's purchase options in the
-// Swell admin (e.g. "Every 30 days"). When plans exist, the storefront
-// shows the Restock & Save purchase toggle automatically.
-export type SubscriptionPlan = {
-  id: string;
-  name: string;
-};
-
-export type Product = {
-  // Swell product id, needed client-side for cart.addItem.
-  id: string;
-  sku: string;
-  name: string;
-  slug: string;
-  category: string;
-  casNumber: string;
-  description: string;
-  price: number | null;
-  ruoDisclaimer: string;
-  stockLevel: number;
-  // "in_stock" | "out_of_stock" | "backorder" | "preorder" | "discontinued" | null
-  stockStatus: string | null;
-  // Every product returned by the storefront API is implicitly active -
-  // Swell excludes inactive products from this endpoint entirely, so an
-  // inactive product (e.g. SLU-PP-332, HCG 10000IU) simply won't appear
-  // here or get a page generated for it. stock_purchasable staying true
-  // even at 0 stock is what keeps a product listed with pricing.
-  inStock: boolean;
-  // Size (or other) options configured in Swell. Empty array = single
-  // variant product; cards can Add to Cart directly. Non-empty = the
-  // product page shows a selector and cards say "Select Options".
-  options: ProductOption[];
-  // Subscription plans if Scheduled Restock is configured for this
-  // product in Swell; null when not offered.
-  subscription: SubscriptionPlan[] | null;
-  // Lowest selectable price when options carry price differences, so
-  // cards can show "From $X". Null when there's a single price.
-  priceFrom: number | null;
-  // Per-product Made in USA flag, read from the made_in_usa checkbox
-  // content field in Swell (add it under Developer > Models > Products
-  // alongside category/cas_number/ruo_disclaimer). Defaults to TRUE when
-  // the field is absent, since the entire current catalog is US-made;
-  // uncheck the box on any future product that isn't.
-  madeInUsa: boolean;
-};
-
-// Display-layer renames pending a counsel-approved rename of the
-// underlying Swell category values. The raw values (and the URL slugs
-// derived from them) still carry consumer-benefit wording like "Weight
-// Loss" and "Sexual Health"; these display names reframe every category
-// as a research area so the most visible words on the site describe
-// fields of study, not human outcomes. "Accessories" also becomes "Lab
-// Supplies" here.
-const CATEGORY_DISPLAY: Record<string, string> = {
-  "Metabolic/Weight Loss": "Metabolic Research",
-  "Growth Hormone/Endocrine": "Endocrine Research",
-  "Inflammation/Recovery": "Tissue & Inflammation Research",
-  "Cellular Repair/Longevity": "Cellular & Longevity Research",
-  "Immune Support": "Immunology Research",
-  Nootropic: "Neurological Research",
-  "Skin/Cosmetic": "Dermal Research",
-  "Sexual Health": "Reproductive Research",
-  Sleep: "Sleep Research",
-  Accessories: "Lab Supplies",
-};
-
-export function displayCategory(category: string): string {
-  return CATEGORY_DISPLAY[category] || category;
-}
+// Types + display helpers live in catalog-shared.ts (no server-only
+// guard) so client components can use them too; re-exported here so
+// server code keeps one import path.
+export { displayCategory } from "./catalog-shared";
+export type {
+  Product,
+  ProductOption,
+  ProductOptionValue,
+  SubscriptionPlan,
+} from "./catalog-shared";
 
 function slugify(name: string): string {
   return name

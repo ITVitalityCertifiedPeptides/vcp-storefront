@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Product } from "@/lib/products";
-import { displayCategory } from "@/lib/products";
+import type { Product } from "@/lib/catalog-shared";
+import { displayCategory } from "@/lib/catalog-shared";
 import { productImages } from "@/lib/product-images";
 import VialIcon from "./VialIcon";
 import AddToCartButton from "./AddToCartButton";
