@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { FileCheck2, ArrowRight } from "lucide-react";
+import { FlaskConical, ArrowRight } from "lucide-react";
 import { getAllCategories, getAllProducts, categorySlug } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
@@ -9,7 +9,7 @@ import ProductCard from "@/components/ProductCard";
 import QualityBadges from "@/components/QualityBadges";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} | Research-Grade Compounds, RUO`,
+  title: `Research Peptides, Third-Party Tested | ${siteConfig.name}`,
   description: siteConfig.description,
   alternates: { canonical: "/" },
 };
@@ -19,14 +19,14 @@ export const metadata: Metadata = {
 // that governs every other page on this site.
 const faqs = [
   {
-    question: "What does Research Use Only (RUO) mean?",
-    answer:
-      "RUO means every compound we sell is intended strictly for laboratory research, not for human or veterinary use, diagnostic use, or any use governed by the FD&C Act. See our RUO Policy page for the full statement.",
-  },
-  {
     question: "Do you provide a Certificate of Analysis (COA)?",
     answer:
-      "Yes. A lot-specific Certificate of Analysis is required from our suppliers for every SKU we carry. Rather than a public archive, each COA is reached by scanning the QR code on your order and vial label, tied to the exact lot you received.",
+      "Yes. Every lot we carry has a lot-specific Certificate of Analysis. Scan the QR code on your order and vial label to pull up the COA for the exact lot you received.",
+  },
+  {
+    question: "How is purity verified?",
+    answer:
+      "Each lot is third-party tested using HPLC and LC-MS, covering identity, purity, and net content. See our Quality Assurance page for the full process.",
   },
   {
     question: "Who can purchase from Vitality Certified Peptides?",
@@ -36,88 +36,64 @@ const faqs = [
   {
     question: "How do I find a compound's CAS number or category?",
     answer:
-      "Every product page lists its CAS number and research category. You can also browse the full catalog by category from the Research Categories page.",
-  },
-];
-
-// "How we describe compounds" comparison - a more concrete substitute for
-// a vague trust paragraph, showing the actual line the site won't cross.
-const languagePairs = [
-  {
-    wont: "“Helps with recovery and performance.”",
-    will: "“Studied in preclinical models for tissue repair.”",
-  },
-  {
-    wont: "“Take 250mcg daily for best results.”",
-    will: "“No dosing guidance for human or animal use, ever.”",
-  },
-  {
-    wont: "“Customers say they feel amazing.”",
-    will: "“Certificate of Analysis on every lot, not testimonials.”",
+      "Every product page lists its CAS number and research category. You can also browse the full catalog by category.",
   },
 ];
 
 export default async function HomePage() {
   const categories = await getAllCategories();
   const products = await getAllProducts();
-  // Lead with what's actually in stock (e.g. your current PO batch) rather
+  // Lead with what's physically in stock (the current PO batch) rather
   // than whatever order the Swell API happens to return - in-stock items
-  // first, everything else after, then take the first 6 for the homepage.
+  // first, everything else after.
   const featured = [...products]
     .sort((a, b) => Number(b.inStock) - Number(a.inStock))
-    .slice(0, 6);
+    .slice(0, 9);
 
   return (
     <div>
       <section className="border-b border-line overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[1fr_1fr]">
           <div className="pt-10 md:pt-14 pb-10 lg:pr-10">
             <span className="inline-flex items-center gap-2 rounded-full border border-gold-deep/30 bg-gold-deep/5 px-3.5 py-1.5 label-eyebrow text-[0.66rem] text-gold-deep mb-6">
-              <FileCheck2 className="h-3.5 w-3.5" aria-hidden />
-              Lot-verified Certificate of Analysis
+              <FlaskConical className="h-3.5 w-3.5" aria-hidden />
+              Third-Party Tested &middot; COA on Every Lot
             </span>
             <h1 className="text-[2.3rem] md:text-[2.9rem] leading-[1.05] font-semibold tracking-tight text-ink max-w-xl">
-              Research compounds,
+              Research-grade peptides,
               <br />
-              documented down to the lot.
+              verified pure.
             </h1>
             <p className="mt-5 text-ink-soft max-w-lg text-lg leading-relaxed">
-              We supply RUO compounds to labs and researchers, with a
-              Certificate of Analysis tied to the exact lot you receive.
+              Every lot is independently tested for identity and purity, and
+              ships with its own Certificate of Analysis. In stock and ready
+              to ship.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-6">
               <Link
                 href="/categories"
                 className="inline-flex items-center gap-2 rounded-full bg-gold-deep text-cream px-7 py-3.5 label-eyebrow text-[0.72rem] hover:bg-ink transition-colors"
               >
-                Browse the Catalog
+                Shop Peptides
                 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
               </Link>
               <Link
-                href="/ruo-policy"
+                href="/quality-assurance"
                 className="label-eyebrow text-[0.72rem] text-ink hover:text-gold-deep transition-colors underline decoration-line underline-offset-4"
               >
-                Read our RUO policy
+                How we test
               </Link>
             </div>
           </div>
-          <div className="relative bg-ink text-cream flex items-end justify-center min-h-[280px] lg:min-h-0 overflow-hidden">
+          <div className="relative bg-ink text-cream min-h-[280px] lg:min-h-0 overflow-hidden">
             <Image
               src="/hero-desktop.jpg"
               alt="Vitality Certified Peptides research compound vials"
               fill
-              sizes="(max-width: 1024px) 100vw, 45vw"
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
               priority
             />
-            <div className="relative mb-8 rounded-sm border border-cream/15 bg-ink/70 backdrop-blur-sm px-5 py-3 text-center">
-              <p className="label-eyebrow text-[0.6rem] text-cream/50 mb-1">
-                Certificate of Analysis
-              </p>
-              <p className="label-eyebrow text-[0.62rem] text-gold">
-                Verified via QR &middot; Lot-specific
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -127,14 +103,17 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
               <div>
-                <p className="label-eyebrow text-gold-deep mb-2">Current Lineup</p>
+                <p className="label-eyebrow text-gold-deep mb-2">Shop</p>
                 <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-                  Featured compounds
+                  In stock now
                 </h2>
               </div>
-              <p className="text-sm text-ink-soft">
-                Showing {featured.length} of {products.length} compounds
-              </p>
+              <Link
+                href="/categories"
+                className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
+              >
+                View all {products.length} products &rarr;
+              </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {featured.map((product) => (
@@ -144,9 +123,9 @@ export default async function HomePage() {
             <div className="mt-8">
               <Link
                 href="/categories"
-                className="inline-flex items-center gap-2 label-eyebrow text-[0.72rem] text-ink hover:text-gold-deep transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-ink text-cream px-6 py-3 label-eyebrow text-[0.7rem] hover:bg-gold-deep transition-colors"
               >
-                View the full catalog
+                Shop the Full Catalog
                 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
               </Link>
             </div>
@@ -154,14 +133,11 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="bg-cream-soft border-y border-line py-16">
+      <section className="bg-cream-soft border-y border-line py-14">
         <div className="max-w-6xl mx-auto px-4 flex items-end justify-between mb-8 gap-4 flex-wrap">
-          <div>
-            <p className="label-eyebrow text-gold-deep mb-2">The Research Catalog</p>
-            <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-              Browse by category
-            </h2>
-          </div>
+          <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
+            Shop by category
+          </h2>
           <Link
             href="/categories"
             className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
@@ -190,48 +166,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-t border-line">
-        <div className="max-w-6xl mx-auto px-4 pt-14 pb-2 text-center">
-          <p className="label-eyebrow text-gold-deep mb-2">Quality Assurance</p>
-          <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-            Verified at every step
-          </h2>
-        </div>
+      <section className="border-b border-line">
         <QualityBadges variant="light" />
-        <div className="max-w-6xl mx-auto px-4 pb-4 text-center">
+        <div className="max-w-6xl mx-auto px-4 pb-6 -mt-2 text-center">
           <Link
             href="/quality-assurance"
             className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
           >
-            See how we verify what we sell &rarr;
+            See how we verify every lot &rarr;
           </Link>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 py-16">
-        <p className="label-eyebrow text-gold-deep mb-2">Our Position</p>
-        <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink mb-8 max-w-xl">
-          Research transparency, not marketing claims
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {languagePairs.map((pair) => (
-            <div key={pair.wont} className="border border-line bg-white p-5">
-              <p className="label-eyebrow text-[0.62rem] text-ink-soft/60 mb-2">
-                We won&apos;t say
-              </p>
-              <p className="text-ink-soft text-sm line-through decoration-line/80 mb-4">
-                {pair.wont}
-              </p>
-              <p className="label-eyebrow text-[0.62rem] text-gold-deep mb-2">We will say</p>
-              <p className="text-ink text-sm leading-relaxed">{pair.will}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-t border-line bg-cream-soft">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <p className="label-eyebrow text-gold-deep mb-2">Questions</p>
+      <section className="bg-cream-soft border-t border-line">
+        <div className="max-w-6xl mx-auto px-4 py-14">
           <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink mb-8">
             Frequently asked questions
           </h2>
