@@ -2,15 +2,22 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { getSwell, type SwellCart } from "@/lib/swell-client";
 import { useCart } from "@/components/CartProvider";
+
+// Flip to true once the Swell payment gateway is configured: buyers will
+// then be sent to Swell's hosted payment checkout (cart.checkout_url)
+// instead of the interim manual-payment checkout at /checkout.
+const HOSTED_CHECKOUT = false;
 
 function money(n?: number) {
   return typeof n === "number" ? `$${n.toFixed(2)}` : "";
 }
 
 export default function CartPage() {
+  const router = useRouter();
   const [cart, setCart] = useState<SwellCart | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -46,7 +53,11 @@ export default function CartPage() {
   }
 
   function checkout() {
-    if (cart?.checkout_url) window.location.href = cart.checkout_url;
+    if (HOSTED_CHECKOUT && cart?.checkout_url) {
+      window.location.href = cart.checkout_url;
+    } else {
+      router.push("/checkout");
+    }
   }
 
   const items = cart?.items || [];
@@ -132,14 +143,15 @@ export default function CartPage() {
           <button
             type="button"
             onClick={checkout}
-            disabled={busy || !cart?.checkout_url}
+            disabled={busy}
             className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gold-deep text-cream px-8 py-4 label-eyebrow text-[0.75rem] hover:bg-ink transition-colors disabled:opacity-60"
           >
             Proceed to Checkout
             <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
           <p className="text-xs text-ink-soft mt-4 text-center">
-            Shipping and taxes are calculated at checkout.
+            No online payment right now: place your order and we contact
+            you to arrange payment before it ships.
           </p>
         </>
       )}
