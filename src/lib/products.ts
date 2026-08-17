@@ -53,7 +53,37 @@ export type Product = {
   // Lowest selectable price when options carry price differences, so
   // cards can show "From $X". Null when there's a single price.
   priceFrom: number | null;
+  // Per-product Made in USA flag, read from the made_in_usa checkbox
+  // content field in Swell (add it under Developer > Models > Products
+  // alongside category/cas_number/ruo_disclaimer). Defaults to TRUE when
+  // the field is absent, since the entire current catalog is US-made;
+  // uncheck the box on any future product that isn't.
+  madeInUsa: boolean;
 };
+
+// Display-layer renames pending a counsel-approved rename of the
+// underlying Swell category values. The raw values (and the URL slugs
+// derived from them) still carry consumer-benefit wording like "Weight
+// Loss" and "Sexual Health"; these display names reframe every category
+// as a research area so the most visible words on the site describe
+// fields of study, not human outcomes. "Accessories" also becomes "Lab
+// Supplies" here.
+const CATEGORY_DISPLAY: Record<string, string> = {
+  "Metabolic/Weight Loss": "Metabolic Research",
+  "Growth Hormone/Endocrine": "Endocrine Research",
+  "Inflammation/Recovery": "Tissue & Inflammation Research",
+  "Cellular Repair/Longevity": "Cellular & Longevity Research",
+  "Immune Support": "Immunology Research",
+  Nootropic: "Neurological Research",
+  "Skin/Cosmetic": "Dermal Research",
+  "Sexual Health": "Reproductive Research",
+  Sleep: "Sleep Research",
+  Accessories: "Lab Supplies",
+};
+
+export function displayCategory(category: string): string {
+  return CATEGORY_DISPLAY[category] || category;
+}
 
 function slugify(name: string): string {
   return name
@@ -96,6 +126,7 @@ type SwellProduct = {
     category?: string;
     cas_number?: string;
     ruo_disclaimer?: string;
+    made_in_usa?: boolean;
   };
   options?: Array<{
     id?: string;
@@ -162,6 +193,7 @@ function mapProduct(p: SwellProduct): Product {
     options,
     subscription,
     priceFrom,
+    madeInUsa: content.made_in_usa !== false,
   };
 }
 
@@ -200,8 +232,17 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
 
 export async function getAllCategories(): Promise<string[]> {
   const products = await getAllProducts();
-  const categories = new Set(products.map((p) => p.category).filter(Boolean));
-  return Array.from(categories);
+  const categories = Array.from(
+    new Set(products.map((p) => p.category).filter(Boolean))
+  );
+  // Lab Supplies (raw value "Accessories") always sorts last: it's the
+  // non-peptide catalog and should trail the research areas everywhere
+  // categories are listed.
+  return categories.sort((a, b) => {
+    if (a === "Accessories") return 1;
+    if (b === "Accessories") return -1;
+    return 0;
+  });
 }
 
 export async function getProductsByCategory(category: string): Promise<Product[]> {

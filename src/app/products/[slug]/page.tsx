@@ -2,9 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllProducts, getProductBySlug, categorySlug } from "@/lib/products";
+import {
+  getAllProducts,
+  getProductBySlug,
+  categorySlug,
+  displayCategory,
+} from "@/lib/products";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
-import { siteConfig, madeInUsa } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
 import { productImages } from "@/lib/product-images";
 import VialIcon from "@/components/VialIcon";
 import RelatedProducts from "@/components/RelatedProducts";
@@ -94,7 +99,7 @@ export default async function ProductPage({
           href={`/categories/${categorySlug(product.category)}`}
           className="hover:text-gold-deep transition-colors"
         >
-          {product.category}
+          {displayCategory(product.category)}
         </Link>{" "}
         <span className="text-line mx-1">/</span> <span className="text-ink">{product.name}</span>
       </nav>
@@ -119,7 +124,7 @@ export default async function ProductPage({
               <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
             </>
           )}
-          {madeInUsa && (
+          {product.madeInUsa && (
             <span className="absolute top-4 left-4 border border-gold/50 text-gold text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
               Made in USA
             </span>
@@ -128,7 +133,9 @@ export default async function ProductPage({
 
         <div>
           {product.category && (
-            <p className="label-eyebrow text-gold-deep mb-2">{product.category}</p>
+            <p className="label-eyebrow text-gold-deep mb-2">
+              {displayCategory(product.category)}
+            </p>
           )}
           <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-4">
             {product.name}
@@ -141,8 +148,12 @@ export default async function ProductPage({
               <dd className="font-medium text-ink">{product.casNumber || "N/A"}</dd>
             </div>
             <div>
-              <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Category</dt>
-              <dd className="font-medium text-ink">{product.category}</dd>
+              <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">
+                Research Area
+              </dt>
+              <dd className="font-medium text-ink">
+                {displayCategory(product.category)}
+              </dd>
             </div>
             <div>
               <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Availability</dt>

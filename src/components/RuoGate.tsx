@@ -56,8 +56,7 @@ export default function RuoGate() {
         <p className="text-sm text-ink-soft leading-relaxed mb-6">
           Products on this site are sold for laboratory research use only
           and are not for human or veterinary use. By entering, you confirm
-          you are 21 or older and a qualified researcher or purchasing on
-          behalf of a laboratory or institution.
+          you are 21 or older and purchasing for research purposes.
         </p>
         <button
           type="button"

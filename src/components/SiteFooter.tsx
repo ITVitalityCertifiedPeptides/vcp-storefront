@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getAllCategories, categorySlug } from "@/lib/products";
+import { getAllCategories, categorySlug, displayCategory } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import FooterSignup from "./FooterSignup";
 
@@ -33,7 +33,7 @@ export default async function SiteFooter() {
           <FooterSignup />
         </div>
         <div>
-          <div className="label-eyebrow text-gold mb-3">Categories</div>
+          <div className="label-eyebrow text-gold mb-3">Research Areas</div>
           <ul className="space-y-2">
             {categories.map((category) => (
               <li key={category}>
@@ -41,7 +41,7 @@ export default async function SiteFooter() {
                   href={`/categories/${categorySlug(category)}`}
                   className="text-cream/70 hover:text-cream transition-colors"
                 >
-                  {category}
+                  {displayCategory(category)}
                 </Link>
               </li>
             ))}

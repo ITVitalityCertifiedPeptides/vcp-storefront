@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Product } from "@/lib/products";
-import { categorySlug } from "@/lib/products";
+import { categorySlug, displayCategory } from "@/lib/products";
 
 // Cross-links a product page to others in the same category. This is the
 // internal-linking structure the GTM doc's SEO plan calls "keyword-mapped
@@ -26,7 +26,7 @@ export default function RelatedProducts({
         Related compounds
       </p>
       <h2 className="font-serif-display text-2xl text-ink mb-6">
-        Also studied in {current.category}
+        Also studied in {displayCategory(current.category)}
       </h2>
       <ul className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {related.map((p) => (
@@ -51,7 +51,7 @@ export default function RelatedProducts({
         href={`/categories/${categorySlug(current.category)}`}
         className="inline-block mt-5 label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
       >
-        View all {current.category} &rarr;
+        View all {displayCategory(current.category)} &rarr;
       </Link>
     </section>
   );

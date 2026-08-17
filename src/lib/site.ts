@@ -1,9 +1,3 @@
-// All current catalog products are synthesized in a US lab. Single switch
-// so sourcing changes don't require hunting badges across the site; if
-// sourcing ever becomes mixed, replace this with a per-product content
-// field in Swell.
-export const madeInUsa = true;
-
 export const siteConfig = {
   name: "Vitality Certified Peptides",
   shortName: "VCP",
@@ -38,7 +32,7 @@ export function productFaqItems(productName: string) {
     {
       question: "Who can purchase from Vitality Certified Peptides?",
       answer:
-        "Products are sold to qualified professionals, laboratories, and research institutions acquiring them solely for in vitro research or laboratory analysis, in compliance with applicable federal, state, and local law.",
+        "Qualified researchers of every kind, including independent researchers. You do not need to represent a lab or institution; every purchase is for laboratory research use only, in compliance with applicable federal, state, and local law.",
     },
   ];
 }
@@ -56,7 +50,7 @@ export const ruoPolicySections = [
   },
   {
     heading: "Buyer eligibility and certification",
-    body: "By placing an order, the buyer represents and certifies that: (a) they are purchasing on behalf of a laboratory, research institution, or other entity qualified to handle research chemicals; (b) the products will be used solely for legitimate research or laboratory purposes; (c) the products will not be resold, repackaged, or distributed for human or veterinary consumption; and (d) they will comply with all applicable federal, state, and local laws governing the purchase, possession, and use of research chemicals in their jurisdiction.",
+    body: "By placing an order, the buyer represents and certifies that: (a) they are a researcher, laboratory, institution, or other party qualified to handle research chemicals, whether independent or affiliated; (b) the products will be used solely for legitimate research or laboratory purposes; (c) the products will not be resold, repackaged, or distributed for human or veterinary consumption; and (d) they will comply with all applicable federal, state, and local laws governing the purchase, possession, and use of research chemicals in their jurisdiction.",
   },
   {
     heading: "No warranty of fitness for human use",

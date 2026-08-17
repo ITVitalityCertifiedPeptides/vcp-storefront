@@ -238,10 +238,9 @@ export default function CheckoutPage() {
               className="mt-1 h-4 w-4 accent-[#a67c24]"
             />
             <span className="text-sm text-ink-soft leading-relaxed">
-              I confirm that I am a qualified researcher or purchasing on
-              behalf of a laboratory or institution, and that all products
-              in this order are for laboratory research use only and will
-              not be used for human or veterinary purposes.
+              I confirm that I am 21 or older, that all products in this
+              order are for laboratory research use only, and that they
+              will not be used for human or veterinary purposes.
             </span>
           </label>
 

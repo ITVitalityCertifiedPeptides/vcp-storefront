@@ -1,11 +1,16 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllCategories, getAllProducts, categorySlug } from "@/lib/products";
+import {
+  getAllCategories,
+  getAllProducts,
+  categorySlug,
+  displayCategory,
+} from "@/lib/products";
 
 export const metadata: Metadata = {
-  title: "Research Categories",
+  title: "Research Areas",
   description:
-    "Browse research-grade compounds by category: metabolic, growth hormone, tissue repair, cellular longevity, immune, nootropic, and more.",
+    "Browse research-grade compounds by research area: metabolic, endocrine, tissue and inflammation, cellular and longevity, immunology, neurological, and more.",
   alternates: { canonical: "/categories" },
 };
 
@@ -17,7 +22,7 @@ export default async function CategoriesPage() {
     <div className="max-w-6xl mx-auto px-4 py-14">
       <p className="label-eyebrow text-gold-deep mb-2">The Research Catalog</p>
       <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">
-        Research categories
+        Research areas
       </h1>
       <p className="text-ink-soft mb-10 max-w-2xl leading-relaxed">
         Compounds grouped by the research area they are most commonly studied
@@ -34,7 +39,7 @@ export default async function CategoriesPage() {
               className="group block rounded-sm border border-line bg-white p-6 hover:border-gold-deep transition-colors"
             >
               <div className="font-serif-display text-lg text-ink group-hover:text-gold-deep transition-colors">
-                {category}
+                {displayCategory(category)}
               </div>
               <div className="text-sm text-ink-soft mt-1">
                 {count} compound{count === 1 ? "" : "s"}

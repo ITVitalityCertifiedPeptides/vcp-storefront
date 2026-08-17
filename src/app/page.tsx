@@ -2,7 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, FlaskConical, Package, Tag } from "lucide-react";
-import { getAllCategories, getAllProducts, categorySlug } from "@/lib/products";
+import {
+  getAllCategories,
+  getAllProducts,
+  categorySlug,
+  displayCategory,
+} from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
 import ProductCard from "@/components/ProductCard";
@@ -52,7 +57,7 @@ const faqs = [
   {
     question: "Who can purchase from Vitality Certified Peptides?",
     answer:
-      "Our products are sold to qualified researchers, laboratories, and institutions purchasing for research purposes only.",
+      "Qualified researchers of every kind, including independent researchers. You do not need to represent a lab or institution; every purchase is for laboratory research use only.",
   },
   {
     question: "How do I find a compound's CAS number or category?",
@@ -119,10 +124,10 @@ export default async function HomePage() {
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
             <Link
-              href="/lab-results"
+              href="/quality-assurance"
               className="label-eyebrow text-[0.72rem] text-cream/80 hover:text-gold transition-colors underline decoration-cream/30 underline-offset-4"
             >
-              See our lab results
+              How we test
             </Link>
           </div>
         </div>
@@ -204,7 +209,7 @@ export default async function HomePage() {
       <section className="py-14">
         <div className="max-w-6xl mx-auto px-4 flex items-end justify-between mb-8 gap-4 flex-wrap">
           <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-            Shop by category
+            Shop by research area
           </h2>
           <Link
             href="/categories"
@@ -220,35 +225,9 @@ export default async function HomePage() {
               href={`/categories/${categorySlug(category)}`}
               className="inline-flex items-center rounded-full border border-line bg-white px-4 py-2.5 font-medium text-ink text-sm hover:border-gold-deep hover:text-gold-deep transition-colors"
             >
-              {category}
+              {displayCategory(category)}
             </Link>
           ))}
-        </div>
-      </section>
-
-      {/* Lab results band: the lot-documentation story, told as a reason to buy. */}
-      <section className="bg-ink text-cream">
-        <div className="max-w-6xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
-          <div>
-            <h2 className="text-2xl md:text-[1.9rem] font-semibold">
-              Every order ships with its lab report.
-            </h2>
-            <p className="mt-4 text-cream/70 leading-relaxed max-w-lg">
-              When your order ships you receive tracking and a digital copy
-              of the third-party Certificate of Analysis for your exact
-              lot: identity, purity, and net content, verified by an
-              independent laboratory.
-            </p>
-          </div>
-          <div className="flex md:justify-end">
-            <Link
-              href="/lab-results"
-              className="inline-flex items-center gap-2 rounded-full bg-gold text-ink px-7 py-3.5 label-eyebrow text-[0.72rem] hover:bg-cream transition-colors"
-            >
-              Browse Lab Results
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
-          </div>
         </div>
       </section>
 

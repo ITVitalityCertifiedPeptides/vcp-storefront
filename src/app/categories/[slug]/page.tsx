@@ -6,6 +6,7 @@ import {
   getProductsByCategory,
   categoryFromSlug,
   categorySlug,
+  displayCategory,
 } from "@/lib/products";
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
@@ -27,8 +28,10 @@ export async function generateMetadata({
   const category = await categoryFromSlug(slug);
   if (!category) return {};
 
-  const title = `${category} Research Compounds`;
-  const description = `Research-grade ${category.toLowerCase()} compounds for laboratory research use only, each with a lot-specific Certificate of Analysis.`;
+  const title = `${displayCategory(category)} Compounds`;
+  const description = `Research-grade compounds in ${displayCategory(
+    category
+  ).toLowerCase()}, for laboratory research use only, each with a lot-specific Certificate of Analysis.`;
 
   return {
     title,
@@ -49,8 +52,11 @@ export default async function CategoryPage({
   const products = await getProductsByCategory(category);
   const jsonLd = breadcrumbSchema([
     { name: "Home", url: siteConfig.url },
-    { name: "Categories", url: `${siteConfig.url}/categories` },
-    { name: category, url: `${siteConfig.url}/categories/${slug}` },
+    { name: "Research Areas", url: `${siteConfig.url}/categories` },
+    {
+      name: displayCategory(category),
+      url: `${siteConfig.url}/categories/${slug}`,
+    },
   ]);
 
   return (
@@ -61,15 +67,17 @@ export default async function CategoryPage({
       />
       <nav className="label-eyebrow text-[0.68rem] text-ink-soft mb-5">
         <Link href="/categories" className="hover:text-gold-deep transition-colors">
-          Categories
+          Research Areas
         </Link>{" "}
         <span className="text-line mx-1">/</span>{" "}
-        <span className="text-ink">{category}</span>
+        <span className="text-ink">{displayCategory(category)}</span>
       </nav>
-      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">{category}</h1>
+      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">
+        {displayCategory(category)}
+      </h1>
       <p className="text-ink-soft mb-10 max-w-2xl">
         {products.length} compound{products.length === 1 ? "" : "s"} in this
-        research category. For laboratory research use only.
+        research area. For laboratory research use only.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
         {products.map((product) => (
