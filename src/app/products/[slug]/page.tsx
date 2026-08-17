@@ -9,6 +9,7 @@ import { productImages } from "@/lib/product-images";
 import VialIcon from "@/components/VialIcon";
 import RelatedProducts from "@/components/RelatedProducts";
 import ProductFaq from "@/components/ProductFaq";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -159,6 +160,14 @@ export default async function ProductPage({
               </dd>
             </div>
           </dl>
+
+          <div className="mb-8">
+            <AddToCartButton
+              productId={product.id}
+              inStock={product.inStock}
+              size="lg"
+            />
+          </div>
 
           <div className="rounded-sm bg-cream-soft border border-line p-4 text-sm text-ink-soft mb-8 leading-relaxed">
             {product.ruoDisclaimer}

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getAllCategories, categorySlug } from "@/lib/products";
+import CartButton from "./CartButton";
 
 export default async function SiteHeader() {
   const categories = await getAllCategories();
@@ -38,13 +39,20 @@ export default async function SiteHeader() {
               </Link>
             ))}
           </nav>
-          <div className="hidden md:flex items-center gap-5 shrink-0">
+          <div className="flex items-center gap-4 shrink-0">
+            <Link
+              href="/lab-results"
+              className="hidden md:inline label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+            >
+              Lab Results
+            </Link>
             <Link
               href="/categories"
-              className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
+              className="hidden md:inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
             >
               Shop Catalog
             </Link>
+            <CartButton />
           </div>
         </div>
         {/* Compact category row for smaller viewports, since the primary

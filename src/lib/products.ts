@@ -2,6 +2,8 @@ import "server-only";
 import swell from "swell-js";
 
 export type Product = {
+  // Swell product id, needed client-side for cart.addItem.
+  id: string;
   sku: string;
   name: string;
   slug: string;
@@ -68,6 +70,7 @@ type SwellProduct = {
 function mapProduct(p: SwellProduct): Product {
   const content = p.content || {};
   return {
+    id: p.id,
     sku: p.sku || "",
     name: p.name,
     slug: slugify(p.name),

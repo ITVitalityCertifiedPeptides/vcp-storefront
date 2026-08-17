@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, FlaskConical, Package, Tag } from "lucide-react";
 import { getAllCategories, getAllProducts, categorySlug } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
@@ -14,6 +14,26 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+const BLEND_SLUGS = ["glow", "klow", "cjc-1295-ipamorelin"];
+
+const benefits = [
+  {
+    icon: FlaskConical,
+    label: "Third-Party Tested",
+    detail: "Every lot verified by an independent lab, COA included.",
+  },
+  {
+    icon: Package,
+    label: "In Stock, Ships from the USA",
+    detail: "What shows in stock is on the shelf and ready to go.",
+  },
+  {
+    icon: Tag,
+    label: "Our Best Price, Up Front",
+    detail: "No coupon codes, no games. The price you see is the price.",
+  },
+];
+
 // Kept strictly to policy/logistics questions - never anything framed as
 // "what does this do" or dosing guidance, per the RUO compliance principle
 // that governs every other page on this site.
@@ -21,7 +41,7 @@ const faqs = [
   {
     question: "Do you provide a Certificate of Analysis (COA)?",
     answer:
-      "Yes. Every lot we carry has a lot-specific Certificate of Analysis. Scan the QR code on your order and vial label to pull up the COA for the exact lot you received.",
+      "Yes. Every lot we carry has a lot-specific Certificate of Analysis. Scan the QR code on your order and vial label, or browse recent reports on our Lab Results page.",
   },
   {
     question: "How is purity verified?",
@@ -43,35 +63,46 @@ const faqs = [
 export default async function HomePage() {
   const categories = await getAllCategories();
   const products = await getAllProducts();
-  // In-stock items lead, everything else follows.
   const featured = [...products]
     .sort((a, b) => Number(b.inStock) - Number(a.inStock))
     .slice(0, 9);
+  const blends = products.filter((p) => BLEND_SLUGS.includes(p.slug));
 
   return (
     <div>
-      {/* Full-bleed hero: the photo runs edge to edge with the copy
-          overlaid on the dark left side of the composition. */}
+      {/* Full-bleed hero with separate desktop and mobile photography. */}
       <section className="relative bg-black text-cream overflow-hidden border-b border-line">
         <Image
           src="/hero-desktop.jpg"
           alt="Vitality Certified Peptides vials"
           fill
           sizes="100vw"
-          className="object-cover object-right"
+          className="object-cover object-right hidden sm:block"
+          priority
+        />
+        <Image
+          src="/hero-mobile.jpg"
+          alt="Vitality Certified Peptides vials"
+          fill
+          sizes="100vw"
+          className="object-cover object-center sm:hidden"
           priority
         />
         <div
-          className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-transparent"
+          className="absolute inset-0 hidden sm:block bg-gradient-to-r from-black/90 via-black/55 to-transparent"
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0 sm:hidden bg-gradient-to-b from-black/85 via-black/40 to-transparent"
           aria-hidden
         />
         <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-32">
           <h1 className="text-[2.4rem] md:text-[3.2rem] leading-[1.05] font-semibold tracking-tight max-w-xl">
-            We sell peptides.
+            Third-party tested research peptides.
           </h1>
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-cream/85">
-            Research-grade compounds supplied to laboratory researchers,
-            in stock and ready to ship.
+            Our best price up front, no codes needed. In stock and ships
+            from the USA.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <Link
@@ -82,12 +113,32 @@ export default async function HomePage() {
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
             <Link
-              href="/ruo-policy"
+              href="/lab-results"
               className="label-eyebrow text-[0.72rem] text-cream/80 hover:text-gold transition-colors underline decoration-cream/30 underline-offset-4"
             >
-              Read our Research Use Only policy
+              See our lab results
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Benefit strip */}
+      <section className="border-b border-line bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {benefits.map((benefit) => (
+            <div key={benefit.label} className="flex items-start gap-3.5">
+              <benefit.icon
+                className="h-5 w-5 text-gold-deep shrink-0 mt-0.5"
+                aria-hidden
+              />
+              <div>
+                <div className="font-medium text-ink text-sm">{benefit.label}</div>
+                <div className="text-xs text-ink-soft mt-1 leading-relaxed">
+                  {benefit.detail}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -123,7 +174,28 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="bg-cream-soft border-y border-line py-14">
+      {blends.length > 0 && (
+        <section className="bg-cream-soft border-y border-line py-14">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="mb-8">
+              <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
+                Research blends
+              </h2>
+              <p className="text-sm text-ink-soft mt-2 max-w-lg">
+                Multi-compound blends, tested and documented the same way as
+                every single compound we carry.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {blends.map((product) => (
+                <ProductCard key={product.slug} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="py-14">
         <div className="max-w-6xl mx-auto px-4 flex items-end justify-between mb-8 gap-4 flex-wrap">
           <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
             Shop by category
@@ -148,6 +220,31 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Lab results band: the per-vial QR story, told as a reason to buy. */}
+      <section className="bg-ink text-cream">
+        <div className="max-w-6xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
+          <div>
+            <h2 className="text-2xl md:text-[1.9rem] font-semibold">
+              Every vial scans to its lab report.
+            </h2>
+            <p className="mt-4 text-cream/70 leading-relaxed max-w-lg">
+              Scan the QR code on your vial and see the third-party
+              Certificate of Analysis for your exact lot: identity, purity,
+              and net content, verified by an independent laboratory.
+            </p>
+          </div>
+          <div className="flex md:justify-end">
+            <Link
+              href="/lab-results"
+              className="inline-flex items-center gap-2 rounded-full bg-gold text-ink px-7 py-3.5 label-eyebrow text-[0.72rem] hover:bg-cream transition-colors"
+            >
+              Browse Lab Results
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-line">
         <div className="max-w-6xl mx-auto px-4 pt-12 pb-0 text-center">
           <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
@@ -165,7 +262,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-cream-soft border-t border-line">
+      <section className="bg-cream-soft">
         <div className="max-w-6xl mx-auto px-4 py-14">
           <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink mb-8">
             Frequently asked questions

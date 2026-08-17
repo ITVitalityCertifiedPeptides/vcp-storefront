@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Product } from "@/lib/products";
 import { productImages } from "@/lib/product-images";
 import VialIcon from "./VialIcon";
+import AddToCartButton from "./AddToCartButton";
 
 // Real product photography is rolling in gradually (see product-images.ts).
 // Any product without a listed image falls back to the drawn vial icon.
@@ -51,9 +52,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {product.price != null && (
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-line">
             <span className="text-ink font-semibold">${product.price.toFixed(2)}</span>
-            <span className="label-eyebrow text-[0.62rem] text-ink-soft group-hover:text-gold-deep transition-colors">
-              View &rarr;
-            </span>
+            <AddToCartButton productId={product.id} inStock={product.inStock} size="sm" />
           </div>
         )}
       </div>
