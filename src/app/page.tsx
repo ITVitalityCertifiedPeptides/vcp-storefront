@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { FileCheck2, ArrowRight } from "lucide-react";
@@ -5,7 +6,6 @@ import { getAllCategories, getAllProducts, categorySlug } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
 import ProductCard from "@/components/ProductCard";
-import VialIcon from "@/components/VialIcon";
 import QualityBadges from "@/components/QualityBadges";
 
 export const metadata: Metadata = {
@@ -60,7 +60,12 @@ const languagePairs = [
 export default async function HomePage() {
   const categories = await getAllCategories();
   const products = await getAllProducts();
-  const featured = products.slice(0, 6);
+  // Lead with what's actually in stock (e.g. your current PO batch) rather
+  // than whatever order the Swell API happens to return - in-stock items
+  // first, everything else after, then take the first 6 for the homepage.
+  const featured = [...products]
+    .sort((a, b) => Number(b.inStock) - Number(a.inStock))
+    .slice(0, 6);
 
   return (
     <div>
@@ -96,18 +101,22 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="relative bg-ink text-cream flex items-center justify-center min-h-[220px] lg:min-h-0">
-            <div className="absolute inset-0 bg-dot-grid text-cream/[0.08]" aria-hidden />
-            <div className="relative flex flex-col items-center gap-5 py-10">
-              <VialIcon className="h-24 w-24 text-gold/70" />
-              <div className="rounded-sm border border-cream/15 bg-cream/[0.04] px-5 py-3 text-center">
-                <p className="label-eyebrow text-[0.6rem] text-cream/50 mb-1">
-                  Certificate of Analysis
-                </p>
-                <p className="label-eyebrow text-[0.62rem] text-gold">
-                  Verified via QR &middot; Lot-specific
-                </p>
-              </div>
+          <div className="relative bg-ink text-cream flex items-end justify-center min-h-[280px] lg:min-h-0 overflow-hidden">
+            <Image
+              src="/hero-desktop.jpg"
+              alt="Vitality Certified Peptides research compound vials"
+              fill
+              sizes="(max-width: 1024px) 100vw, 45vw"
+              className="object-cover"
+              priority
+            />
+            <div className="relative mb-8 rounded-sm border border-cream/15 bg-ink/70 backdrop-blur-sm px-5 py-3 text-center">
+              <p className="label-eyebrow text-[0.6rem] text-cream/50 mb-1">
+                Certificate of Analysis
+              </p>
+              <p className="label-eyebrow text-[0.62rem] text-gold">
+                Verified via QR &middot; Lot-specific
+              </p>
             </div>
           </div>
         </div>
