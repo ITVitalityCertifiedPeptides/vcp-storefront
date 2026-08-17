@@ -102,7 +102,7 @@ export default async function ProductPage({
         {/* Falls back to the drawn vial icon for any product without a real
             photo yet - see ProductCard.tsx for the same treatment used in
             listing grids. */}
-        <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden p-6">
+        <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
           {image ? (
             <Image
               src={image}
@@ -155,7 +155,7 @@ export default async function ProductPage({
                   }`}
                   aria-hidden
                 />
-                {product.inStock ? "In stock" : "Available to order"}
+                {product.inStock ? "In stock" : "Out of stock"}
               </dd>
             </div>
           </dl>
@@ -165,7 +165,7 @@ export default async function ProductPage({
           </div>
 
           <p className="label-eyebrow text-[0.68rem] text-ink-soft">
-            Certificate of Analysis included with every order — verify your
+            Certificate of Analysis included with every order. Verify your
             lot via the QR code on your packing slip and vial label.
           </p>
         </div>

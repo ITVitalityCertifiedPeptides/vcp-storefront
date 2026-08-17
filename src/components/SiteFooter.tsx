@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getAllCategories, categorySlug } from "@/lib/products";
-import { siteConfig, ruoNotice } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
 
 export default async function SiteFooter() {
   const categories = await getAllCategories();
@@ -9,7 +9,7 @@ export default async function SiteFooter() {
 
   return (
     <footer className="bg-ink text-cream mt-20">
-      <div className="max-w-6xl mx-auto px-4 py-14 grid grid-cols-1 md:grid-cols-4 gap-10 text-sm">
+      <div className="max-w-6xl mx-auto px-4 py-14 grid grid-cols-1 md:grid-cols-3 gap-10 text-sm">
         <div>
           <div className="flex items-center gap-3 mb-3">
             <Image
@@ -71,10 +71,6 @@ export default async function SiteFooter() {
             A Certificate of Analysis ships with every lot, accessible via
             the QR code on your order and vial label.
           </p>
-        </div>
-        <div>
-          <div className="label-eyebrow text-gold mb-3">Research Use Only</div>
-          <p className="text-cream/55 text-xs leading-relaxed">{ruoNotice}</p>
         </div>
       </div>
       <div className="border-t border-white/10">

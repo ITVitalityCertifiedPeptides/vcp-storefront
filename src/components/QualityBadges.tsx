@@ -20,16 +20,16 @@ export default function QualityBadges({
     >
       <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
         {qualityAssurancePoints.map((point) => (
-          <div key={point.label} className="flex flex-col items-center text-center gap-2.5">
+          <div key={point.label} className="flex flex-col items-center text-center gap-3">
             <span
-              className={`flex items-center justify-center h-11 w-11 rounded-full border ${
+              className={`flex items-center justify-center h-16 w-16 rounded-full border ${
                 isDark ? "border-gold/40 text-gold" : "border-gold-deep/30 text-gold-deep"
               }`}
             >
-              <point.icon className="h-5 w-5" aria-hidden />
+              <point.icon className="h-7 w-7" aria-hidden />
             </span>
             <span
-              className={`label-eyebrow text-[0.62rem] ${
+              className={`label-eyebrow text-[0.66rem] ${
                 isDark ? "text-cream" : "text-ink"
               }`}
             >

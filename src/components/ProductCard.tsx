@@ -13,7 +13,10 @@ export default function ProductCard({ product }: { product: Product }) {
       href={`/products/${product.slug}`}
       className="group block bg-white border border-line hover:border-gold-deep hover:shadow-[0_8px_24px_-12px_rgba(21,19,15,0.25)] transition-all"
     >
-      <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden p-4">
+      {/* bg-black matches the near-black background of the product
+          photography, so wider compositions (the two-vial blend shots)
+          letterbox invisibly instead of showing gray bars. */}
+      <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
         {image ? (
           <Image
             src={image}
@@ -25,12 +28,9 @@ export default function ProductCard({ product }: { product: Product }) {
         ) : (
           <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />
         )}
-        <span className="absolute top-3 left-3 label-eyebrow text-[0.6rem] text-cream/60">
-          RUO
-        </span>
         {!product.inStock && (
-          <span className="absolute top-3 right-3 bg-gold-deep text-cream text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
-            Order Only
+          <span className="absolute top-3 right-3 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
+            Out of Stock
           </span>
         )}
       </div>

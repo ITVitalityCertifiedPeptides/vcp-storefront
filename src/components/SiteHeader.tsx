@@ -7,12 +7,6 @@ export default async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="bg-ink text-cream text-center py-2 px-4">
-        <p className="label-eyebrow text-[0.68rem] tracking-[0.18em] text-cream/90">
-          Research Use Only <span className="text-gold mx-1.5">&#8226;</span>{" "}
-          Not for human or veterinary use
-        </p>
-      </div>
       <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">
         <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-3 shrink-0">
