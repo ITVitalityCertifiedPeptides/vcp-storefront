@@ -150,9 +150,9 @@ export default function CartPage() {
             <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
           <p className="text-xs text-ink-soft mt-4 text-center">
-            Free US shipping on orders over $250. No online payment right
-            now: place your order and we contact you to arrange payment
-            before it ships.
+            Free US shipping over $250, or over $75 on Scheduled Restock
+            orders. No online payment right now: place your order and we
+            contact you to arrange payment before it ships.
           </p>
         </>
       )}

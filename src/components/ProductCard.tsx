@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/products";
 import { productImages } from "@/lib/product-images";
+import { madeInUsa } from "@/lib/site";
 import VialIcon from "./VialIcon";
 import AddToCartButton from "./AddToCartButton";
 
@@ -28,6 +29,11 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         ) : (
           <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />
+        )}
+        {madeInUsa && (
+          <span className="absolute top-3 left-3 border border-gold/50 text-gold text-[0.58rem] font-semibold uppercase tracking-wide px-2 py-1">
+            Made in USA
+          </span>
         )}
         {!product.inStock && (
           <span className="absolute top-3 right-3 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">

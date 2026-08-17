@@ -1,3 +1,9 @@
+// All current catalog products are synthesized in a US lab. Single switch
+// so sourcing changes don't require hunting badges across the site; if
+// sourcing ever becomes mixed, replace this with a per-product content
+// field in Swell.
+export const madeInUsa = true;
+
 export const siteConfig = {
   name: "Vitality Certified Peptides",
   shortName: "VCP",

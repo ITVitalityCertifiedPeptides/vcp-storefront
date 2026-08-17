@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllProducts, getProductBySlug, categorySlug } from "@/lib/products";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, madeInUsa } from "@/lib/site";
 import { productImages } from "@/lib/product-images";
 import VialIcon from "@/components/VialIcon";
 import RelatedProducts from "@/components/RelatedProducts";
@@ -118,6 +118,11 @@ export default async function ProductPage({
               <div className="absolute inset-0 bg-dot-grid text-cream/[0.06]" aria-hidden />
               <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
             </>
+          )}
+          {madeInUsa && (
+            <span className="absolute top-4 left-4 border border-gold/50 text-gold text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
+              Made in USA
+            </span>
           )}
         </div>
 

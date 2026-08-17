@@ -11,7 +11,9 @@ export default async function SiteHeader() {
     <header className="sticky top-0 z-40">
       <div className="bg-ink text-center py-2 px-4">
         <p className="label-eyebrow text-[0.66rem] tracking-[0.16em] text-gold">
-          Free US shipping on orders over $250
+          Free US shipping over $250
+          <span className="text-cream/40 mx-2">&#8226;</span>
+          Restock orders over $75
         </p>
       </div>
       <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">

@@ -171,7 +171,7 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
                 </select>
                 <p className="text-xs text-ink-soft mt-2">
                   Cancel or change frequency anytime. Free US shipping on
-                  every Restock order.
+                  Restock orders over $75.
                 </p>
               </div>
             )}
