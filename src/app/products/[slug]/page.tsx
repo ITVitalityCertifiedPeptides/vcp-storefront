@@ -102,14 +102,14 @@ export default async function ProductPage({
         {/* Falls back to the drawn vial icon for any product without a real
             photo yet - see ProductCard.tsx for the same treatment used in
             listing grids. */}
-        <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden">
+        <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden p-6">
           {image ? (
             <Image
               src={image}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
+              className="object-contain"
               priority
             />
           ) : (
@@ -118,9 +118,6 @@ export default async function ProductPage({
               <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
             </>
           )}
-          <span className="absolute top-4 left-4 label-eyebrow text-[0.65rem] text-cream/60">
-            RUO
-          </span>
         </div>
 
         <div>

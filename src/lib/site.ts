@@ -21,10 +21,6 @@ export const ruoNotice =
 export function productFaqItems(productName: string) {
   return [
     {
-      question: "Is this product intended for human or veterinary use?",
-      answer: `No. ${productName} is sold strictly for laboratory research use only (RUO). It is not a drug, dietary supplement, cosmetic, or food, and has not been evaluated by the FDA for safety or efficacy in humans or animals.`,
-    },
-    {
       question: "How is the purity of each lot verified?",
       answer: `Every lot of ${productName} we sell ships with a lot-specific Certificate of Analysis (COA) from our supplier, verifying identity and purity for that batch. The COA is reachable via the QR code printed on your order and vial label.`,
     },

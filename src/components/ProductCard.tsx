@@ -13,14 +13,14 @@ export default function ProductCard({ product }: { product: Product }) {
       href={`/products/${product.slug}`}
       className="group block bg-white border border-line hover:border-gold-deep hover:shadow-[0_8px_24px_-12px_rgba(21,19,15,0.25)] transition-all"
     >
-      <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-square bg-ink flex items-center justify-center overflow-hidden p-4">
         {image ? (
           <Image
             src={image}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover"
+            className="object-contain"
           />
         ) : (
           <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />

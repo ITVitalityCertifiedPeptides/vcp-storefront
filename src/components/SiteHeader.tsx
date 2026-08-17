@@ -33,12 +33,12 @@ export default async function SiteHeader() {
               </span>
             </span>
           </Link>
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-5">
             {categories.slice(0, 6).map((category) => (
               <Link
                 key={category}
                 href={`/categories/${categorySlug(category)}`}
-                className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
+                className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
               >
                 {category}
               </Link>

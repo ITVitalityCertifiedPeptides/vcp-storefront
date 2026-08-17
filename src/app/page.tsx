@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { FlaskConical, ShieldCheck, FileCheck2, Microscope, ArrowRight } from "lucide-react";
+import { FileCheck2, ArrowRight } from "lucide-react";
 import { getAllCategories, getAllProducts, categorySlug } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
@@ -13,29 +13,6 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   alternates: { canonical: "/" },
 };
-
-const trustPoints = [
-  {
-    icon: FileCheck2,
-    label: "Certificate of Analysis",
-    detail: "Issued for every lot, verified by QR code on arrival",
-  },
-  {
-    icon: ShieldCheck,
-    label: "RUO Compliant",
-    detail: "Research use only, never marketed for human use",
-  },
-  {
-    icon: Microscope,
-    label: "Qualified Researchers",
-    detail: "Sold to labs & institutions, not consumers",
-  },
-  {
-    icon: FlaskConical,
-    label: "Documented Purity",
-    detail: "Identity and purity confirmed lot by lot",
-  },
-];
 
 // Kept strictly to policy/logistics questions - never anything framed as
 // "what does this do" or dosing guidance, per the RUO compliance principle
@@ -89,23 +66,21 @@ export default async function HomePage() {
     <div>
       <section className="border-b border-line overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="pt-16 md:pt-20 pb-14 lg:pr-10">
-            <span className="inline-flex items-center gap-2 rounded-full border border-gold-deep/30 bg-gold-deep/5 px-3.5 py-1.5 label-eyebrow text-[0.66rem] text-gold-deep mb-7">
+          <div className="pt-10 md:pt-14 pb-10 lg:pr-10">
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold-deep/30 bg-gold-deep/5 px-3.5 py-1.5 label-eyebrow text-[0.66rem] text-gold-deep mb-6">
               <FileCheck2 className="h-3.5 w-3.5" aria-hidden />
               Lot-verified Certificate of Analysis
             </span>
-            <h1 className="text-[2.6rem] md:text-[3.4rem] leading-[1.03] font-semibold tracking-tight text-ink max-w-xl">
+            <h1 className="text-[2.3rem] md:text-[2.9rem] leading-[1.05] font-semibold tracking-tight text-ink max-w-xl">
               Research compounds,
               <br />
               documented down to the lot.
             </h1>
-            <p className="mt-6 text-ink-soft max-w-lg text-lg leading-relaxed">
-              {siteConfig.name} supplies laboratory research use only (RUO)
-              compounds for qualified research settings. Every product is
-              sold strictly for research use, not for human or veterinary
-              consumption.
+            <p className="mt-5 text-ink-soft max-w-lg text-lg leading-relaxed">
+              We supply RUO compounds to labs and researchers, with a
+              Certificate of Analysis tied to the exact lot you receive.
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-6">
+            <div className="mt-7 flex flex-wrap items-center gap-6">
               <Link
                 href="/categories"
                 className="inline-flex items-center gap-2 rounded-full bg-gold-deep text-cream px-7 py-3.5 label-eyebrow text-[0.72rem] hover:bg-ink transition-colors"
@@ -120,14 +95,11 @@ export default async function HomePage() {
                 Read our RUO policy
               </Link>
             </div>
-            <p className="mt-8 text-xs text-ink-soft/70 label-eyebrow tracking-[0.12em]">
-              For Laboratory Research Use Only. Not for human or veterinary use.
-            </p>
           </div>
-          <div className="relative bg-ink text-cream flex items-center justify-center min-h-[280px] lg:min-h-0">
+          <div className="relative bg-ink text-cream flex items-center justify-center min-h-[220px] lg:min-h-0">
             <div className="absolute inset-0 bg-dot-grid text-cream/[0.08]" aria-hidden />
-            <div className="relative flex flex-col items-center gap-5 py-14">
-              <VialIcon className="h-28 w-28 text-gold/70" />
+            <div className="relative flex flex-col items-center gap-5 py-10">
+              <VialIcon className="h-24 w-24 text-gold/70" />
               <div className="rounded-sm border border-cream/15 bg-cream/[0.04] px-5 py-3 text-center">
                 <p className="label-eyebrow text-[0.6rem] text-cream/50 mb-1">
                   Certificate of Analysis
@@ -141,76 +113,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-ink text-cream">
-        <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {trustPoints.map((point) => (
-            <div key={point.label} className="flex items-start gap-3.5">
-              <point.icon className="h-5 w-5 text-gold shrink-0 mt-0.5" aria-hidden />
-              <div>
-                <div className="font-medium text-cream text-sm">{point.label}</div>
-                <div className="text-xs text-cream/55 mt-1 leading-relaxed">{point.detail}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-t border-line">
-        <div className="max-w-6xl mx-auto px-4 pt-12 pb-2 text-center">
-          <p className="label-eyebrow text-gold-deep mb-2">Quality Assurance</p>
-          <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-            Verified at every step
-          </h2>
-        </div>
-        <QualityBadges variant="light" />
-        <div className="max-w-6xl mx-auto px-4 pb-4 text-center">
-          <Link
-            href="/quality-assurance"
-            className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
-          >
-            See how we verify what we sell &rarr;
-          </Link>
-        </div>
-      </section>
-
-      <section className="max-w-6xl mx-auto px-4 py-16">
-        <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
-          <div>
-            <p className="label-eyebrow text-gold-deep mb-2">The Research Catalog</p>
-            <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-              Browse by category
-            </h2>
-          </div>
-          <Link
-            href="/categories"
-            className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
-          >
-            View all &rarr;
-          </Link>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {categories.map((category) => {
-            const count = products.filter((p) => p.category === category).length;
-            return (
-              <Link
-                key={category}
-                href={`/categories/${categorySlug(category)}`}
-                className="group inline-flex items-center gap-2.5 rounded-full border border-line bg-white pl-4 pr-3 py-2.5 hover:border-gold-deep hover:bg-cream-soft transition-colors"
-              >
-                <span className="font-medium text-ink text-sm group-hover:text-gold-deep transition-colors">
-                  {category}
-                </span>
-                <span className="text-xs text-ink-soft bg-cream-soft group-hover:bg-white rounded-full px-2 py-0.5">
-                  {count}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
       {featured.length > 0 && (
-        <section className="bg-cream-soft border-y border-line py-16">
+        <section className="py-14">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
               <div>
@@ -240,6 +144,60 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      <section className="bg-cream-soft border-y border-line py-16">
+        <div className="max-w-6xl mx-auto px-4 flex items-end justify-between mb-8 gap-4 flex-wrap">
+          <div>
+            <p className="label-eyebrow text-gold-deep mb-2">The Research Catalog</p>
+            <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
+              Browse by category
+            </h2>
+          </div>
+          <Link
+            href="/categories"
+            className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
+          >
+            View all &rarr;
+          </Link>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 flex flex-wrap gap-3">
+          {categories.map((category) => {
+            const count = products.filter((p) => p.category === category).length;
+            return (
+              <Link
+                key={category}
+                href={`/categories/${categorySlug(category)}`}
+                className="group inline-flex items-center gap-2.5 rounded-full border border-line bg-white pl-4 pr-3 py-2.5 hover:border-gold-deep hover:bg-cream-soft transition-colors"
+              >
+                <span className="font-medium text-ink text-sm group-hover:text-gold-deep transition-colors">
+                  {category}
+                </span>
+                <span className="text-xs text-ink-soft bg-cream-soft group-hover:bg-white rounded-full px-2 py-0.5">
+                  {count}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="border-t border-line">
+        <div className="max-w-6xl mx-auto px-4 pt-14 pb-2 text-center">
+          <p className="label-eyebrow text-gold-deep mb-2">Quality Assurance</p>
+          <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
+            Verified at every step
+          </h2>
+        </div>
+        <QualityBadges variant="light" />
+        <div className="max-w-6xl mx-auto px-4 pb-4 text-center">
+          <Link
+            href="/quality-assurance"
+            className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
+          >
+            See how we verify what we sell &rarr;
+          </Link>
+        </div>
+      </section>
 
       <section className="max-w-6xl mx-auto px-4 py-16">
         <p className="label-eyebrow text-gold-deep mb-2">Our Position</p>
