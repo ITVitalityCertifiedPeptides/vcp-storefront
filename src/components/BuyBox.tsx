@@ -149,7 +149,8 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
                   Restock &amp; Save{" "}
                   <span className="text-gold-deep">
                     {Math.round(RESTOCK_DISCOUNT * 100)}%
-                  </span>
+                  </span>{" "}
+                  with Autoship
                 </span>
               </span>
               <span className="font-semibold text-ink">

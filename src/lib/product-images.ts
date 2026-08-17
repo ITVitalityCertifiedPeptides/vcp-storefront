@@ -1,17 +1,10 @@
-// Real product photography lands here as it's generated, keyed by product
-// slug. Not every product has a real photo yet - ProductCard and the
-// product detail page fall back to the drawn VialIcon placeholder for any
-// slug not listed below.
+// Real product photography keyed by product slug. Any product without a
+// listed image falls back to the drawn VialIcon placeholder.
 //
-// IMPORTANT - size-on-label vs. site price is unresolved: the label
-// artwork shows a specific size/dosage per vial (e.g. Tirzepatide 30mg,
-// BPC-157 20mg, Retatrutide 30mg, CJC-1295/Ipamorelin 10mg/10mg - these
-// four match the actual PO-2026-001 batch sizes), but each product's
-// single price on the site was set from the GTM doc's "entry-size" pricing
-// table, which may reference a smaller/different size than what's
-// physically in stock. Confirm what size a customer actually receives at
-// the listed price before this goes live - a label that doesn't match
-// what's charged is a real risk, not just a cosmetic mismatch.
+// Catalog structure: one product per compound (no size variants), per
+// Josh's decision 2026-08-17. Additional per-size photo files exist in
+// public/products/ (e.g. bpc-157-20mg.jpg) from an explored-and-rolled-
+// back per-size restructure; they are unused and harmless.
 export const productImages: Record<string, string> = {
   "bpc-157": "/products/bpc-157.jpg",
   "cjc-1295-ipamorelin": "/products/cjc-1295-ipamorelin.jpg",

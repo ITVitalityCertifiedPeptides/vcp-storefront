@@ -77,7 +77,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
             {product.subscription && (
               <p className="text-[0.7rem] text-gold-deep mt-2">
-                Save 10% with Scheduled Restock
+                Restock &amp; Save 10% with Autoship
               </p>
             )}
           </div>

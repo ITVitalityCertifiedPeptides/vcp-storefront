@@ -61,6 +61,18 @@ export default async function SiteHeader() {
             >
               Quality
             </Link>
+            <Link
+              href="/research"
+              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+            >
+              Library
+            </Link>
+            <Link
+              href="/affiliates"
+              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+            >
+              Affiliate Program
+            </Link>
           </nav>
           <div className="flex items-center gap-4 shrink-0">
             <Link
