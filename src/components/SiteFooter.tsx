@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getAllCategories, categorySlug } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
+import FooterSignup from "./FooterSignup";
 
 export default async function SiteFooter() {
   const categories = await getAllCategories();
@@ -29,6 +30,7 @@ export default async function SiteFooter() {
             </span>
           </div>
           <p className="text-cream/60 leading-relaxed">{siteConfig.description}</p>
+          <FooterSignup />
         </div>
         <div>
           <div className="label-eyebrow text-gold mb-3">Categories</div>
@@ -76,8 +78,8 @@ export default async function SiteFooter() {
             </li>
           </ul>
           <p className="text-cream/45 text-xs leading-relaxed mt-4">
-            A Certificate of Analysis ships with every lot, accessible via
-            the QR code on your order and vial label.
+            A digital Certificate of Analysis is delivered with every
+            order&apos;s shipping confirmation.
           </p>
         </div>
       </div>

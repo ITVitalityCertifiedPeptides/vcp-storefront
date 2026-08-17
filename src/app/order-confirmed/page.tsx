@@ -20,7 +20,8 @@ function Confirmation() {
         payment, and your order ships once payment is confirmed.
       </p>
       <p className="text-ink-soft leading-relaxed mb-10 max-w-md mx-auto">
-        A confirmation has been sent to the email address on your order.
+        When it ships, you will receive tracking and a digital copy of the
+        Certificate of Analysis for your lot.
       </p>
       <Link
         href="/categories"

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { User } from "lucide-react";
 import { getAllCategories, categorySlug } from "@/lib/products";
 import CartButton from "./CartButton";
 
@@ -46,16 +47,17 @@ export default async function SiteHeader() {
           </nav>
           <div className="flex items-center gap-4 shrink-0">
             <Link
-              href="/lab-results"
-              className="hidden md:inline label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-            >
-              Lab Results
-            </Link>
-            <Link
               href="/categories"
               className="hidden md:inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
             >
               Shop Catalog
+            </Link>
+            <Link
+              href="/account"
+              className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-line bg-white text-ink hover:border-gold-deep hover:text-gold-deep transition-colors"
+              aria-label="Account"
+            >
+              <User className="h-4.5 w-4.5" aria-hidden />
             </Link>
             <CartButton />
           </div>

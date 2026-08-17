@@ -41,7 +41,7 @@ const faqs = [
   {
     question: "Do you provide a Certificate of Analysis (COA)?",
     answer:
-      "Yes. Every lot we carry has a lot-specific Certificate of Analysis. Scan the QR code on your order and vial label, or browse recent reports on our Lab Results page.",
+      "Yes. Every lot we carry has a lot-specific Certificate of Analysis. When your order ships you receive tracking and a digital copy of the COA for your exact lot.",
   },
   {
     question: "How is purity verified?",
@@ -225,17 +225,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Lab results band: the per-vial QR story, told as a reason to buy. */}
+      {/* Lab results band: the lot-documentation story, told as a reason to buy. */}
       <section className="bg-ink text-cream">
         <div className="max-w-6xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
           <div>
             <h2 className="text-2xl md:text-[1.9rem] font-semibold">
-              Every vial scans to its lab report.
+              Every order ships with its lab report.
             </h2>
             <p className="mt-4 text-cream/70 leading-relaxed max-w-lg">
-              Scan the QR code on your vial and see the third-party
-              Certificate of Analysis for your exact lot: identity, purity,
-              and net content, verified by an independent laboratory.
+              When your order ships you receive tracking and a digital copy
+              of the third-party Certificate of Analysis for your exact
+              lot: identity, purity, and net content, verified by an
+              independent laboratory.
             </p>
           </div>
           <div className="flex md:justify-end">

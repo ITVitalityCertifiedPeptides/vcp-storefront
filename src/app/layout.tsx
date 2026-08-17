@@ -5,6 +5,7 @@ import { organizationSchema, websiteSchema } from "@/lib/schema";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CartProvider from "@/components/CartProvider";
+import RuoGate from "@/components/RuoGate";
 
 // Re-fetch product/category data from Swell at most once per hour instead
 // of only on a fresh deploy, so price/stock/copy edits made in the Swell
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           />
         ))}
         <CartProvider>
+          <RuoGate />
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />

@@ -9,7 +9,7 @@ import { productImages } from "@/lib/product-images";
 import VialIcon from "@/components/VialIcon";
 import RelatedProducts from "@/components/RelatedProducts";
 import ProductFaq from "@/components/ProductFaq";
-import AddToCartButton from "@/components/AddToCartButton";
+import BuyBox from "@/components/BuyBox";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -139,14 +139,6 @@ export default async function ProductPage({
               <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Category</dt>
               <dd className="font-medium text-ink">{product.category}</dd>
             </div>
-            {product.price != null && (
-              <div>
-                <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Price</dt>
-                <dd className="font-serif-display text-lg text-ink">
-                  ${product.price.toFixed(2)}
-                </dd>
-              </div>
-            )}
             <div>
               <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Availability</dt>
               <dd className="font-medium text-ink flex items-center gap-1.5">
@@ -161,22 +153,23 @@ export default async function ProductPage({
             </div>
           </dl>
 
-          <div className="mb-8">
-            <AddToCartButton
-              productId={product.id}
-              inStock={product.inStock}
-              size="lg"
-            />
-          </div>
+          <BuyBox
+            product={{
+              id: product.id,
+              price: product.price,
+              inStock: product.inStock,
+              options: product.options,
+              subscription: product.subscription,
+            }}
+          />
 
-          <div className="rounded-sm bg-cream-soft border border-line p-4 text-sm text-ink-soft mb-8 leading-relaxed">
-            {product.ruoDisclaimer}
-          </div>
-
-          <p className="label-eyebrow text-[0.68rem] text-ink-soft">
-            Certificate of Analysis included with every order. Verify your
-            lot via the QR code on your packing slip and vial label.
+          <p className="label-eyebrow text-[0.68rem] text-ink-soft mb-3">
+            When your order ships you receive tracking and a digital copy
+            of the Certificate of Analysis for your lot.
           </p>
+          {product.ruoDisclaimer && (
+            <p className="text-xs text-ink-soft/70">{product.ruoDisclaimer}</p>
+          )}
         </div>
       </div>
     </div>

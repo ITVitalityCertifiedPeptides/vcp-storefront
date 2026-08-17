@@ -1,6 +1,28 @@
 import "server-only";
 import swell from "swell-js";
 
+// NOTE: Swell option value prices are ADDITIVE - value.price is added to
+// the product's base price when that value is selected.
+export type ProductOptionValue = {
+  id: string;
+  name: string;
+  price: number | null;
+};
+
+export type ProductOption = {
+  id: string;
+  name: string;
+  values: ProductOptionValue[];
+};
+
+// A subscription plan configured on the product's purchase options in the
+// Swell admin (e.g. "Every 30 days"). When plans exist, the storefront
+// shows the Restock & Save purchase toggle automatically.
+export type SubscriptionPlan = {
+  id: string;
+  name: string;
+};
+
 export type Product = {
   // Swell product id, needed client-side for cart.addItem.
   id: string;
@@ -21,6 +43,16 @@ export type Product = {
   // here or get a page generated for it. stock_purchasable staying true
   // even at 0 stock is what keeps a product listed with pricing.
   inStock: boolean;
+  // Size (or other) options configured in Swell. Empty array = single
+  // variant product; cards can Add to Cart directly. Non-empty = the
+  // product page shows a selector and cards say "Select Options".
+  options: ProductOption[];
+  // Subscription plans if Scheduled Restock is configured for this
+  // product in Swell; null when not offered.
+  subscription: SubscriptionPlan[] | null;
+  // Lowest selectable price when options carry price differences, so
+  // cards can show "From $X". Null when there's a single price.
+  priceFrom: number | null;
 };
 
 function slugify(name: string): string {
@@ -65,10 +97,55 @@ type SwellProduct = {
     cas_number?: string;
     ruo_disclaimer?: string;
   };
+  options?: Array<{
+    id?: string;
+    name?: string;
+    active?: boolean;
+    values?: Array<{ id?: string; name?: string; price?: number | null }>;
+  }>;
+  purchase_options?: {
+    subscription?: {
+      active?: boolean;
+      plans?: Array<{ id?: string; name?: string; active?: boolean }>;
+    };
+  };
 };
 
 function mapProduct(p: SwellProduct): Product {
   const content = p.content || {};
+
+  const options: ProductOption[] = (p.options || [])
+    .filter((o) => o.active !== false && o.name && (o.values?.length || 0) > 0)
+    .map((o) => ({
+      id: o.id || o.name!,
+      name: o.name!,
+      values: (o.values || [])
+        .filter((v) => v.name)
+        .map((v) => ({
+          id: v.id || v.name!,
+          name: v.name!,
+          price: v.price ?? null,
+        })),
+    }));
+
+  const plans = (p.purchase_options?.subscription?.plans || []).filter(
+    (plan) => plan.active !== false && plan.id
+  );
+  const subscription: SubscriptionPlan[] | null =
+    p.purchase_options?.subscription?.active !== false && plans.length > 0
+      ? plans.map((plan) => ({ id: plan.id!, name: plan.name || "Recurring" }))
+      : null;
+
+  // Option value prices are additive on top of the base price; the
+  // cheapest selectable configuration is base + the lowest value delta.
+  const base = p.price ?? null;
+  let priceFrom: number | null = null;
+  if (base != null && options.length > 0) {
+    const deltas = options[0].values.map((v) => v.price ?? 0);
+    const hasSpread = deltas.some((d) => d !== 0);
+    if (hasSpread) priceFrom = base + Math.min(...deltas);
+  }
+
   return {
     id: p.id,
     sku: p.sku || "",
@@ -77,11 +154,14 @@ function mapProduct(p: SwellProduct): Product {
     category: content.category || "",
     casNumber: content.cas_number || "",
     description: p.description || "",
-    price: p.price ?? null,
+    price: base,
     ruoDisclaimer: content.ruo_disclaimer || "",
     stockLevel: p.stock_level || 0,
     stockStatus: p.stock_status ?? null,
     inStock: p.stock_status === "in_stock",
+    options,
+    subscription,
+    priceFrom,
   };
 }
 

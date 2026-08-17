@@ -65,8 +65,8 @@ export default async function LabResultsPage() {
         Certificates of Analysis for lots we have carried.
       </p>
       <p className="text-ink-soft leading-relaxed mb-10">
-        Have a vial in hand? Scan the QR code on the label and it takes you
-        straight to the report for your exact lot.
+        When your order ships you receive tracking and a digital copy of
+        the Certificate of Analysis for your exact lot.
       </p>
 
       {lots.length === 0 ? (

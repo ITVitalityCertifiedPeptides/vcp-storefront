@@ -50,9 +50,30 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
         {product.price != null && (
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-line">
-            <span className="text-ink font-semibold">${product.price.toFixed(2)}</span>
-            <AddToCartButton productId={product.id} inStock={product.inStock} size="sm" />
+          <div className="mt-4 pt-3 border-t border-line">
+            <div className="flex items-center justify-between">
+              <span className="text-ink font-semibold">
+                {product.priceFrom != null
+                  ? `From $${product.priceFrom.toFixed(2)}`
+                  : `$${product.price.toFixed(2)}`}
+              </span>
+              {product.options.length > 0 ? (
+                <span className="inline-flex items-center justify-center rounded-full px-3.5 py-1.5 label-eyebrow text-[0.6rem] bg-gold-deep text-cream group-hover:bg-ink transition-colors">
+                  Select Options
+                </span>
+              ) : (
+                <AddToCartButton
+                  productId={product.id}
+                  inStock={product.inStock}
+                  size="sm"
+                />
+              )}
+            </div>
+            {product.subscription && (
+              <p className="text-[0.7rem] text-gold-deep mt-2">
+                Save 10% with Scheduled Restock
+              </p>
+            )}
           </div>
         )}
       </div>

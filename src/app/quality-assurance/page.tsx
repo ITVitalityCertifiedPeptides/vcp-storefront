@@ -20,9 +20,9 @@ export default function QualityAssurancePage() {
         </h1>
         <p className="text-ink-soft leading-relaxed mb-8">
           Every lot we sell is independently tested before it reaches our
-          inventory, and the paperwork travels with it: scan the QR code on
-          your vial and you get the Certificate of Analysis for that exact
-          lot. Here is what stands behind every order.
+          inventory, and the paperwork travels with it: when your order
+          ships you receive a digital copy of the Certificate of Analysis
+          for your exact lot. Here is what stands behind every order.
         </p>
       </div>
 

@@ -22,7 +22,7 @@ export function productFaqItems(productName: string) {
   return [
     {
       question: "How is the purity of each lot verified?",
-      answer: `Every lot of ${productName} we sell ships with a lot-specific Certificate of Analysis (COA) from our supplier, verifying identity and purity for that batch. The COA is reachable via the QR code printed on your order and vial label.`,
+      answer: `Every lot of ${productName} we sell has a lot-specific Certificate of Analysis (COA) verifying identity and purity for that batch. A digital copy is sent with your tracking when your order ships.`,
     },
     {
       question: "What comes with an order?",

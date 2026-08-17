@@ -79,7 +79,7 @@ export default function AffiliatesPage() {
       </h2>
       <p className="text-ink-soft leading-relaxed mb-4">
         Commission is only earned on referrals from a real visitor genuinely
-        choosing to click an affiliate's link. Every affiliate agrees to the
+        choosing to click an affiliate&apos;s link. Every affiliate agrees to the
         following before receiving a referral link:
       </p>
       <ul className="space-y-3 mb-10">
