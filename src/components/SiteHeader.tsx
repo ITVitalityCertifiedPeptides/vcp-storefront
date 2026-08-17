@@ -65,7 +65,7 @@ export default async function SiteHeader() {
               href="/research"
               className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
             >
-              Library
+              Research Library
             </Link>
             <Link
               href="/affiliates"
