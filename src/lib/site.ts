@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Vitality Certified Peptides",
   shortName: "VCP",
-  // Placeholder until the GoDaddy domain is connected to this Vercel deployment.
-  // Update this the moment the real domain goes live — it feeds canonical URLs,
-  // the sitemap, and JSON-LD, all of which matter for SEO.
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://vitalitycertifiedpeptides.com",
+  // Canonical host is www (the apex 308-redirects to it in Vercel), so
+  // canonical URLs, the sitemap, and JSON-LD must all use www — pointing
+  // them at the redirecting apex wastes crawl signals.
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.vitalitycertifiedpeptides.com",
   description:
     "Research-grade peptides and compounds for laboratory research use only. Full Certificate of Analysis on every lot. Not for human or veterinary use.",
   legalName: "Vitality Certified Peptides",

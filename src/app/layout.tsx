@@ -37,6 +37,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // Google Search Console ownership verification (URL-prefix property
+  // https://www.vitalitycertifiedpeptides.com, added 2026-08-17).
+  verification: {
+    google: "_zRu7_n1RDBcWfCa0lz1qmrUJCLG_OMsXN7p0YCPtAQ",
+  },
 };
 
 export const viewport = {
