@@ -7,6 +7,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CartProvider from "@/components/CartProvider";
 import RuoGate from "@/components/RuoGate";
+import TapfiliateTracker from "@/components/TapfiliateTracker";
 
 // Re-fetch product/category data from Swell at most once per hour instead
 // of only on a fresh deploy, so price/stock/copy edits made in the Swell
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteFooter />
         </CartProvider>
         <Analytics />
+        <TapfiliateTracker />
       </body>
     </html>
   );

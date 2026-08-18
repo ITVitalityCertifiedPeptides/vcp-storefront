@@ -12,6 +12,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getSwell, type SwellCart } from "@/lib/swell-client";
 import { useCart } from "@/components/CartProvider";
+import { trackConversion } from "@/lib/tapfiliate";
 
 function money(n?: number) {
   return typeof n === "number" ? `$${n.toFixed(2)}` : "";
@@ -95,9 +96,19 @@ export default function CheckoutPage() {
       });
       const order = (await swell.cart.submitOrder()) as unknown as {
         number?: string | number;
+        id?: string;
+        sub_total?: number;
       } | null;
-      await refresh();
+      // Report the referral conversion to Tapfiliate: order number,
+      // product subtotal (commission excludes shipping/tax), and the
+      // buyer's email as customer_id for lifetime/recurring attribution.
       const number = order?.number ? String(order.number) : "";
+      trackConversion(
+        number || order?.id || "",
+        order?.sub_total ?? cart?.sub_total ?? 0,
+        form.email
+      );
+      await refresh();
       router.push(`/order-confirmed${number ? `?number=${encodeURIComponent(number)}` : ""}`);
     } catch {
       setError(

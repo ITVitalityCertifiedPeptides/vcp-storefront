@@ -133,12 +133,19 @@ export default function AffiliatesPage() {
         ))}
       </ul>
 
-      <div className="rounded-sm bg-cream-soft border border-line px-5 py-4">
-        <p className="label-eyebrow text-[0.65rem] text-ink-soft leading-relaxed">
-          Enrollment opens at launch. Agreement to the standards above will
-          be a required step in the signup flow once the Tapfiliate
-          integration is live, not just a page you read.
+      <div className="rounded-sm bg-cream-soft border border-line px-5 py-5 text-center">
+        <p className="text-ink-soft leading-relaxed mb-4">
+          Ready to partner with us? Agreement to the standards above is a
+          required step of the application.
         </p>
+        <a
+          href="https://vitalitycertifiedpeptides.tapfiliate.com/programs/vitalitycertifiedpeptides/signup/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center rounded-full bg-gold-deep text-cream px-8 py-3.5 label-eyebrow text-[0.72rem] hover:bg-ink transition-colors"
+        >
+          Apply to the Program
+        </a>
       </div>
     </div>
   );
