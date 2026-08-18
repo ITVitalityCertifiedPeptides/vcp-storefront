@@ -7,11 +7,6 @@ import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { getSwell, type SwellCart } from "@/lib/swell-client";
 import { useCart } from "@/components/CartProvider";
 
-// Flip to true once the Swell payment gateway is configured: buyers will
-// then be sent to Swell's hosted payment checkout (cart.checkout_url)
-// instead of the interim manual-payment checkout at /checkout.
-const HOSTED_CHECKOUT = false;
-
 function money(n?: number) {
   return typeof n === "number" ? `$${n.toFixed(2)}` : "";
 }
@@ -52,12 +47,12 @@ export default function CartPage() {
     }
   }
 
+  // Checkout is invoice-based: the order is created in Swell as pending
+  // payment and the buyer receives an invoice with payment details. Card
+  // (PaymentCloud) and crypto (BitPay) become selectable in /checkout once
+  // those merchant accounts are approved.
   function checkout() {
-    if (HOSTED_CHECKOUT && cart?.checkout_url) {
-      window.location.href = cart.checkout_url;
-    } else {
-      router.push("/checkout");
-    }
+    router.push("/checkout");
   }
 
   const items = cart?.items || [];
@@ -151,8 +146,8 @@ export default function CartPage() {
           </button>
           <p className="text-xs text-ink-soft mt-4 text-center">
             Free US shipping over $250, or over $75 on Scheduled Restock
-            orders. No online payment right now: place your order and we
-            contact you to arrange payment before it ships.
+            orders. Checkout is invoice-based: place your order and our
+            team sends your invoice and payment details.
           </p>
         </>
       )}

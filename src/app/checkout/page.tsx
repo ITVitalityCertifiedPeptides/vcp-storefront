@@ -1,10 +1,12 @@
 "use client";
 
-// Interim checkout: collects contact + shipping details and submits the
-// order to Swell as UNPAID (payment_pending). We then contact the buyer to
-// collect payment before fulfilling. When the payment gateway is live in
-// Swell, set HOSTED_CHECKOUT = true in src/app/cart/page.tsx and buyers
-// will be sent to Swell's hosted payment checkout instead of this page.
+// Invoice-based checkout: collects contact + shipping details and submits
+// the order to Swell as UNPAID (pending payment). Our team then sends the
+// buyer an invoice (Zelle / Venmo / Cash App / Wise) and the order ships
+// once payment is confirmed. Card (PaymentCloud) and crypto (BitPay) are
+// shown as Coming Soon below until those merchant accounts are approved;
+// when they go live they become selectable here at the SAME listed price
+// (no payment-method discounts anywhere in this flow).
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -87,29 +89,36 @@ export default function CheckoutPage() {
           phone: form.phone,
         },
         comments:
-          "RUO attestation accepted at checkout. Payment to be collected by phone/email (interim manual checkout).",
+          "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Venmo / Cash App / Wise). Ship only after payment is confirmed.",
         metadata: {
           ruo_attestation: true,
           ruo_attested_at: new Date().toISOString(),
-          manual_payment: true,
+          payment_method: "invoice",
+          invoice_pending: true,
         },
       });
       const order = (await swell.cart.submitOrder()) as unknown as {
         number?: string | number;
         id?: string;
         sub_total?: number;
+        grand_total?: number;
       } | null;
       // Report the referral conversion to Tapfiliate: order number,
       // product subtotal (commission excludes shipping/tax), and the
       // buyer's email as customer_id for lifetime/recurring attribution.
       const number = order?.number ? String(order.number) : "";
+      const total = order?.grand_total ?? cart?.grand_total ?? cart?.sub_total ?? 0;
       trackConversion(
         number || order?.id || "",
         order?.sub_total ?? cart?.sub_total ?? 0,
         form.email
       );
       await refresh();
-      router.push(`/order-confirmed${number ? `?number=${encodeURIComponent(number)}` : ""}`);
+      const params = new URLSearchParams();
+      if (number) params.set("number", number);
+      if (total) params.set("total", total.toFixed(2));
+      const qs = params.toString();
+      router.push(`/order-confirmed${qs ? `?${qs}` : ""}`);
     } catch {
       setError(
         "We couldn't place the order. Please try again, or email us and we'll take your order directly."
@@ -128,9 +137,8 @@ export default function CheckoutPage() {
         Checkout
       </h1>
       <p className="text-ink-soft leading-relaxed mb-10">
-        No payment is collected online right now. Place your order and we
-        will contact you within one business day to arrange payment before
-        it ships.
+        Checkout is invoice-based. Place your order and our team sends
+        your invoice with payment instructions. Nothing is charged online.
       </p>
 
       {loading ? (
@@ -166,6 +174,63 @@ export default function CheckoutPage() {
               </span>
               <span className="font-serif-display text-lg text-ink">
                 {money(cart?.sub_total ?? cart?.grand_total)}
+              </span>
+            </div>
+          </div>
+
+          <p className="label-eyebrow text-[0.7rem] text-gold-deep mb-3">
+            Payment Method
+          </p>
+          <div className="border border-line rounded-sm divide-y divide-line mb-8">
+            <label className="flex items-start gap-3 p-4 bg-cream-soft/60">
+              <input
+                type="radio"
+                name="payment-method"
+                checked
+                readOnly
+                className="mt-1 h-4 w-4 accent-[#a67c24]"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">
+                  Pay by Invoice
+                </span>
+                <span className="block text-xs text-ink-soft mt-1 leading-relaxed">
+                  Place your order now. We send your invoice with payment
+                  instructions for Zelle, Venmo, Cash App, or Wise. Your
+                  order ships once payment is confirmed.
+                </span>
+              </span>
+            </label>
+            <div className="flex items-start gap-3 p-4 opacity-50" aria-disabled>
+              <input
+                type="radio"
+                name="payment-method"
+                disabled
+                className="mt-1 h-4 w-4"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">
+                  Credit / Debit Card{" "}
+                  <span className="ml-2 inline-block rounded-full border border-line px-2 py-0.5 label-eyebrow text-[0.55rem] text-ink-soft align-middle">
+                    Coming Soon
+                  </span>
+                </span>
+              </span>
+            </div>
+            <div className="flex items-start gap-3 p-4 opacity-50" aria-disabled>
+              <input
+                type="radio"
+                name="payment-method"
+                disabled
+                className="mt-1 h-4 w-4"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">
+                  Cryptocurrency{" "}
+                  <span className="ml-2 inline-block rounded-full border border-line px-2 py-0.5 label-eyebrow text-[0.55rem] text-ink-soft align-middle">
+                    Coming Soon
+                  </span>
+                </span>
               </span>
             </div>
           </div>
@@ -266,12 +331,12 @@ export default function CheckoutPage() {
             disabled={submitting}
             className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gold-deep text-cream px-8 py-4 label-eyebrow text-[0.75rem] hover:bg-ink transition-colors disabled:opacity-60"
           >
-            {submitting ? "Placing Order..." : "Place Order"}
+            {submitting ? "Placing Order..." : "Complete Order"}
             <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
           <p className="text-xs text-ink-soft mt-4 text-center">
-            We will contact you to arrange payment and confirm shipping.
-            Nothing is charged online.
+            Nothing is charged online. Your invoice with payment
+            instructions follows by email.
           </p>
         </form>
       )}
