@@ -6,18 +6,11 @@ import { productImages } from "@/lib/product-images";
 import VialIcon from "./VialIcon";
 import QuickAdd from "./QuickAdd";
 
-// Product card for the shop grids. The main shot is the product's hero;
-// when the product has additional gallery images (molecule cards), small
-// thumbnails are overlaid in the bottom left corner so shoppers can see
-// there is more to look at before clicking into the product page.
+// Product card for the shop grids: the hero shot only, kept clean.
+// Additional gallery images (molecule cards) live on the product page,
+// browsable with arrows and the thumbnail strip.
 export default function ProductCard({ product }: { product: Product }) {
-  const gallery = product.images?.length
-    ? product.images
-    : productImages[product.slug]
-      ? [productImages[product.slug]]
-      : [];
-  const image = gallery[0];
-  const extras = gallery.slice(1, 4);
+  const image = product.images?.[0] || productImages[product.slug];
   return (
     <Link
       href={`/products/${product.slug}`}
@@ -49,26 +42,6 @@ export default function ProductCard({ product }: { product: Product }) {
           <span className="absolute top-1 left-1 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
             Out of Stock
           </span>
-        )}
-        {/* Mini previews of the additional gallery images (molecule
-            cards). Purely a visual cue; the whole card is one link. */}
-        {extras.length > 0 && (
-          <div className="absolute bottom-1.5 left-1.5 flex gap-1" aria-hidden>
-            {extras.map((src) => (
-              <span
-                key={src}
-                className="relative block h-12 w-8 overflow-hidden rounded-[2px] border border-cream/25 bg-black/70"
-              >
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="32px"
-                  className="object-cover"
-                />
-              </span>
-            ))}
-          </div>
         )}
       </div>
       <div className="p-5">
