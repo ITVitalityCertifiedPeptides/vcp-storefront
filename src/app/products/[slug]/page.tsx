@@ -78,7 +78,21 @@ function galleryImages(slug: string): string[] {
   };
   const hero = find(`${slug}-hero`);
   const legacy = find(slug);
-  const molecule = find(`${slug}-molecule`);
+  // Molecule cards are per COMPOUND, shared by every size of that product
+  // (e.g. bpc-157-molecule.png serves bpc-157-5mg/10mg/20mg). Try the full
+  // slug first, then strip trailing size tokens (5mg, 10ml, 10000iu) to
+  // reach the compound base. Only size-shaped tokens are stripped, so a
+  // blend like bpc-157-tb-500-10mg-10mg resolves to bpc-157-tb-500 and can
+  // never fall through to a component compound's card.
+  let molecule = find(`${slug}-molecule`);
+  if (!molecule) {
+    const parts = slug.split("-");
+    while (parts.length > 1 && /^\d+(mg|ml|iu|mcg)$/i.test(parts[parts.length - 1])) {
+      parts.pop();
+      molecule = find(`${parts.join("-")}-molecule`);
+      if (molecule) break;
+    }
+  }
   const vial = find(`${slug}-vial`);
   const found = [hero, hero ? null : legacy, molecule, vial].filter(
     (x): x is string => Boolean(x)
