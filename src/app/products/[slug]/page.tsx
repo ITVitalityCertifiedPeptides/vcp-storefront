@@ -55,6 +55,21 @@ export async function generateMetadata({
   };
 }
 
+// Blend gallery composition: a blend product shows the molecule/sequence
+// card of EACH component compound as additional gallery images (matching
+// the Blend Profile order on its hero card). Keys are size-stripped slug
+// bases; values are the component compounds' slug bases. Components with
+// no molecule card yet (e.g. CJC-1295, Tesamorelin) are skipped
+// automatically and appear as soon as their card lands in
+// public/products.
+const BLEND_MOLECULE_COMPONENTS: Record<string, string[]> = {
+  "bpc-157-tb-500": ["bpc-157", "tb-500"],
+  "cjc-1295-ipamorelin": ["cjc-1295", "ipamorelin"],
+  "tesamorelin-ipamorelin": ["tesamorelin", "ipamorelin"],
+  klow: ["ghk-cu", "kpv", "bpc-157", "tb-500"],
+  glow: ["ghk-cu", "bpc-157", "tb-500"],
+};
+
 // Gallery discovery: files in public/products named by convention
 // (<slug>-hero, <slug>-molecule, plus legacy <slug> and optional
 // <slug>-vial; .jpg/.png/.webp) appear automatically. The standard set is
@@ -78,23 +93,31 @@ function galleryImages(slug: string): string[] {
   };
   const hero = find(`${slug}-hero`);
   const legacy = find(slug);
-  // Molecule cards are per COMPOUND, shared by every size of that product
-  // (e.g. bpc-157-molecule.png serves bpc-157-5mg/10mg/20mg). Try the full
-  // slug first, then strip trailing size tokens (5mg, 10ml, 10000iu) to
-  // reach the compound base. Only size-shaped tokens are stripped, so a
-  // blend like bpc-157-tb-500-10mg-10mg resolves to bpc-157-tb-500 and can
-  // never fall through to a component compound's card.
-  let molecule = find(`${slug}-molecule`);
-  if (!molecule) {
-    const parts = slug.split("-");
-    while (parts.length > 1 && /^\d+(mg|ml|iu|mcg)$/i.test(parts[parts.length - 1])) {
-      parts.pop();
-      molecule = find(`${parts.join("-")}-molecule`);
-      if (molecule) break;
+  // Strip trailing size tokens (5mg, 10ml, 10000iu) to reach the compound
+  // base, e.g. bpc-157-5mg -> bpc-157, klow-80mg -> klow. Only size-shaped
+  // tokens are stripped, so bpc-157-tb-500-10mg-10mg resolves to
+  // bpc-157-tb-500 and can never collapse into a component compound.
+  const parts = slug.split("-");
+  while (parts.length > 1 && /^\d+(mg|ml|iu|mcg)$/i.test(parts[parts.length - 1])) {
+    parts.pop();
+  }
+  const base = parts.join("-");
+  // Molecule cards: single compounds get their own card, shared by every
+  // size (bpc-157-molecule.png serves bpc-157-5mg/10mg/20mg). Blends get
+  // one card PER COMPONENT compound, in blend-profile order.
+  const molecules: string[] = [];
+  const blendComponents = BLEND_MOLECULE_COMPONENTS[base];
+  if (blendComponents) {
+    for (const component of blendComponents) {
+      const card = find(`${component}-molecule`);
+      if (card) molecules.push(card);
     }
+  } else {
+    const single = find(`${slug}-molecule`) || find(`${base}-molecule`);
+    if (single) molecules.push(single);
   }
   const vial = find(`${slug}-vial`);
-  const found = [hero, hero ? null : legacy, molecule, vial].filter(
+  const found = [hero, hero ? null : legacy, ...molecules, vial].filter(
     (x): x is string => Boolean(x)
   );
   // Fallback to the static map for any legacy filename mismatch.

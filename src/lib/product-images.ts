@@ -3,11 +3,8 @@
 // page's gallery does). Catalog structure: one individual product per
 // size, so keys are per-size slugs.
 //
-// 2026-08-19: the single-compound batch landed. Every entry pointing at a
-// "-hero.jpg" is the new 2:3 (1024x1536) hero standard. Entries still
-// pointing at a plain "<slug>.jpg" are the old square shots kept only
-// until Josh's next batch (blends, HCG, Pinealon, N-Acetyl Selank,
-// Glutathione, BAC Water, and the sizes called out below) replaces them.
+// 2026-08-19: full catalog on the 2:3 (1024x1536) hero standard. The old
+// square shots are fully retired.
 export const productImages: Record<string, string> = {
   // ---- New 2:3 heroes (single-compound batch, 2026-08-19) ----
   "5-amino-1mq-10mg": "/products/5-amino-1mq-10mg-hero.jpg",
@@ -55,19 +52,19 @@ export const productImages: Record<string, string> = {
   "cjc-1295-ipamorelin-5mg-5mg": "/products/cjc-1295-ipamorelin-5mg-5mg-hero.jpg",
   "cjc-1295-ipamorelin-10mg-10mg": "/products/cjc-1295-ipamorelin-10mg-10mg-hero.jpg",
   "bacteriostatic-water-10ml": "/products/bacteriostatic-water-10ml-hero.jpg",
-
-  // ---- Old square shots, awaiting replacement in the next batch ----
-  "tesamorelin-20mg": "/products/tesamorelin-20mg.jpg",
-  "tesamorelin-ipamorelin-10mg-3mg": "/products/tesamorelin-ipamorelin-10mg-3mg.jpg",
-  "hcg-10000iu": "/products/hcg-10000iu.jpg",
-  "kpv-10mg": "/products/kpv-10mg.jpg",
-  "glutathione-1500mg": "/products/glutathione-1500mg.jpg",
-  "mots-c-20mg": "/products/mots-c-20mg.jpg",
-  "ss-31-30mg": "/products/ss-31-30mg.jpg",
-  "epitalon-50mg": "/products/epitalon-50mg.jpg",
-  "n-acetyl-selank-10mg": "/products/n-acetyl-selank-10mg.jpg",
-  "pinealon-20mg": "/products/pinealon-20mg.jpg",
-  "ghk-cu-100mg": "/products/ghk-cu-100mg.jpg",
-  "glow-70mg": "/products/glow-70mg.jpg",
-  "klow-80mg": "/products/klow-80mg.jpg",
+  "epitalon-50mg": "/products/epitalon-50mg-hero.jpg",
+  "ghk-cu-100mg": "/products/ghk-cu-100mg-hero.jpg",
+  "glow-70mg": "/products/glow-70mg-hero.jpg",
+  "glutathione-1500mg": "/products/glutathione-1500mg-hero.jpg",
+  "hcg-10000iu": "/products/hcg-10000iu-hero.jpg",
+  "klow-80mg": "/products/klow-80mg-hero.jpg",
+  "kpv-10mg": "/products/kpv-10mg-hero.jpg",
+  "mots-c-20mg": "/products/mots-c-20mg-hero.jpg",
+  "n-acetyl-selank-10mg": "/products/n-acetyl-selank-10mg-hero.jpg",
+  "pinealon-20mg": "/products/pinealon-20mg-hero.jpg",
+  "ss-31-30mg": "/products/ss-31-30mg-hero.jpg",
+  "tesamorelin-20mg": "/products/tesamorelin-20mg-hero.jpg",
+  "tesamorelin-ipamorelin-10mg-3mg": "/products/tesamorelin-ipamorelin-10mg-3mg-hero.jpg",
+  // Every product now has a 2:3 hero except Bacteriostatic Water 30mL,
+  // which falls back to the drawn vial icon until its image lands.
 };
