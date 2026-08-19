@@ -105,19 +105,22 @@ export default async function HomePage() {
           className="absolute inset-0 sm:hidden bg-gradient-to-b from-black/85 via-black/40 to-transparent"
           aria-hidden
         />
-        <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-32">
-          <h1 className="text-[2.4rem] md:text-[3.2rem] leading-[1.05] font-semibold tracking-tight max-w-xl">
-            Third-party tested peptides, made in the USA, fast shipping.
+        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 md:py-32">
+          <h1 className="text-[1.7rem] sm:text-3xl md:text-[2.6rem] leading-[1.3] md:leading-[1.25] font-semibold tracking-tight max-w-xl">
+            Third-Party Tested
+            <br />
+            Made in the USA
+            <br />
+            Fast Shipping
+            <br />
+            Everyday Low Prices
           </h1>
-          <p className="mt-5 max-w-lg text-lg leading-relaxed text-cream/85">
-            Everyday low prices.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-6">
+          <div className="mt-7 md:mt-9 flex flex-wrap items-center gap-6">
             <Link
               href="/categories"
-              className="inline-flex items-center gap-2 rounded-full bg-gold text-ink px-7 py-3.5 label-eyebrow text-[0.72rem] hover:bg-cream transition-colors"
+              className="inline-flex items-center gap-2 rounded-full bg-gold text-ink px-8 py-3.5 label-eyebrow text-[0.72rem] hover:bg-cream transition-colors"
             >
-              Shop Peptides
+              Shop
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </div>
