@@ -37,7 +37,7 @@ const benefits = [
   {
     icon: Tag,
     label: "Direct Pricing, Every Day",
-    detail: "The listed price is our best price. No codes required.",
+    detail: "The listed price is the price. No codes required.",
   },
 ];
 
@@ -107,11 +107,11 @@ export default async function HomePage() {
         />
         <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-32">
           <h1 className="text-[2.4rem] md:text-[3.2rem] leading-[1.05] font-semibold tracking-tight max-w-xl">
-            Third-party tested research peptides.
+            Direct pricing every day, for all of your research needs.
           </h1>
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-cream/85">
-            Direct pricing, every day: the listed price is our best price.
-            In stock and ships from the USA.
+            Third-party tested peptides, made in the USA, shipped within
+            one business day. The listed price is the price.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <Link
@@ -217,13 +217,13 @@ export default async function HomePage() {
       </section>
 
       <section className="border-b border-line">
-        <div className="max-w-6xl mx-auto px-4 pt-12 pb-0 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-14 pb-8 text-center">
           <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-            Quality assured
+            Quality Assured
           </h2>
         </div>
         <QualityBadges variant="light" />
-        <div className="max-w-6xl mx-auto px-4 pb-6 -mt-2 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-8 pb-12 text-center">
           <Link
             href="/quality-assurance"
             className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"

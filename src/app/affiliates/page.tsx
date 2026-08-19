@@ -62,19 +62,14 @@ export default function AffiliatesPage() {
         Affiliate Program
       </h1>
 
-      <p className="text-ink-soft leading-relaxed mb-4">
+      <p className="text-ink-soft leading-relaxed mb-10">
         Vitality Certified Peptides supplies US-made, research-use-only
         compounds with batch documentation behind every vial and direct
         pricing every day. If your audience follows the peptide research
         space, that is an easy story to tell, and we built this program so
         you are rewarded for telling it well.
       </p>
-      <p className="text-ink-soft leading-relaxed mb-10">
-        Partners earn on every order they refer, not just the first one.
-        Because many of our customers reorder on a schedule through Restock
-        autoship, a single referral can keep earning you commission month
-        after month.
-      </p>
+
 
       <h2 className="font-serif-display text-xl text-ink mb-5">How it works</h2>
       <div className="grid gap-4 sm:grid-cols-3 mb-10">

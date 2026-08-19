@@ -70,3 +70,10 @@ body {
   background-image: radial-gradient(currentColor 1.4px, transparent 1.4px);
   background-size: 26px 26px;
 }
+
+/* Sticky header is ~7rem tall (announcement bar + nav). Without this,
+   any in-page anchor or restored scroll position lands with its heading
+   tucked under the header, which reads as the page top being cut off. */
+html {
+  scroll-padding-top: 7.5rem;
+}

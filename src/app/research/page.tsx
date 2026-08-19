@@ -25,16 +25,9 @@ export default function ResearchLibraryPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-14">
-      <p className="label-eyebrow text-gold-deep mb-2">Research Library</p>
-      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-6">
-        The published literature.
+      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-8">
+        Research Library
       </h1>
-      <p className="text-ink-soft leading-relaxed mb-8">
-        Peer-reviewed publications involving compounds in our catalog, each
-        linked to its original source on PubMed or the publishing journal.
-        The library grows continually as new literature is published and
-        verified.
-      </p>
 
       <div className="rounded-sm bg-cream-soft border border-line px-5 py-4 mb-10">
         <p className="text-xs text-ink-soft leading-relaxed">{libraryDisclaimer}</p>
