@@ -32,7 +32,7 @@ export default function ProductGallery({
 
   if (images.length === 0) {
     return (
-      <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-dot-grid text-cream/[0.06]" aria-hidden />
         <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
         {badge}
@@ -42,7 +42,7 @@ export default function ProductGallery({
 
   return (
     <div>
-      <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
         <Image
           key={images[active]}
           src={images[active]}
@@ -62,7 +62,7 @@ export default function ProductGallery({
               type="button"
               onClick={() => setActive(i)}
               aria-label={`View image ${i + 1} of ${name}`}
-              className={`relative aspect-square bg-black overflow-hidden border transition-colors ${
+              className={`relative aspect-[2/3] bg-black overflow-hidden border transition-colors ${
                 i === active
                   ? "border-gold-deep"
                   : "border-transparent hover:border-line"

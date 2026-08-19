@@ -18,7 +18,7 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* bg-black matches the near-black background of the product
           photography, so wider compositions (the two-vial blend shots)
           letterbox invisibly instead of showing gray bars. */}
-      <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
         {image ? (
           <Image
             src={image}

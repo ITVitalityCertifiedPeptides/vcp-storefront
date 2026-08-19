@@ -5,9 +5,10 @@
 // guessed). Matching is by product-name prefix, longest match first, so
 // blends match before their component compounds.
 //
-// NOTE: GHK-Cu formula/mass intentionally omitted (sources disagree on
-// 1:1 vs 2:1 peptide:copper stoichiometry); Thymosin Alpha-1 sequence
-// omitted (source transcription ambiguity). Verify before adding.
+// Second verification pass 2026-08-18: all values below confirmed against
+// PubChem / MedChemExpress / vendor datasheets. GHK-Cu resolved: the 1:1
+// copper(II) complex is C14H22CuN6O4, 401.9 g/mol, CAS 89030-95-5 (the
+// CAS 49557-75-7 sometimes seen is the metal-FREE GHK tripeptide).
 
 export type TechnicalData = {
   formula?: string;
@@ -40,21 +41,21 @@ const D: Array<[string, TechnicalData]> = [
   ["IGF-1 LR3", { formula: "C400H625N111O115S9", molarMass: "9117.6 g/mol", synonyms: ["Long R3 IGF-I"] }],
   ["HCG", { molarMass: "~36.7 kDa (glycoprotein heterodimer)", synonyms: ["Human chorionic gonadotropin", "Choriogonadotropin"], note: "Glycoprotein; no discrete molecular formula." }],
   ["KPV", { formula: "C16H30N4O4", molarMass: "342.4 g/mol", sequence: "Lys-Pro-Val", synonyms: ["Alpha-MSH (11-13)"] }],
-  ["VIP", { formula: "C147H238N44O42S", molarMass: "3325.8 g/mol", synonyms: ["Vasoactive intestinal peptide"] }],
+  ["VIP", { formula: "C147H238N44O42S", molarMass: "3325.8 g/mol", sequence: "HSDAVFTDNYTRLRKQMAVKKYLNSILN-NH2", synonyms: ["Vasoactive intestinal peptide"] }],
   ["Glutathione", { formula: "C10H17N3O6S", molarMass: "307.3 g/mol", sequence: "gamma-Glu-Cys-Gly", synonyms: ["GSH", "Reduced glutathione"] }],
   ["NAD+", { formula: "C21H27N7O14P2", molarMass: "663.4 g/mol", synonyms: ["Nicotinamide adenine dinucleotide", "Coenzyme I"] }],
   ["MOTS-c", { formula: "C101H152N28O22S2", molarMass: "2174.6 g/mol", sequence: "MRWQEMGYIFYPRKLR", synonyms: ["Mitochondrial-derived peptide MOTS-c"] }],
-  ["SS-31", { formula: "C32H49N9O5", molarMass: "639.8 g/mol", synonyms: ["Elamipretide", "MTP-131", "Bendavia"] }],
+  ["SS-31", { formula: "C32H49N9O5", molarMass: "639.8 g/mol", sequence: "H-D-Arg-Dmt-Lys-Phe-NH2", synonyms: ["Elamipretide", "MTP-131", "Bendavia"] }],
   ["Epitalon", { formula: "C14H22N4O9", molarMass: "390.4 g/mol", sequence: "Ala-Glu-Asp-Gly (AEDG)", synonyms: ["Epithalon"] }],
-  ["Thymosin Alpha-1", { formula: "C129H215N33O55", molarMass: "3108.3 g/mol", synonyms: ["Thymalfasin"] }],
+  ["Thymosin Alpha-1", { formula: "C129H215N33O55", molarMass: "3108.3 g/mol", sequence: "Ac-SDAAVDTSSEITTKDLKEKKEVVEEAEN", synonyms: ["Thymalfasin"] }],
   ["LL-37", { formula: "C205H340N60O53", molarMass: "4493.4 g/mol", sequence: "LLGDFFRKSKEKIGKEFKRIVQRIKDFLRNLVPRTES", synonyms: ["Human cathelicidin", "CAP-18 (109-140)"] }],
   ["N-Acetyl Selank", { sequence: "N-acetylated analog of Selank (TKPRPGP)", synonyms: ["Selank amidate analog"], note: "Parent peptide Selank: C33H57N11O9, 751.9 g/mol." }],
   ["N-Acetyl Semax", { formula: "C39H54N10O10S", molarMass: "855.0 g/mol", sequence: "N-acetylated analog of Semax (MEHFPGP)", synonyms: ["Ac-Semax"] }],
   ["Pinealon", { formula: "C15H26N6O8", molarMass: "418.4 g/mol", sequence: "Glu-Asp-Arg (EDR)", synonyms: ["EDR peptide"] }],
-  ["GHK-Cu", { sequence: "Gly-His-Lys (copper complex)", synonyms: ["Copper tripeptide-1"] }],
+  ["GHK-Cu", { formula: "C14H22CuN6O4", molarMass: "401.9 g/mol", sequence: "Gly-His-Lys copper(II) complex (1:1)", synonyms: ["Copper Tripeptide-1", "Prezatide copper"] }],
   ["Melanotan I", { formula: "C78H111N21O19", molarMass: "1646.9 g/mol", sequence: "Ac-Ser-Tyr-Ser-Nle-Glu-His-D-Phe-Arg-Trp-Gly-Lys-Pro-Val-NH2", synonyms: ["Afamelanotide", "NDP-alpha-MSH"] }],
   ["Melanotan II", { formula: "C50H69N15O9", molarMass: "1024.2 g/mol", sequence: "Ac-Nle-cyclo[Asp-His-D-Phe-Arg-Trp-Lys]-NH2", synonyms: ["MT-II"] }],
-  ["PT-141", { formula: "C50H68N14O10", molarMass: "1025.2 g/mol", synonyms: ["Bremelanotide"] }],
+  ["PT-141", { formula: "C50H68N14O10", molarMass: "1025.2 g/mol", sequence: "Ac-Nle-cyclo[Asp-His-D-Phe-Arg-Trp-Lys]-OH", synonyms: ["Bremelanotide"] }],
   ["Kisspeptin", { formula: "C63H83N17O14", molarMass: "1302.4 g/mol", sequence: "YNWNSFGLRF-NH2", synonyms: ["Kisspeptin-10", "Metastin (45-54)"] }],
   ["DSIP", { formula: "C35H48N10O15", molarMass: "848.8 g/mol", sequence: "WAGGDASGE", synonyms: ["Delta sleep-inducing peptide"] }],
   ["5-Amino-1MQ", { formula: "C10H11N2+ (cation)", molarMass: "286.1 g/mol (iodide salt)", synonyms: ["5-amino-1-methylquinolinium"] }],
