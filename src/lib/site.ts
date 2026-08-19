@@ -11,7 +11,7 @@ export const siteConfig = {
 };
 
 export const ruoNotice =
-  "All products sold by Vitality Certified Peptides are intended strictly for laboratory research use only (RUO). They are not drugs, dietary supplements, cosmetics, or foods, and are not for human or veterinary use, diagnostic use, or any use governed by the FD&C Act. These products have not been evaluated by the FDA for safety or efficacy in humans or animals. By purchasing, the buyer certifies that they are a qualified professional, laboratory, or institution acquiring these products solely for research or laboratory analysis, and assumes full responsibility for lawful handling, storage, and use in compliance with all applicable federal, state, and local laws. Every lot ships with a Certificate of Analysis.";
+  "All products sold by Vitality Certified Peptides are intended strictly for laboratory research use only (RUO). They are not drugs, dietary supplements, cosmetics, or foods, and are not for human or veterinary use, diagnostic use, or any use governed by the FD&C Act. These products have not been evaluated by the FDA for safety or efficacy in humans or animals. By purchasing, the buyer certifies that they are at least 21 years of age and a researcher, laboratory, institution, or other qualified party, whether independent or affiliated, acquiring these products solely for research or laboratory analysis, and assumes full responsibility for lawful handling, storage, and use in compliance with all applicable federal, state, and local laws. Every lot ships with a Certificate of Analysis.";
 
 // Generic, compliance-safe FAQ content reused on every product page.
 // Deliberately answers logistics/verification questions, not "what does
@@ -32,7 +32,7 @@ export function productFaqItems(productName: string) {
     {
       question: "Who can purchase from Vitality Certified Peptides?",
       answer:
-        "Qualified researchers of every kind, including independent researchers. You do not need to represent a lab or institution; every purchase is for laboratory research use only, in compliance with applicable federal, state, and local law.",
+        "Qualified researchers of every kind, including independent researchers, who are at least 21 years of age. You do not need to represent a lab or institution; every purchase is for laboratory research use only, in compliance with applicable federal, state, and local law.",
     },
   ];
 }
@@ -50,7 +50,7 @@ export const ruoPolicySections = [
   },
   {
     heading: "Buyer eligibility and certification",
-    body: "By placing an order, the buyer represents and certifies that: (a) they are a researcher, laboratory, institution, or other party qualified to handle research chemicals, whether independent or affiliated; (b) the products will be used solely for legitimate research or laboratory purposes; (c) the products will not be resold, repackaged, or distributed for human or veterinary consumption; and (d) they will comply with all applicable federal, state, and local laws governing the purchase, possession, and use of research chemicals in their jurisdiction.",
+    body: "By placing an order, the buyer represents and certifies that: (a) they are at least 21 years of age; (b) they are a researcher, laboratory, institution, or other party qualified to handle research chemicals, whether independent or affiliated; (c) the products will be used solely for legitimate research or laboratory purposes; (d) the products will not be resold, repackaged, or distributed for human or veterinary consumption; and (e) they will comply with all applicable federal, state, and local laws governing the purchase, possession, and use of research chemicals in their jurisdiction.",
   },
   {
     heading: "No warranty of fitness for human use",

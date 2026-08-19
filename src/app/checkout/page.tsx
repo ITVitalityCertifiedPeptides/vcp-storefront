@@ -25,6 +25,8 @@ export default function CheckoutPage() {
   const { refresh } = useCart();
   const [cart, setCart] = useState<SwellCart | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
+  const [asGuest, setAsGuest] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,6 +67,7 @@ export default function CheckoutPage() {
           };
         } | null;
         if (account?.email) {
+          setSignedIn(true);
           const ship = account.shipping;
           setForm((f) => ({
             ...f,
@@ -190,6 +193,37 @@ export default function CheckoutPage() {
             Shop Peptides
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
+        </div>
+      ) : !signedIn && !asGuest ? (
+        <div>
+          <p className="label-eyebrow text-[0.7rem] text-gold-deep mb-4">
+            How would you like to check out?
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <Link
+              href="/account?return=/checkout"
+              className="rounded-sm border border-gold-deep/50 bg-white px-5 py-5 hover:border-gold-deep transition-colors block"
+            >
+              <p className="font-medium text-ink mb-1.5">
+                Sign in or create an account
+              </p>
+              <p className="text-sm text-ink-soft leading-relaxed">
+                Track your orders, reuse saved shipping details, and manage
+                Restock autoship in one place.
+              </p>
+            </Link>
+            <button
+              type="button"
+              onClick={() => setAsGuest(true)}
+              className="rounded-sm border border-line bg-white px-5 py-5 hover:border-gold-deep transition-colors text-left"
+            >
+              <p className="font-medium text-ink mb-1.5">Continue as guest</p>
+              <p className="text-sm text-ink-soft leading-relaxed">
+                No account needed. You can always create one later with the
+                same email to see this order.
+              </p>
+            </button>
+          </div>
         </div>
       ) : (
         <form onSubmit={submit}>

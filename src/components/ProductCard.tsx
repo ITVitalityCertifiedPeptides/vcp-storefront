@@ -4,7 +4,7 @@ import type { Product } from "@/lib/catalog-shared";
 import { displayCategory } from "@/lib/catalog-shared";
 import { productImages } from "@/lib/product-images";
 import VialIcon from "./VialIcon";
-import AddToCartButton from "./AddToCartButton";
+import QuickAdd from "./QuickAdd";
 
 // Real product photography is rolling in gradually (see product-images.ts).
 // Any product without a listed image falls back to the drawn vial icon.
@@ -68,10 +68,12 @@ export default function ProductCard({ product }: { product: Product }) {
                   Select Options
                 </span>
               ) : (
-                <AddToCartButton
+                <QuickAdd
                   productId={product.id}
+                  name={product.name}
+                  price={product.price}
                   inStock={product.inStock}
-                  size="sm"
+                  plans={product.subscription}
                 />
               )}
             </div>

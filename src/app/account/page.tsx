@@ -5,8 +5,9 @@
 // pre-fill checkout), and Restock autoship subscriptions (read-only view;
 // changes go through support so cancellations are handled by the team).
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Package, MapPin, RefreshCw, ChevronDown } from "lucide-react";
 import { getSwell } from "@/lib/swell-client";
 
@@ -81,7 +82,14 @@ function trackingUrl(shipment: Shipment): string | null {
   return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(code)}`;
 }
 
-export default function AccountPage() {
+function AccountContent() {
+  const router = useRouter();
+  const params = useSearchParams();
+  // Only allow same-site relative paths as a return target.
+  const rawReturn = params.get("return") || "";
+  const returnTo =
+    rawReturn.startsWith("/") && !rawReturn.startsWith("//") ? rawReturn : "";
+
   const [account, setAccount] = useState<Account>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -219,6 +227,9 @@ export default function AccountPage() {
             ? "Invalid email or password."
             : "Could not create the account. It may already exist, try signing in."
         );
+      } else if (returnTo) {
+        router.push(returnTo);
+        return;
       } else {
         setAccount(logged);
         hydrateShippingForm(logged);
@@ -618,5 +629,13 @@ export default function AccountPage() {
         </form>
       )}
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={null}>
+      <AccountContent />
+    </Suspense>
   );
 }
