@@ -43,8 +43,45 @@ export default function CheckoutPage() {
 
   const load = useCallback(async () => {
     try {
-      const result = (await getSwell().cart.get()) as unknown as SwellCart | null;
+      const swell = getSwell();
+      const result = (await swell.cart.get()) as unknown as SwellCart | null;
       setCart(result);
+      // Pre-fill contact + shipping from the signed-in account's saved
+      // shipping details (managed on /account).
+      try {
+        const account = (await swell.account.get()) as unknown as {
+          email?: string;
+          first_name?: string;
+          last_name?: string;
+          phone?: string;
+          shipping?: {
+            name?: string;
+            address1?: string;
+            address2?: string;
+            city?: string;
+            state?: string;
+            zip?: string;
+            phone?: string;
+          };
+        } | null;
+        if (account?.email) {
+          const ship = account.shipping;
+          setForm((f) => ({
+            ...f,
+            firstName: f.firstName || account.first_name || "",
+            lastName: f.lastName || account.last_name || "",
+            email: f.email || account.email || "",
+            phone: f.phone || ship?.phone || account.phone || "",
+            address1: f.address1 || ship?.address1 || "",
+            address2: f.address2 || ship?.address2 || "",
+            city: f.city || ship?.city || "",
+            state: f.state || ship?.state || "",
+            zip: f.zip || ship?.zip || "",
+          }));
+        }
+      } catch {
+        // Not signed in; leave the form empty.
+      }
     } finally {
       setLoading(false);
     }
