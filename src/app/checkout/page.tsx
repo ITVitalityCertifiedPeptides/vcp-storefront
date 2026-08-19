@@ -111,13 +111,7 @@ export default function CheckoutPage() {
     try {
       const swell = getSwell();
       const name = `${form.firstName} ${form.lastName}`.trim();
-      await swell.cart.update({
-        account: {
-          email: form.email,
-          first_name: form.firstName,
-          last_name: form.lastName,
-          phone: form.phone,
-        },
+      const base = {
         shipping: {
           name,
           address1: form.address1,
@@ -136,7 +130,48 @@ export default function CheckoutPage() {
           payment_method: "invoice",
           invoice_pending: true,
         },
-      });
+      };
+      // Swell's public API rejects account name/phone updates through the
+      // cart whenever the cart is already tied to an existing account
+      // record (signed-in sessions, or a guest cart whose email matches a
+      // registered account) with "You are not allowed to update
+      // `account.first_name`". So: try the richest payload first for new
+      // guests, and on a permission error fall back to email-only, then to
+      // no account block at all (an attached cart already has its email).
+      // The buyer's name still reaches the order via shipping.name.
+      const attempts: Array<Record<string, unknown>> = signedIn
+        ? [base, { ...base, account: { email: form.email } }]
+        : [
+            {
+              ...base,
+              account: {
+                email: form.email,
+                first_name: form.firstName,
+                last_name: form.lastName,
+                phone: form.phone,
+              },
+            },
+            { ...base, account: { email: form.email } },
+            base,
+          ];
+      let updated = false;
+      let lastErr: unknown = null;
+      for (const payload of attempts) {
+        try {
+          await swell.cart.update(payload);
+          updated = true;
+          break;
+        } catch (err) {
+          lastErr = err;
+          const msg = String(
+            (err as { message?: string })?.message ?? err
+          ).toLowerCase();
+          // Only a permission complaint about the account block should
+          // trigger a retry; anything else is a real failure.
+          if (!msg.includes("not allowed")) throw err;
+        }
+      }
+      if (!updated) throw lastErr;
       const order = (await swell.cart.submitOrder()) as unknown as {
         number?: string | number;
         id?: string;
@@ -159,7 +194,10 @@ export default function CheckoutPage() {
       if (total) params.set("total", total.toFixed(2));
       const qs = params.toString();
       router.push(`/order-confirmed${qs ? `?${qs}` : ""}`);
-    } catch {
+    } catch (err) {
+      // Keep the user-facing message friendly, but log the real reason so
+      // it shows in the browser console for debugging.
+      console.error("Checkout failed:", err);
       setError(
         "We couldn't place the order. Please try again, or email us and we'll take your order directly."
       );

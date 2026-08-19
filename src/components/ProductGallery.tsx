@@ -25,7 +25,7 @@ export default function ProductGallery({
   const [active, setActive] = useState(0);
 
   const badge = madeInUsa ? (
-    <span className="absolute top-4 left-4 border border-gold/50 text-gold text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1 z-10">
+    <span className="absolute top-4 right-4 border border-gold/50 text-gold text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1 z-10">
       Made in USA
     </span>
   ) : null;

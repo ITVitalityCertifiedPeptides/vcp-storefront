@@ -31,12 +31,14 @@ export default function ProductCard({ product }: { product: Product }) {
           <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />
         )}
         {product.madeInUsa && (
-          <span className="absolute top-3 left-3 border border-gold/50 text-gold text-[0.58rem] font-semibold uppercase tracking-wide px-2 py-1">
+          <span className="absolute top-3 right-3 border border-gold/50 text-gold text-[0.58rem] font-semibold uppercase tracking-wide px-2 py-1">
             Made in USA
           </span>
         )}
+        {/* Out of Stock sits on the left so it never collides with the
+            Made in USA badge, which now lives on the right. */}
         {!product.inStock && (
-          <span className="absolute top-3 right-3 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
+          <span className="absolute top-3 left-3 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
             Out of Stock
           </span>
         )}
