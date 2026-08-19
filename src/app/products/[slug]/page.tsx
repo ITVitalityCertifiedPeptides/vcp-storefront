@@ -1,4 +1,5 @@
-import Image from "next/image";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -11,7 +12,8 @@ import {
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
 import { productImages } from "@/lib/product-images";
-import VialIcon from "@/components/VialIcon";
+import { technicalDataFor, componentDataFor } from "@/lib/technical-data";
+import ProductGallery from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
 import ProductFaq from "@/components/ProductFaq";
 import BuyBox from "@/components/BuyBox";
@@ -53,6 +55,54 @@ export async function generateMetadata({
   };
 }
 
+// Gallery discovery: files in public/products named by convention
+// (<slug>-hero, <slug>, <slug>-molecule, <slug>-vial in .jpg/.png/.webp)
+// appear automatically in that order. Drop images in, redeploy, done.
+function galleryImages(slug: string): string[] {
+  let files: string[] = [];
+  try {
+    files = readdirSync(join(process.cwd(), "public", "products"));
+  } catch {
+    // public/products missing in some build contexts; fall through.
+  }
+  const lower = new Map(files.map((f) => [f.toLowerCase(), f]));
+  const bases = [`${slug}-hero`, slug, `${slug}-molecule`, `${slug}-vial`];
+  const found: string[] = [];
+  for (const base of bases) {
+    for (const ext of ["jpg", "png", "webp"]) {
+      const hit = lower.get(`${base.toLowerCase()}.${ext}`);
+      if (hit) {
+        found.push(`/products/${hit}`);
+        break;
+      }
+    }
+  }
+  // Fallback to the static map for any legacy filename mismatch.
+  if (found.length === 0 && productImages[slug]) found.push(productImages[slug]);
+  return found;
+}
+
+// Lot testing documents from the COA repository (public/coas), named
+// <slug>--<batch>.pdf. Josh uploads our own testing sheets there; newest
+// first by filename sort.
+function coaDocs(slug: string): string[] {
+  let files: string[] = [];
+  try {
+    files = readdirSync(join(process.cwd(), "public", "coas"));
+  } catch {
+    return [];
+  }
+  return files
+    .filter(
+      (f) =>
+        f.toLowerCase().startsWith(`${slug.toLowerCase()}--`) &&
+        f.toLowerCase().endsWith(".pdf")
+    )
+    .sort()
+    .reverse()
+    .map((f) => `/coas/${f}`);
+}
+
 export default async function ProductPage({
   params,
 }: {
@@ -65,7 +115,10 @@ export default async function ProductPage({
   ]);
   if (!product) notFound();
 
-  const image = productImages[product.slug];
+  const images = galleryImages(product.slug);
+  const coas = coaDocs(product.slug);
+  const tech = technicalDataFor(product.name);
+  const isLiquid = product.name.toLowerCase().includes("bacteriostatic");
 
   const jsonLd = [
     productSchema(product),
@@ -105,31 +158,11 @@ export default async function ProductPage({
       </nav>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
-        {/* Falls back to the drawn vial icon for any product without a real
-            photo yet - see ProductCard.tsx for the same treatment used in
-            listing grids. */}
-        <div className="relative aspect-square bg-black flex items-center justify-center overflow-hidden">
-          {image ? (
-            <Image
-              src={image}
-              alt={product.name}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-contain"
-              priority
-            />
-          ) : (
-            <>
-              <div className="absolute inset-0 bg-dot-grid text-cream/[0.06]" aria-hidden />
-              <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
-            </>
-          )}
-          {product.madeInUsa && (
-            <span className="absolute top-4 left-4 border border-gold/50 text-gold text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
-              Made in USA
-            </span>
-          )}
-        </div>
+        <ProductGallery
+          images={images}
+          name={product.name}
+          madeInUsa={product.madeInUsa}
+        />
 
         <div>
           {product.category && (
@@ -188,6 +221,121 @@ export default async function ProductPage({
           )}
         </div>
       </div>
+
+      {/* Technical Information: verified chemical data (see technical-data.ts)
+          plus physical specifications. Nothing here is a use claim. */}
+      <section className="mt-14 border-t border-line pt-10">
+        <h2 className="font-serif-display text-2xl text-ink mb-6">
+          Technical Information
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <dl className="text-sm space-y-4">
+            <div className="grid grid-cols-[9rem_1fr] gap-3">
+              <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">CAS Number</dt>
+              <dd className="font-medium text-ink font-mono text-[0.82rem]">{product.casNumber || "N/A"}</dd>
+            </div>
+            {tech?.formula && (
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Molecular Formula</dt>
+                <dd className="font-medium text-ink font-mono text-[0.82rem]">{tech.formula}</dd>
+              </div>
+            )}
+            {tech?.molarMass && (
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Molar Mass</dt>
+                <dd className="font-medium text-ink">{tech.molarMass}</dd>
+              </div>
+            )}
+            {tech?.sequence && (
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Sequence</dt>
+                <dd className="font-medium text-ink font-mono text-[0.78rem] break-all">{tech.sequence}</dd>
+              </div>
+            )}
+            {tech?.synonyms && tech.synonyms.length > 0 && (
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Synonyms</dt>
+                <dd className="text-ink">{tech.synonyms.join(", ")}</dd>
+              </div>
+            )}
+            {tech?.components && (
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Blend Components</dt>
+                <dd className="text-ink">
+                  {tech.components.map((component) => {
+                    const c = componentDataFor(component);
+                    return (
+                      <span key={component} className="block mb-1.5">
+                        <span className="font-medium">{component}</span>
+                        {c?.formula ? (
+                          <span className="text-ink-soft font-mono text-[0.78rem]">
+                            {" "}({c.formula}{c.molarMass ? `, ${c.molarMass}` : ""})
+                          </span>
+                        ) : null}
+                      </span>
+                    );
+                  })}
+                </dd>
+              </div>
+            )}
+            {tech?.note && (
+              <p className="text-xs text-ink-soft">{tech.note}</p>
+            )}
+          </dl>
+
+          <div>
+            <dl className="text-sm space-y-4 mb-8">
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Form</dt>
+                <dd className="font-medium text-ink">
+                  {isLiquid ? "Sterile liquid" : "Lyophilized powder"}
+                </dd>
+              </div>
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Container</dt>
+                <dd className="font-medium text-ink">Sealed glass vial, flip-top cap</dd>
+              </div>
+              {!isLiquid && (
+                <div className="grid grid-cols-[9rem_1fr] gap-3">
+                  <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">State</dt>
+                  <dd className="font-medium text-ink">Not reconstituted</dd>
+                </div>
+              )}
+              <div className="grid grid-cols-[9rem_1fr] gap-3">
+                <dt className="label-eyebrow text-[0.62rem] text-ink-soft pt-0.5">Purity</dt>
+                <dd className="font-medium text-ink">
+                  Verified per lot on the Certificate of Analysis
+                </dd>
+              </div>
+            </dl>
+
+            <h3 className="label-eyebrow text-[0.7rem] text-gold-deep mb-3">
+              Batch Testing
+            </h3>
+            {coas.length > 0 ? (
+              <ul className="space-y-2 mb-3">
+                {coas.map((doc) => (
+                  <li key={doc}>
+                    <a
+                      href={doc}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gold-deep hover:underline underline-offset-4"
+                    >
+                      Testing document: {doc.split("/").pop()?.replace(".pdf", "").split("--")[1] || "lot report"}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <p className="text-xs text-ink-soft leading-relaxed">
+              Every lot is tested and documented. When your order ships you
+              receive tracking and a digital copy of the Certificate of
+              Analysis for your exact lot.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
 
       <ProductFaq productName={product.name} />
