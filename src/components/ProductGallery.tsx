@@ -25,7 +25,9 @@ export default function ProductGallery({
   const [active, setActive] = useState(0);
 
   const badge = madeInUsa ? (
-    <span className="absolute top-4 right-4 border border-gold/50 text-gold text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1 z-10">
+    // Sits high in the corner so it clears the "RESEARCH USE ONLY" line
+    // printed in the top right of the hero artwork itself.
+    <span className="absolute top-1.5 right-1.5 border border-gold/50 text-gold text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1 z-10">
       Made in USA
     </span>
   ) : null;
