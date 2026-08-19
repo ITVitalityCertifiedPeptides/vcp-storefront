@@ -107,11 +107,10 @@ export default async function HomePage() {
         />
         <div className="relative max-w-6xl mx-auto px-4 py-24 md:py-32">
           <h1 className="text-[2.4rem] md:text-[3.2rem] leading-[1.05] font-semibold tracking-tight max-w-xl">
-            Direct pricing every day, for all of your research needs.
+            Third-party tested peptides, made in the USA, fast shipping.
           </h1>
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-cream/85">
-            Third-party tested peptides, made in the USA, shipped within
-            one business day. The listed price is the price.
+            Everyday low prices.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <Link
@@ -120,12 +119,6 @@ export default async function HomePage() {
             >
               Shop Peptides
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
-            <Link
-              href="/quality-assurance"
-              className="label-eyebrow text-[0.72rem] text-cream/80 hover:text-gold transition-colors underline decoration-cream/30 underline-offset-4"
-            >
-              How we test
             </Link>
           </div>
         </div>
