@@ -11,7 +11,6 @@ import {
 } from "@/lib/products";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
-import { productImages } from "@/lib/product-images";
 import { technicalDataFor, componentDataFor } from "@/lib/technical-data";
 import ProductGallery from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
@@ -55,76 +54,6 @@ export async function generateMetadata({
   };
 }
 
-// Blend gallery composition: a blend product shows the molecule/sequence
-// card of EACH component compound as additional gallery images (matching
-// the Blend Profile order on its hero card). Keys are size-stripped slug
-// bases; values are the component compounds' slug bases. Components with
-// no molecule card yet (e.g. CJC-1295, Tesamorelin) are skipped
-// automatically and appear as soon as their card lands in
-// public/products.
-const BLEND_MOLECULE_COMPONENTS: Record<string, string[]> = {
-  "bpc-157-tb-500": ["bpc-157", "tb-500"],
-  "cjc-1295-ipamorelin": ["cjc-1295", "ipamorelin"],
-  "tesamorelin-ipamorelin": ["tesamorelin", "ipamorelin"],
-  klow: ["ghk-cu", "kpv", "bpc-157", "tb-500"],
-  glow: ["ghk-cu", "bpc-157", "tb-500"],
-};
-
-// Gallery discovery: files in public/products named by convention
-// (<slug>-hero, <slug>-molecule, plus legacy <slug> and optional
-// <slug>-vial; .jpg/.png/.webp) appear automatically. The standard set is
-// TWO images per product: hero (formula card + vial) and molecule
-// (diagram + sequence card). Once a -hero exists it supersedes the legacy
-// square <slug> shot, which is then hidden.
-function galleryImages(slug: string): string[] {
-  let files: string[] = [];
-  try {
-    files = readdirSync(join(process.cwd(), "public", "products"));
-  } catch {
-    // public/products missing in some build contexts; fall through.
-  }
-  const lower = new Map(files.map((f) => [f.toLowerCase(), f]));
-  const find = (base: string): string | null => {
-    for (const ext of ["jpg", "png", "webp"]) {
-      const hit = lower.get(`${base.toLowerCase()}.${ext}`);
-      if (hit) return `/products/${hit}`;
-    }
-    return null;
-  };
-  const hero = find(`${slug}-hero`);
-  const legacy = find(slug);
-  // Strip trailing size tokens (5mg, 10ml, 10000iu) to reach the compound
-  // base, e.g. bpc-157-5mg -> bpc-157, klow-80mg -> klow. Only size-shaped
-  // tokens are stripped, so bpc-157-tb-500-10mg-10mg resolves to
-  // bpc-157-tb-500 and can never collapse into a component compound.
-  const parts = slug.split("-");
-  while (parts.length > 1 && /^\d+(mg|ml|iu|mcg)$/i.test(parts[parts.length - 1])) {
-    parts.pop();
-  }
-  const base = parts.join("-");
-  // Molecule cards: single compounds get their own card, shared by every
-  // size (bpc-157-molecule.png serves bpc-157-5mg/10mg/20mg). Blends get
-  // one card PER COMPONENT compound, in blend-profile order.
-  const molecules: string[] = [];
-  const blendComponents = BLEND_MOLECULE_COMPONENTS[base];
-  if (blendComponents) {
-    for (const component of blendComponents) {
-      const card = find(`${component}-molecule`);
-      if (card) molecules.push(card);
-    }
-  } else {
-    const single = find(`${slug}-molecule`) || find(`${base}-molecule`);
-    if (single) molecules.push(single);
-  }
-  const vial = find(`${slug}-vial`);
-  const found = [hero, hero ? null : legacy, ...molecules, vial].filter(
-    (x): x is string => Boolean(x)
-  );
-  // Fallback to the static map for any legacy filename mismatch.
-  if (found.length === 0 && productImages[slug]) found.push(productImages[slug]);
-  return found;
-}
-
 // Lot testing documents from the COA repository (public/coas), named
 // <slug>--<batch>.pdf. Josh uploads our own testing sheets there; newest
 // first by filename sort.
@@ -158,7 +87,7 @@ export default async function ProductPage({
   ]);
   if (!product) notFound();
 
-  const images = galleryImages(product.slug);
+  const images = product.images;
   const coas = coaDocs(product.slug);
   const tech = technicalDataFor(product.name);
   const isLiquid = product.name.toLowerCase().includes("bacteriostatic");

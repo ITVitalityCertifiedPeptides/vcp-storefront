@@ -1,16 +1,19 @@
 "use client";
 
-// Multi-image product gallery: main image with a thumbnail strip.
-// The image list is discovered server-side (see products/[slug]/page.tsx)
-// from files in public/products following the naming convention:
+// Multi-image product gallery: main image with left/right arrows, an
+// image counter, and a thumbnail strip. The image list is discovered
+// server-side (see lib/product-gallery.ts) from files in public/products
+// following the naming convention:
 //   <slug>-hero.jpg      hero shot (formula card background, vial foreground)
 //   <slug>.jpg           label/blend shot (existing images)
 //   <slug>-molecule.jpg  molecular structure card
 //   <slug>-vial.jpg      plain vial shot
+// Blends additionally show one molecule card per component compound.
 // Drop the files in and they appear on the next deploy; no code changes.
 
 import { useState } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import VialIcon from "./VialIcon";
 
 export default function ProductGallery({
@@ -42,9 +45,14 @@ export default function ProductGallery({
     );
   }
 
+  const prev = () => setActive((a) => (a - 1 + images.length) % images.length);
+  const next = () => setActive((a) => (a + 1) % images.length);
+  const arrowClass =
+    "absolute top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/45 text-cream/90 hover:bg-gold-deep hover:text-cream transition-colors";
+
   return (
     <div>
-      <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden group">
         <Image
           key={images[active]}
           src={images[active]}
@@ -55,6 +63,29 @@ export default function ProductGallery({
           priority={active === 0}
         />
         {badge}
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              aria-label="Previous image"
+              className={`${arrowClass} left-2`}
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              aria-label="Next image"
+              className={`${arrowClass} right-2`}
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden />
+            </button>
+            <span className="absolute bottom-2 right-2 z-10 rounded-full bg-black/50 text-cream/85 text-[0.62rem] font-medium px-2 py-0.5 tabular-nums">
+              {active + 1} / {images.length}
+            </span>
+          </>
+        )}
       </div>
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2 mt-2">

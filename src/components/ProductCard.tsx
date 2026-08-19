@@ -6,18 +6,26 @@ import { productImages } from "@/lib/product-images";
 import VialIcon from "./VialIcon";
 import QuickAdd from "./QuickAdd";
 
-// Real product photography is rolling in gradually (see product-images.ts).
-// Any product without a listed image falls back to the drawn vial icon.
+// Product card for the shop grids. The main shot is the product's hero;
+// when the product has additional gallery images (molecule cards), small
+// thumbnails are overlaid in the bottom left corner so shoppers can see
+// there is more to look at before clicking into the product page.
 export default function ProductCard({ product }: { product: Product }) {
-  const image = productImages[product.slug];
+  const gallery = product.images?.length
+    ? product.images
+    : productImages[product.slug]
+      ? [productImages[product.slug]]
+      : [];
+  const image = gallery[0];
+  const extras = gallery.slice(1, 4);
   return (
     <Link
       href={`/products/${product.slug}`}
       className="group block bg-white border border-line hover:border-gold-deep hover:shadow-[0_8px_24px_-12px_rgba(21,19,15,0.25)] transition-all"
     >
       {/* bg-black matches the near-black background of the product
-          photography, so wider compositions (the two-vial blend shots)
-          letterbox invisibly instead of showing gray bars. */}
+          photography, so wider compositions letterbox invisibly instead
+          of showing gray bars. */}
       <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
         {image ? (
           <Image
@@ -36,11 +44,31 @@ export default function ProductCard({ product }: { product: Product }) {
           </span>
         )}
         {/* Out of Stock sits on the left so it never collides with the
-            Made in USA badge, which now lives on the right. */}
+            Made in USA badge, which lives on the right. */}
         {!product.inStock && (
-          <span className="absolute top-3 left-3 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
+          <span className="absolute top-1 left-1 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
             Out of Stock
           </span>
+        )}
+        {/* Mini previews of the additional gallery images (molecule
+            cards). Purely a visual cue; the whole card is one link. */}
+        {extras.length > 0 && (
+          <div className="absolute bottom-1.5 left-1.5 flex gap-1" aria-hidden>
+            {extras.map((src) => (
+              <span
+                key={src}
+                className="relative block h-12 w-8 overflow-hidden rounded-[2px] border border-cream/25 bg-black/70"
+              >
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="32px"
+                  className="object-cover"
+                />
+              </span>
+            ))}
+          </div>
         )}
       </div>
       <div className="p-5">

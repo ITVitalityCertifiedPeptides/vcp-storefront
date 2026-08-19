@@ -1,5 +1,6 @@
 import "server-only";
 import swell from "swell-js";
+import { galleryImages } from "./product-gallery";
 import type {
   Product,
   ProductOption,
@@ -126,6 +127,7 @@ function mapProduct(p: SwellProduct): Product {
     subscription,
     priceFrom,
     madeInUsa: content.made_in_usa !== false,
+    images: galleryImages(slugify(p.name)),
   };
 }
 

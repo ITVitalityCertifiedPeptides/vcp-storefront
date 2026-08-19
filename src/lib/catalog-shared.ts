@@ -38,6 +38,9 @@ export type Product = {
   subscription: SubscriptionPlan[] | null;
   priceFrom: number | null;
   madeInUsa: boolean;
+  // Gallery image URLs discovered server-side from public/products
+  // (see lib/product-gallery.ts): hero first, then molecule card(s).
+  images: string[];
 };
 
 // Display-layer renames pending a counsel-approved rename of the
