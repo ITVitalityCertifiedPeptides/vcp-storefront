@@ -56,8 +56,11 @@ export async function generateMetadata({
 }
 
 // Gallery discovery: files in public/products named by convention
-// (<slug>-hero, <slug>, <slug>-molecule, <slug>-vial in .jpg/.png/.webp)
-// appear automatically in that order. Drop images in, redeploy, done.
+// (<slug>-hero, <slug>-molecule, plus legacy <slug> and optional
+// <slug>-vial; .jpg/.png/.webp) appear automatically. The standard set is
+// TWO images per product: hero (formula card + vial) and molecule
+// (diagram + sequence card). Once a -hero exists it supersedes the legacy
+// square <slug> shot, which is then hidden.
 function galleryImages(slug: string): string[] {
   let files: string[] = [];
   try {
@@ -66,17 +69,20 @@ function galleryImages(slug: string): string[] {
     // public/products missing in some build contexts; fall through.
   }
   const lower = new Map(files.map((f) => [f.toLowerCase(), f]));
-  const bases = [`${slug}-hero`, slug, `${slug}-molecule`, `${slug}-vial`];
-  const found: string[] = [];
-  for (const base of bases) {
+  const find = (base: string): string | null => {
     for (const ext of ["jpg", "png", "webp"]) {
       const hit = lower.get(`${base.toLowerCase()}.${ext}`);
-      if (hit) {
-        found.push(`/products/${hit}`);
-        break;
-      }
+      if (hit) return `/products/${hit}`;
     }
-  }
+    return null;
+  };
+  const hero = find(`${slug}-hero`);
+  const legacy = find(slug);
+  const molecule = find(`${slug}-molecule`);
+  const vial = find(`${slug}-vial`);
+  const found = [hero, hero ? null : legacy, molecule, vial].filter(
+    (x): x is string => Boolean(x)
+  );
   // Fallback to the static map for any legacy filename mismatch.
   if (found.length === 0 && productImages[slug]) found.push(productImages[slug]);
   return found;
