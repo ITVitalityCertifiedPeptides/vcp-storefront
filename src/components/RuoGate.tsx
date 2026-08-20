@@ -1,10 +1,11 @@
 "use client";
 
-// One-time entry acknowledgment, the same pattern the rest of the
-// industry uses (age/qualification gate at the door). Acknowledging it is
-// remembered in the browser, so returning visitors are not nagged. Having
-// this at the door is what lets the rest of the site keep research-use
-// language down to the footer, the policy pages, and checkout.
+// Entry acknowledgment shown on EVERY visit (per Josh, matching the
+// competitor pattern): sessionStorage remembers the acknowledgment only
+// for the current browser session, so navigating between pages doesn't
+// re-prompt, but every new visit to the site starts with the gate.
+// Having this at the door is what lets the rest of the site keep
+// research-use language down to the footer, policy pages, and checkout.
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -19,7 +20,7 @@ export default function RuoGate() {
     // synchronously inside the effect body.
     const id = window.setTimeout(() => {
       try {
-        if (!window.localStorage.getItem(STORAGE_KEY)) setOpen(true);
+        if (!window.sessionStorage.getItem(STORAGE_KEY)) setOpen(true);
       } catch {
         // Storage unavailable (private browsing edge cases): stay closed
         // rather than trapping the visitor behind a gate that can't persist.
@@ -30,7 +31,7 @@ export default function RuoGate() {
 
   function accept() {
     try {
-      window.localStorage.setItem(STORAGE_KEY, new Date().toISOString());
+      window.sessionStorage.setItem(STORAGE_KEY, new Date().toISOString());
     } catch {
       // Ignore storage failures; close for this visit regardless.
     }

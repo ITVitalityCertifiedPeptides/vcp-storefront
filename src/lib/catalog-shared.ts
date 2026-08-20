@@ -27,6 +27,9 @@ export type Product = {
   name: string;
   slug: string;
   category: string;
+  // All research areas (raw category values): primary category first,
+  // then literature-supported secondary areas of study.
+  areas: string[];
   casNumber: string;
   description: string;
   price: number | null;

@@ -63,10 +63,21 @@ const D: Array<[string, TechnicalData]> = [
 ];
 
 export function technicalDataFor(productName: string): TechnicalData | null {
+  // Longest matching prefix wins. Ordering alone is not enough: the name
+  // "Melanotan II 10mg" string-prefix-matches "Melanotan I" too, so list
+  // order would hand Melanotan II the Melanotan I data.
+  let best: TechnicalData | null = null;
+  let bestLen = -1;
   for (const [prefix, data] of D) {
-    if (productName.toLowerCase().startsWith(prefix.toLowerCase())) return data;
+    if (
+      productName.toLowerCase().startsWith(prefix.toLowerCase()) &&
+      prefix.length > bestLen
+    ) {
+      best = data;
+      bestLen = prefix.length;
+    }
   }
-  return null;
+  return best;
 }
 
 // Lookup a single component's data for blend component tables.

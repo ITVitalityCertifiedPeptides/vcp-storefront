@@ -69,6 +69,36 @@ export default async function SiteHeader() {
             >
               Research Library
             </Link>
+            <Link
+              href="/about"
+              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+            >
+              About
+            </Link>
+            <div className="relative group">
+              <span className="inline-flex items-center gap-1.5 label-eyebrow text-[0.7rem] text-ink-soft group-hover:text-gold-deep transition-colors cursor-default py-3">
+                Legal
+                <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+              </span>
+              <div className="absolute left-0 top-full hidden group-hover:block bg-white border border-line shadow-[0_12px_32px_-16px_rgba(21,19,15,0.35)] min-w-[220px] py-2 z-50">
+                {[
+                  ["/ruo-policy", "RUO Policy"],
+                  ["/privacy-policy", "Privacy Policy"],
+                  ["/liability-waiver", "Liability Waiver"],
+                  ["/refund-returns", "Refund and Returns"],
+                  ["/terms-of-service", "Terms of Service"],
+                  ["/support", "Support Center"],
+                ].map(([href, label]) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="block px-5 py-2.5 text-sm text-ink hover:bg-cream-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </nav>
           <div className="flex items-center gap-4 shrink-0">
             <Link

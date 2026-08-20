@@ -154,10 +154,20 @@ export default async function ProductPage({
             </div>
             <div>
               <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">
-                Research Area
+                {product.areas.length > 1 ? "Research Areas" : "Research Area"}
               </dt>
               <dd className="font-medium text-ink">
-                {displayCategory(product.category)}
+                {product.areas.map((area, i) => (
+                  <span key={area}>
+                    {i > 0 && <span className="text-ink-soft/60">, </span>}
+                    <Link
+                      href={`/categories/${categorySlug(area)}`}
+                      className="hover:text-gold-deep transition-colors"
+                    >
+                      {displayCategory(area)}
+                    </Link>
+                  </span>
+                ))}
               </dd>
             </div>
             <div>

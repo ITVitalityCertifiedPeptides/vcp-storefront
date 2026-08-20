@@ -1,6 +1,7 @@
 import "server-only";
 import swell from "swell-js";
 import { galleryImages } from "./product-gallery";
+import { secondaryAreasFor } from "./research-areas";
 import type {
   Product,
   ProductOption,
@@ -110,12 +111,22 @@ function mapProduct(p: SwellProduct): Product {
     if (hasSpread) priceFrom = base + Math.min(...deltas);
   }
 
+  const primaryArea = content.category || "";
+  // Full list of research areas: the Swell category first, then any
+  // literature-supported secondary areas (see lib/research-areas.ts),
+  // deduplicated in case a secondary ever matches the primary.
+  const areas = [
+    primaryArea,
+    ...secondaryAreasFor(p.name).filter((a) => a && a !== primaryArea),
+  ].filter(Boolean);
+
   return {
     id: p.id,
     sku: p.sku || "",
     name: p.name,
     slug: slugify(p.name),
-    category: content.category || "",
+    category: primaryArea,
+    areas,
     casNumber: content.cas_number || "",
     description: p.description || "",
     price: base,
@@ -181,7 +192,9 @@ export async function getAllCategories(): Promise<string[]> {
 
 export async function getProductsByCategory(category: string): Promise<Product[]> {
   const products = await getAllProducts();
-  return products.filter((p) => p.category === category);
+  // A product appears on every research-area page it is studied under,
+  // not only its primary category.
+  return products.filter((p) => p.areas.includes(category));
 }
 
 export function categorySlug(category: string): string {

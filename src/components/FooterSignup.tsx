@@ -19,7 +19,7 @@ export default function FooterSignup() {
       const data = (await response.json()) as { error?: string };
       if (response.ok) {
         setState("done");
-        setMessage("You're on the list.");
+        setMessage("You're on the priority list.");
       } else {
         setState("error");
         setMessage(data.error || "Something went wrong. Please try again.");
@@ -35,9 +35,13 @@ export default function FooterSignup() {
   }
 
   return (
-    <form onSubmit={submit} className="mt-4">
-      <label className="label-eyebrow text-[0.62rem] text-cream/60 block mb-2">
-        Get stock updates and new lot notices
+    <form onSubmit={submit} className="mt-5">
+      <p className="label-eyebrow text-[0.7rem] text-gold mb-1.5">
+        Join Our Priority List
+      </p>
+      <label className="text-xs text-cream/60 leading-relaxed block mb-2.5">
+        Early access to new compounds, restock notices, and private offers,
+        delivered to your inbox.
       </label>
       <div className="flex gap-2">
         <input
@@ -53,7 +57,7 @@ export default function FooterSignup() {
           disabled={state === "busy"}
           className="rounded-full bg-gold text-ink px-4 py-2 label-eyebrow text-[0.62rem] hover:bg-cream transition-colors disabled:opacity-60 shrink-0"
         >
-          {state === "busy" ? "..." : "Sign Up"}
+          {state === "busy" ? "..." : "Subscribe"}
         </button>
       </div>
       {state === "error" && (

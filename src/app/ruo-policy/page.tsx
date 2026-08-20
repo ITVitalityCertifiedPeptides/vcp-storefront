@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ruoNotice, ruoPolicySections } from "@/lib/site";
+import { restrictedStateNames } from "@/lib/restricted-states";
 
 export const metadata: Metadata = {
   title: "Research Use Only Policy",
@@ -37,14 +38,27 @@ export default function RuoPolicyPage() {
         dosage or human-consumption information.
       </p>
 
-      <div className="rounded-sm bg-cream-soft border border-line px-5 py-4">
-        <p className="label-eyebrow text-[0.65rem] text-ink-soft leading-relaxed">
-          This policy reflects our current RUO practices and will be
-          reviewed by legal counsel on an ongoing basis, including the
-          state-by-state risk matrix. Language here is subject to
-          revision as that review progresses.
-        </p>
-      </div>
+      <h2 className="font-serif-display text-xl text-ink mb-3">
+        State shipping restrictions
+      </h2>
+      <p className="text-ink-soft leading-relaxed mb-4">
+        Vitality Certified Peptides does not sell or ship to the following
+        states:
+      </p>
+      <ul className="space-y-2 mb-4">
+        {restrictedStateNames.map((state) => (
+          <li key={state} className="flex items-center gap-3 text-ink font-medium">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold shrink-0" aria-hidden />
+            {state}
+          </li>
+        ))}
+      </ul>
+      <p className="text-ink-soft leading-relaxed text-sm">
+        Orders with a shipping address in these states cannot be fulfilled
+        and will be canceled and refunded. This list reflects current
+        state-level regulation and enforcement activity and is reviewed
+        regularly; it may change as state law changes.
+      </p>
     </div>
   );
 }

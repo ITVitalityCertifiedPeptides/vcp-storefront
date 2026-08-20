@@ -15,6 +15,7 @@ import { ArrowRight } from "lucide-react";
 import { getSwell, type SwellCart } from "@/lib/swell-client";
 import { useCart } from "@/components/CartProvider";
 import { trackConversion } from "@/lib/tapfiliate";
+import { isRestrictedState } from "@/lib/restricted-states";
 
 function money(n?: number) {
   return typeof n === "number" ? `$${n.toFixed(2)}` : "";
@@ -103,6 +104,18 @@ export default function CheckoutPage() {
     if (!form.attested) {
       setError(
         "Please confirm the research use only statement to place your order."
+      );
+      return;
+    }
+    // State shipping restrictions: matches the list published on
+    // /ruo-policy (lib/restricted-states.ts is the single source of
+    // truth for both).
+    const restricted = isRestrictedState(form.state);
+    if (restricted) {
+      setError(
+        `We're sorry, but we do not sell or ship to ${restricted.name}. ` +
+          "See our Research Use Only Policy for the current list of " +
+          "restricted states."
       );
       return;
     }
