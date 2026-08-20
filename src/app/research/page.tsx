@@ -11,7 +11,8 @@ export const metadata: Metadata = {
 };
 
 // Screenshot thumbnails live in public/trusted/ (home-page captures,
-// refreshed occasionally). Same source list as the header dropdown.
+// refreshed occasionally). Shown at the top of this page, above the
+// library search.
 const trustedSources = [
   {
     name: "PubMed",
@@ -56,9 +57,7 @@ export default function ResearchLibraryPage() {
         <p className="text-xs text-ink-soft leading-relaxed">{libraryDisclaimer}</p>
       </div>
 
-      <ResearchLibraryBrowser entries={researchLibrary} />
-
-      <section className="mt-16 border-t border-line pt-12">
+      <section className="mb-16">
         <h2 className="font-serif-display text-2xl text-ink mb-3">
           Trusted Sources
         </h2>
@@ -95,6 +94,13 @@ export default function ResearchLibraryPage() {
             </a>
           ))}
         </div>
+      </section>
+
+      <section className="border-t border-line pt-12">
+        <h2 className="font-serif-display text-2xl text-ink mb-6">
+          Search Our Library
+        </h2>
+        <ResearchLibraryBrowser entries={researchLibrary} />
       </section>
     </div>
   );
