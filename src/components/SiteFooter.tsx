@@ -140,6 +140,12 @@ export default async function SiteFooter() {
           <p>
             &copy; {year} {siteConfig.name}. All rights reserved.
           </p>
+          <a
+            href="mailto:info@vitalitycertifiedpeptides.com?subject=Wholesale%20Pricing"
+            className="text-cream/50 hover:text-cream/80 transition-colors"
+          >
+            Buying in bulk? Ask about wholesale pricing.
+          </a>
           <p>For laboratory research use only. Not for human consumption.</p>
         </div>
       </div>
