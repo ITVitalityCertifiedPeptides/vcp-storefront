@@ -1,11 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, User } from "lucide-react";
-import { getAllCategories, categorySlug, displayCategory } from "@/lib/products";
+import {
+  getAllCategories,
+  getAllProducts,
+  categorySlug,
+  displayCategory,
+} from "@/lib/products";
+import { productImages } from "@/lib/product-images";
 import CartButton from "./CartButton";
+import HeaderSearch from "./HeaderSearch";
 
 export default async function SiteHeader() {
-  const categories = await getAllCategories();
+  const [categories, products] = await Promise.all([
+    getAllCategories(),
+    getAllProducts(),
+  ]);
+  // Lightweight index for the header's live-search dropdown: getAllProducts()
+  // is cached per server process, so this doesn't add a second Swell call.
+  const searchIndex = products.map((product) => ({
+    slug: product.slug,
+    name: product.name,
+    category: displayCategory(product.category),
+    price: product.priceFrom ?? product.price,
+    image: product.images?.[0] || productImages[product.slug] || null,
+  }));
 
   return (
     <header className="sticky top-0 z-40">
@@ -101,6 +120,7 @@ export default async function SiteHeader() {
             </div>
           </nav>
           <div className="flex items-center gap-4 shrink-0">
+            <HeaderSearch products={searchIndex} />
             <Link
               href="/categories"
               className="hidden md:inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
