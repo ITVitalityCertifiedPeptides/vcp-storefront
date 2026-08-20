@@ -64,17 +64,48 @@ export default async function SiteHeader() {
               Quality
             </Link>
             <Link
-              href="/research"
-              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-            >
-              Research Library
-            </Link>
-            <Link
               href="/about"
               className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
             >
               About
             </Link>
+            <div className="relative group">
+              <Link
+                href="/research"
+                className="inline-flex items-center gap-1.5 label-eyebrow text-[0.7rem] text-ink-soft group-hover:text-gold-deep transition-colors whitespace-nowrap py-3"
+              >
+                Research Library
+                <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+              </Link>
+              <div className="absolute left-0 top-full hidden group-hover:block bg-white border border-line shadow-[0_12px_32px_-16px_rgba(21,19,15,0.35)] min-w-[230px] py-2 z-50">
+                <Link
+                  href="/research"
+                  className="block px-5 py-2.5 text-sm text-ink hover:bg-cream-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+                >
+                  Our Research Library
+                </Link>
+                <div className="px-5 pt-3 pb-1.5 label-eyebrow text-[0.58rem] text-ink-soft/70">
+                  Trusted Sources
+                </div>
+                {[
+                  ["https://pubmed.ncbi.nlm.nih.gov/", "PubMed"],
+                  ["https://pubchem.ncbi.nlm.nih.gov/", "PubChem"],
+                  ["https://clinicaltrials.gov/", "ClinicalTrials.gov"],
+                  ["https://europepmc.org/", "Europe PMC"],
+                  ["https://scholar.google.com/", "Google Scholar"],
+                ].map(([href, label]) => (
+                  <a
+                    key={href}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-5 py-2.5 text-sm text-ink hover:bg-cream-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+                  >
+                    {label} &#8599;
+                  </a>
+                ))}
+              </div>
+            </div>
             <div className="relative group">
               <span className="inline-flex items-center gap-1.5 label-eyebrow text-[0.7rem] text-ink-soft group-hover:text-gold-deep transition-colors cursor-default py-3">
                 Legal
