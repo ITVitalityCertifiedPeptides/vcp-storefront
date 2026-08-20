@@ -135,6 +135,24 @@ export default function CheckoutPage() {
           country: "US",
           phone: form.phone,
         },
+        // Swell won't submit an order without a billing block + a
+        // billing.method that matches a payment method configured in
+        // Settings > Payments. We collect one address (no separate billing
+        // form), so billing mirrors shipping, with method set to the
+        // "Pay by Invoice" manual payment method (id "cash" in Swell,
+        // enabled 2026-08-20 — was previously disabled, which is why
+        // submitOrder failed with "Billing information is incomplete").
+        billing: {
+          name,
+          address1: form.address1,
+          address2: form.address2 || undefined,
+          city: form.city,
+          state: form.state,
+          zip: form.zip,
+          country: "US",
+          phone: form.phone,
+          method: "cash",
+        },
         comments:
           "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Venmo / Cash App / Wise). Ship only after payment is confirmed.",
         metadata: {
