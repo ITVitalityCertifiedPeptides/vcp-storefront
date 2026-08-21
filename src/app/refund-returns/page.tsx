@@ -36,7 +36,7 @@ const sections: Array<{ heading: string; body: string }> = [
   },
   {
     heading: "Contact",
-    body: "For any refund or return matter, email info@vitalitycertifiedpeptides.com with your order number. A real person replies, usually within 1 business day.",
+    body: "For any refund or return matter, email customerservice@vitalitycertifiedpeptides.com with your order number. A real person replies, usually within 1 business day.",
   },
 ];
 

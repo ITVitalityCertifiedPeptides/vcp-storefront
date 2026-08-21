@@ -1,19 +1,20 @@
 "use client";
 
-// Invoice-based order confirmation. Shows the order number and total with
-// the manual-payment instructions (Zelle / Venmo / Cash App / Wise).
+// Invoice-based order confirmation. The actual payment target (a Zelle
+// address or an Apple Cash phone number, whichever the team is using for
+// this order) is NOT shown here - it goes out in a follow-up email, since
+// only one method is sent per order rather than a menu of choices. This
+// page just tells the buyer that email is coming and what to do with it.
 //
-// TODO (Jeff/Tom): actual Zelle / Venmo / Cash App / Wise account details
-// are intentionally NOT shown here. They are sent with the invoice by the
-// team. If account details should ever appear on this page, they must
-// come from Jeff or Tom directly; do not add placeholders or guesses.
+// TODO (Jeff/Tom): the email itself (Swell Settings > Notifications >
+// order confirmation) still needs the real Zelle account / Apple Cash
+// phone number filled in. Do not add placeholders or guesses here or
+// there.
 
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-
-const PAYMENT_METHODS = ["Zelle", "Venmo", "Cash App", "Wise"];
 
 function Confirmation() {
   const params = useSearchParams();
@@ -36,26 +37,18 @@ function Confirmation() {
 
       <div className="rounded-sm border border-line bg-cream-soft px-6 py-6 mb-8">
         <p className="label-eyebrow text-[0.7rem] text-gold-deep mb-3">
-          How to complete your purchase
+          What happens next
         </p>
         <p className="text-ink-soft leading-relaxed mb-4">
-          Your order has been received. To complete your purchase, please
-          send payment{total ? ` for $${total}` : ""} via one of the
-          following methods:
+          We&apos;ve sent payment instructions to your email
+          {number ? ` for order #${number}` : ""}. Please complete payment
+          {total ? ` of $${total}` : ""} and reply to that email with a
+          screenshot or confirmation number from the transaction.
         </p>
-        <ul className="mb-4 space-y-1.5">
-          {PAYMENT_METHODS.map((method) => (
-            <li key={method} className="flex items-center gap-3 text-ink">
-              <span className="h-1.5 w-1.5 rounded-full bg-gold shrink-0" aria-hidden />
-              {method}
-            </li>
-          ))}
-        </ul>
         <p className="text-ink-soft leading-relaxed">
-          Payment instructions and account details will be sent separately
-          by our team{number ? `, referencing order #${number}` : ""}.
-          Orders ship once payment is confirmed, typically within one
-          business day of payment being received.
+          One of our team members will review and approve your order.
+          We process payments Monday through Friday during business
+          hours, and your order ships within 1 business day of approval.
         </p>
       </div>
 

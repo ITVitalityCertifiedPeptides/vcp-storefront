@@ -35,10 +35,10 @@ export default function SupportPage() {
           <Mail className="h-5 w-5 text-gold-deep mb-3" aria-hidden />
           <p className="font-medium text-ink mb-1.5">Email us</p>
           <a
-            href="mailto:info@vitalitycertifiedpeptides.com"
+            href="mailto:customerservice@vitalitycertifiedpeptides.com"
             className="text-sm text-gold-deep hover:underline underline-offset-4 break-all"
           >
-            info@vitalitycertifiedpeptides.com
+            customerservice@vitalitycertifiedpeptides.com
           </a>
           <p className="text-xs text-ink-soft mt-2 leading-relaxed">
             Include your order number for the fastest help.

@@ -44,7 +44,7 @@ const sections: Array<{ heading: string; body: string }> = [
   },
   {
     heading: "Changes and contact",
-    body: "We may update this policy from time to time; the current version is always posted here with its date. Questions or requests: info@vitalitycertifiedpeptides.com.",
+    body: "We may update this policy from time to time; the current version is always posted here with its date. Questions or requests: customerservice@vitalitycertifiedpeptides.com.",
   },
 ];
 

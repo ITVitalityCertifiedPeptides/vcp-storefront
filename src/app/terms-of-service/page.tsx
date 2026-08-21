@@ -73,7 +73,7 @@ const sections: Array<{ heading: string; body: string }> = [
   },
   {
     heading: "16. Contact",
-    body: "Questions about these terms can be sent to info@vitalitycertifiedpeptides.com.",
+    body: "Questions about these terms can be sent to customerservice@vitalitycertifiedpeptides.com.",
   },
 ];
 

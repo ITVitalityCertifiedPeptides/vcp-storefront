@@ -89,6 +89,14 @@ export default async function SiteFooter() {
                 Affiliate Program
               </Link>
             </li>
+            <li>
+              <a
+                href="mailto:info@vitalitycertifiedpeptides.com?subject=Wholesale%20Inquiry"
+                className="text-cream/70 hover:text-cream transition-colors"
+              >
+                Wholesale Inquiries
+              </a>
+            </li>
           </ul>
           <p className="text-cream/45 text-xs leading-relaxed mt-4">
             A digital Certificate of Analysis is delivered with every
@@ -140,12 +148,6 @@ export default async function SiteFooter() {
           <p>
             &copy; {year} {siteConfig.name}. All rights reserved.
           </p>
-          <a
-            href="mailto:info@vitalitycertifiedpeptides.com?subject=Wholesale%20Pricing"
-            className="text-cream/50 hover:text-cream/80 transition-colors"
-          >
-            Buying in bulk? Ask about wholesale pricing.
-          </a>
           <p>For laboratory research use only. Not for human consumption.</p>
         </div>
       </div>
