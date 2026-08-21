@@ -2,8 +2,8 @@
 
 // Invoice-based checkout: collects contact + shipping details and submits
 // the order to Swell as UNPAID (pending payment). Our team then sends the
-// buyer an invoice (Zelle / Venmo / Cash App / Wise) and the order ships
-// once payment is confirmed. Card (PaymentCloud) and crypto (BitPay) are
+// buyer an invoice (Zelle / Apple Cash / Venmo / Cash App / Wise) and the
+// order ships once payment is confirmed. Card (PaymentCloud) and crypto (BitPay) are
 // shown as Coming Soon below until those merchant accounts are approved;
 // when they go live they become selectable here at the SAME listed price
 // (no payment-method discounts anywhere in this flow).
@@ -134,6 +134,15 @@ export default function CheckoutPage() {
           zip: form.zip,
           country: "US",
           phone: form.phone,
+          // Swell also won't submit an order without a shipping SERVICE
+          // selected (separate requirement from the billing method below) —
+          // "standard" is the id of "Standard Shipping", the only shipping
+          // service enabled in Settings > Shipping. Confirmed via
+          // swell.cart.getShippingRates() on 2026-08-20, which returned
+          // exactly one service: { id: "standard", name: "Standard
+          // Shipping" }. Without this, submitOrder fails with "Please
+          // select a shipping service."
+          service: "standard",
         },
         // Swell won't submit an order without a billing block + a
         // billing.method that matches a payment method configured in
@@ -154,7 +163,7 @@ export default function CheckoutPage() {
           method: "cash",
         },
         comments:
-          "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Venmo / Cash App / Wise). Ship only after payment is confirmed.",
+          "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Apple Cash / Venmo / Cash App / Wise). Ship only after payment is confirmed.",
         metadata: {
           ruo_attestation: true,
           ruo_attested_at: new Date().toISOString(),
@@ -336,8 +345,8 @@ export default function CheckoutPage() {
                 </span>
                 <span className="block text-xs text-ink-soft mt-1 leading-relaxed">
                   Place your order now. We send your invoice with payment
-                  instructions for Zelle, Venmo, Cash App, or Wise. Your
-                  order ships once payment is confirmed.
+                  instructions for Zelle, Apple Cash, Venmo, Cash App, or
+                  Wise. Your order ships once payment is confirmed.
                 </span>
               </span>
             </label>
