@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { getAllCategories, categorySlug, displayCategory } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
+import { isApprovedResearcher } from "@/lib/current-session";
 import FooterSignup from "./FooterSignup";
 
 export default async function SiteFooter() {
-  const categories = await getAllCategories();
+  const approved = await isApprovedResearcher();
+  const categories = approved ? await getAllCategories() : [];
   const year = new Date().getFullYear();
 
   return (
@@ -33,19 +35,41 @@ export default async function SiteFooter() {
           <FooterSignup />
         </div>
         <div>
-          <div className="label-eyebrow text-gold mb-3">Research Areas</div>
-          <ul className="space-y-2">
-            {categories.map((category) => (
-              <li key={category}>
-                <Link
-                  href={`/categories/${categorySlug(category)}`}
-                  className="text-cream/70 hover:text-cream transition-colors"
-                >
-                  {displayCategory(category)}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {approved ? (
+            <>
+              <div className="label-eyebrow text-gold mb-3">Research Areas</div>
+              <ul className="space-y-2">
+                {categories.map((category) => (
+                  <li key={category}>
+                    <Link
+                      href={`/categories/${categorySlug(category)}`}
+                      className="text-cream/70 hover:text-cream transition-colors"
+                    >
+                      {displayCategory(category)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            // Researcher-gate (2026-08-27): no category names for logged-out
+            // visitors - a Get Access column instead of the catalog list.
+            <>
+              <div className="label-eyebrow text-gold mb-3">Get Access</div>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/register" className="text-cream/70 hover:text-cream transition-colors">
+                    Register as a Researcher
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="text-cream/70 hover:text-cream transition-colors">
+                    Sign In
+                  </Link>
+                </li>
+              </ul>
+            </>
+          )}
         </div>
         <div>
           <div className="label-eyebrow text-gold mb-3">Trust &amp; Compliance</div>

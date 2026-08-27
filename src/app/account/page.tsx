@@ -278,9 +278,19 @@ function AccountContent() {
 
   async function logout() {
     await getSwell().account.logout();
+    // Also clear the researcher-gate cookie (see src/lib/session.ts) so
+    // catalog/pricing access ends immediately instead of lingering up to
+    // 24h - this is the counterpart to the dual login in /login.
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // non-fatal - the gate cookie still expires on its own
+    }
     setAccount(null);
     setOrders([]);
     setSubscriptions([]);
+    router.push("/");
+    router.refresh();
   }
 
   return (

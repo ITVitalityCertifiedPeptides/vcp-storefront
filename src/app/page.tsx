@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, FlaskConical, Package, Tag } from "lucide-react";
+import { ArrowRight, FlaskConical, Package, Tag, LockKeyhole } from "lucide-react";
 import {
   getAllCategories,
   getAllProducts,
@@ -10,6 +10,7 @@ import {
 } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
+import { isApprovedResearcher } from "@/lib/current-session";
 import FilteredProductGrid from "@/components/FilteredProductGrid";
 import ProductCard from "@/components/ProductCard";
 import QualityBadges from "@/components/QualityBadges";
@@ -73,8 +74,9 @@ const faqs = [
 ];
 
 export default async function HomePage() {
-  const categories = await getAllCategories();
-  const products = await getAllProducts();
+  const approved = await isApprovedResearcher();
+  const categories = approved ? await getAllCategories() : [];
+  const products = approved ? await getAllProducts() : [];
   const blends = products.filter((p) => BLEND_SLUGS.includes(p.slug));
 
   return (
@@ -117,10 +119,10 @@ export default async function HomePage() {
           </h1>
           <div className="mt-7 md:mt-9 flex flex-wrap items-center gap-6">
             <Link
-              href="/categories"
+              href={approved ? "/categories" : "/register"}
               className="inline-flex items-center gap-2 rounded-full bg-gold text-ink px-8 py-3.5 label-eyebrow text-[0.72rem] hover:bg-cream transition-colors"
             >
-              Shop
+              {approved ? "Shop" : "Request Access"}
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </div>
@@ -147,70 +149,105 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {products.length > 0 && (
-        <section className="py-14">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
+      {approved ? (
+        <>
+          {products.length > 0 && (
+            <section className="py-14">
+              <div className="max-w-6xl mx-auto px-4">
+                <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
+                  <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
+                    Shop peptides
+                  </h2>
+                  <Link
+                    href="/categories"
+                    className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
+                  >
+                    Shop by research area &rarr;
+                  </Link>
+                </div>
+                <FilteredProductGrid products={products} />
+              </div>
+            </section>
+          )}
+
+          {blends.length > 0 && (
+            <section className="bg-cream-soft border-y border-line py-14">
+              <div className="max-w-6xl mx-auto px-4">
+                <div className="mb-8">
+                  <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
+                    Research blends
+                  </h2>
+                  <p className="text-sm text-ink-soft mt-2 max-w-lg">
+                    Multi-compound blends, tested and documented the same way as
+                    every single compound we carry.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {blends.map((product) => (
+                    <ProductCard key={product.slug} product={product} />
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          <section className="py-14">
+            <div className="max-w-6xl mx-auto px-4 flex items-end justify-between mb-8 gap-4 flex-wrap">
               <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-                Shop peptides
+                Shop by research area
               </h2>
               <Link
                 href="/categories"
                 className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
               >
-                Shop by research area &rarr;
+                View all &rarr;
               </Link>
             </div>
-            <FilteredProductGrid products={products} />
-          </div>
-        </section>
-      )}
-
-      {blends.length > 0 && (
-        <section className="bg-cream-soft border-y border-line py-14">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="mb-8">
-              <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-                Research blends
-              </h2>
-              <p className="text-sm text-ink-soft mt-2 max-w-lg">
-                Multi-compound blends, tested and documented the same way as
-                every single compound we carry.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {blends.map((product) => (
-                <ProductCard key={product.slug} product={product} />
+            <div className="max-w-6xl mx-auto px-4 flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <Link
+                  key={category}
+                  href={`/categories/${categorySlug(category)}`}
+                  className="inline-flex items-center rounded-full border border-line bg-white px-4 py-2.5 font-medium text-ink text-sm hover:border-gold-deep hover:text-gold-deep transition-colors"
+                >
+                  {displayCategory(category)}
+                </Link>
               ))}
             </div>
+          </section>
+        </>
+      ) : (
+        // Researcher-gate (2026-08-27): logged-out visitors get this CTA
+        // instead of the catalog - no product names, categories, or prices
+        // render anywhere on the public homepage.
+        <section className="py-16">
+          <div className="max-w-2xl mx-auto px-4 text-center">
+            <LockKeyhole className="h-8 w-8 text-gold-deep mx-auto mb-5" aria-hidden />
+            <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink mb-4">
+              Catalog &amp; Pricing for Approved Researchers
+            </h2>
+            <p className="text-ink-soft leading-relaxed mb-8">
+              We publish our full catalog and pricing to approved researchers
+              only. Register below and our team will review your account,
+              usually within one business day.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/register"
+                className="inline-flex items-center rounded-full bg-gold-deep text-cream px-7 py-3 label-eyebrow text-[0.68rem] hover:bg-ink transition-colors"
+              >
+                Request Access
+              </Link>
+              <Link
+                href="/login"
+                className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
+              >
+                Already approved? Sign in
+              </Link>
+            </div>
           </div>
         </section>
       )}
-
-      <section className="py-14">
-        <div className="max-w-6xl mx-auto px-4 flex items-end justify-between mb-8 gap-4 flex-wrap">
-          <h2 className="text-2xl md:text-[1.9rem] font-semibold text-ink">
-            Shop by research area
-          </h2>
-          <Link
-            href="/categories"
-            className="label-eyebrow text-[0.68rem] text-ink-soft hover:text-gold-deep transition-colors"
-          >
-            View all &rarr;
-          </Link>
-        </div>
-        <div className="max-w-6xl mx-auto px-4 flex flex-wrap gap-3">
-          {categories.map((category) => (
-            <Link
-              key={category}
-              href={`/categories/${categorySlug(category)}`}
-              className="inline-flex items-center rounded-full border border-line bg-white px-4 py-2.5 font-medium text-ink text-sm hover:border-gold-deep hover:text-gold-deep transition-colors"
-            >
-              {displayCategory(category)}
-            </Link>
-          ))}
-        </div>
-      </section>
 
       <section className="border-b border-line">
         <div className="max-w-6xl mx-auto px-4 pt-14 pb-8 text-center">
