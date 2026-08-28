@@ -41,10 +41,29 @@ export type Product = {
   subscription: SubscriptionPlan[] | null;
   priceFrom: number | null;
   madeInUsa: boolean;
+  // Researcher-gate (2026-08-28, revised per Josh): most of the catalog is
+  // public for its research/reference value - pricing and purchasing are
+  // what require an approved login (see filterVisible()/ProductCard/BuyBox).
+  // This one flag is for the rare product Josh wants hidden ENTIRELY from
+  // anyone not signed in - not just its price. Set per-product in Swell
+  // admin (Developer > Models > Product > Content fields > "Researcher
+  // Only", same pattern as Category/CAS Number/RUO Disclaimer). Defaults
+  // to false/public when unset.
+  researcherOnly: boolean;
   // Gallery image URLs discovered server-side from public/products
   // (see lib/product-gallery.ts): hero first, then molecule card(s).
   images: string[];
 };
+
+// Researcher-gate helper: the one place that decides which products an
+// unapproved visitor gets to see at all. approved=false strips out every
+// researcherOnly product; approved=true (or omitted) returns everything.
+// Used wherever a product LIST is built for rendering (grids, search
+// results, the header search index, related-products) - the single
+// product page does its own redirect instead (see products/[slug]/page.tsx).
+export function filterVisible(products: Product[], approved: boolean): Product[] {
+  return approved ? products : products.filter((p) => !p.researcherOnly);
+}
 
 // Display-layer renames pending a counsel-approved rename of the
 // underlying Swell category values (raw values and URL slugs still carry

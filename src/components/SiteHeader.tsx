@@ -6,6 +6,7 @@ import {
   getAllProducts,
   categorySlug,
   displayCategory,
+  filterVisible,
 } from "@/lib/products";
 import { productImages } from "@/lib/product-images";
 import { isApprovedResearcher } from "@/lib/current-session";
@@ -66,84 +67,29 @@ function LegalDropdown() {
   );
 }
 
-// Researcher-gate (2026-08-27): a logged-out (or not-yet-approved) visitor
-// never receives category names or the price-bearing search index in the
-// HTML at all - not just a hidden UI element - since the whole point of
-// gating is that pricing/catalog data isn't sitting in a public page's
-// markup. This header only has Quality/About/Research/Legal plus Sign In
-// and Register. See middleware.ts for the route-level gating this backs.
-function PublicHeader() {
-  return (
-    <header className="sticky top-0 z-40">
-      <div className="bg-ink text-center py-2 px-4">
-        <p className="label-eyebrow text-[0.66rem] tracking-[0.16em] text-gold">
-          Research-Grade Peptides
-          <span className="text-cream/40 mx-2">&#8226;</span>
-          Approved Researchers Only
-        </p>
-      </div>
-      <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">
-        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-6">
-          <Wordmark />
-          <nav className="hidden lg:flex items-center gap-6">
-            <Link
-              href="/quality-assurance"
-              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-            >
-              Quality
-            </Link>
-            <Link
-              href="/about"
-              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-            >
-              About
-            </Link>
-            <Link
-              href="/research"
-              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-            >
-              Research
-            </Link>
-            <LegalDropdown />
-          </nav>
-          <div className="flex items-center gap-3 shrink-0">
-            <Link
-              href="/login"
-              className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors whitespace-nowrap"
-            >
-              Register
-            </Link>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
-
+// Researcher-gate (2026-08-28, revised per Josh): the catalog itself -
+// categories, product names, the header search - is public, so this is
+// one header for everyone. What changes with approval status is only the
+// right-hand actions (Sign In/Register vs. Account/Cart) and the header
+// search results: an unapproved visitor's search index has no price on
+// it and never includes a "Researcher Only" product (see filterVisible()
+// in catalog-shared.ts). middleware.ts is what actually blocks /cart and
+// /checkout for anyone not approved.
 export default async function SiteHeader() {
   const approved = await isApprovedResearcher();
 
-  if (!approved) {
-    return <PublicHeader />;
-  }
-
-  const [categories, products] = await Promise.all([
+  const [categories, allProducts] = await Promise.all([
     getAllCategories(),
     getAllProducts(),
   ]);
+  const products = filterVisible(allProducts, approved);
   // Lightweight index for the header's live-search dropdown: getAllProducts()
   // is cached per server process, so this doesn't add a second Swell call.
   const searchIndex = products.map((product) => ({
     slug: product.slug,
     name: product.name,
     category: displayCategory(product.category),
-    price: product.priceFrom ?? product.price,
+    price: approved ? (product.priceFrom ?? product.price) : null,
     image: product.images?.[0] || productImages[product.slug] || null,
   }));
 
@@ -208,14 +154,33 @@ export default async function SiteHeader() {
             >
               Shop Catalog
             </Link>
-            <Link
-              href="/account"
-              className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-line bg-white text-ink hover:border-gold-deep hover:text-gold-deep transition-colors"
-              aria-label="Account"
-            >
-              <User className="h-4.5 w-4.5" aria-hidden />
-            </Link>
-            <CartButton />
+            {approved ? (
+              <>
+                <Link
+                  href="/account"
+                  className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-line bg-white text-ink hover:border-gold-deep hover:text-gold-deep transition-colors"
+                  aria-label="Account"
+                >
+                  <User className="h-4.5 w-4.5" aria-hidden />
+                </Link>
+                <CartButton />
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors whitespace-nowrap"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
         {/* Compact category row for smaller viewports, since the primary

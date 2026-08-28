@@ -1,21 +1,24 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import {
   getAllProducts,
   getProductBySlug,
   categorySlug,
   displayCategory,
+  filterVisible,
 } from "@/lib/products";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
 import { technicalDataFor, componentDataFor } from "@/lib/technical-data";
+import { isApprovedResearcher } from "@/lib/current-session";
 import ProductGallery from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
 import ProductFaq from "@/components/ProductFaq";
 import BuyBox from "@/components/BuyBox";
+import SignInToBuy from "@/components/SignInToBuy";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -81,11 +84,23 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [product, allProducts] = await Promise.all([
+  const [product, rawAllProducts] = await Promise.all([
     getProductBySlug(slug),
     getAllProducts(),
   ]);
   if (!product) notFound();
+
+  const approved = await isApprovedResearcher();
+
+  // Researcher-gate (2026-08-28): individual products can be flagged
+  // "Researcher Only" in Swell (content.researcher_only). Anyone not
+  // approved gets bounced straight to sign-in rather than seeing this
+  // page at all - no name, no description, no images.
+  if (product.researcherOnly && !approved) {
+    redirect(`/login?return=${encodeURIComponent(`/products/${product.slug}`)}`);
+  }
+
+  const allProducts = filterVisible(rawAllProducts, approved);
 
   const images = product.images;
   const coas = coaDocs(product.slug);
@@ -184,15 +199,19 @@ export default async function ProductPage({
             </div>
           </dl>
 
-          <BuyBox
-            product={{
-              id: product.id,
-              price: product.price,
-              inStock: product.inStock,
-              options: product.options,
-              subscription: product.subscription,
-            }}
-          />
+          {approved ? (
+            <BuyBox
+              product={{
+                id: product.id,
+                price: product.price,
+                inStock: product.inStock,
+                options: product.options,
+                subscription: product.subscription,
+              }}
+            />
+          ) : (
+            <SignInToBuy returnTo={`/products/${product.slug}`} />
+          )}
 
           <p className="label-eyebrow text-[0.68rem] text-ink-soft mb-3">
             When your order ships you receive tracking and a digital copy

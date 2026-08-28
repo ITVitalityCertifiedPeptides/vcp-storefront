@@ -9,8 +9,10 @@ import ProductCard from "./ProductCard";
 
 export default function FilteredProductGrid({
   products,
+  approved = false,
 }: {
   products: Product[];
+  approved?: boolean;
 }) {
   const [filter, setFilter] = useState<"in_stock" | "all">("in_stock");
 
@@ -54,7 +56,7 @@ export default function FilteredProductGrid({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {shown.map((product) => (
-            <ProductCard key={product.slug} product={product} />
+            <ProductCard key={product.slug} product={product} approved={approved} />
           ))}
         </div>
       )}

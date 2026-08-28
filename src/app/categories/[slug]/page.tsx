@@ -6,11 +6,12 @@ import {
   getProductsByCategory,
   categoryFromSlug,
   categorySlug,
-  displayCategory,
+  filterVisible,
 } from "@/lib/products";
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
-import FilteredProductGrid from "@/components/FilteredProductGrid";
+import { isApprovedResearcher } from "@/lib/current-session";
+import ProductCard from "@/components/ProductCard";
 
 export async function generateStaticParams() {
   const categories = await getAllCategories();
@@ -28,10 +29,8 @@ export async function generateMetadata({
   const category = await categoryFromSlug(slug);
   if (!category) return {};
 
-  const title = `${displayCategory(category)} Compounds`;
-  const description = `Research-grade compounds in ${displayCategory(
-    category
-  ).toLowerCase()}, for laboratory research use only, each with a lot-specific Certificate of Analysis.`;
+  const title = `${category} Research Compounds`;
+  const description = `Research-grade ${category.toLowerCase()} compounds for laboratory research use only, each with a lot-specific Certificate of Analysis.`;
 
   return {
     title,
@@ -49,14 +48,12 @@ export default async function CategoryPage({
   const category = await categoryFromSlug(slug);
   if (!category) notFound();
 
-  const products = await getProductsByCategory(category);
+  const approved = await isApprovedResearcher();
+  const products = filterVisible(await getProductsByCategory(category), approved);
   const jsonLd = breadcrumbSchema([
     { name: "Home", url: siteConfig.url },
-    { name: "Research Areas", url: `${siteConfig.url}/categories` },
-    {
-      name: displayCategory(category),
-      url: `${siteConfig.url}/categories/${slug}`,
-    },
+    { name: "Categories", url: `${siteConfig.url}/categories` },
+    { name: category, url: `${siteConfig.url}/categories/${slug}` },
   ]);
 
   return (
@@ -67,18 +64,21 @@ export default async function CategoryPage({
       />
       <nav className="label-eyebrow text-[0.68rem] text-ink-soft mb-5">
         <Link href="/categories" className="hover:text-gold-deep transition-colors">
-          Research Areas
+          Categories
         </Link>{" "}
         <span className="text-line mx-1">/</span>{" "}
-        <span className="text-ink">{displayCategory(category)}</span>
+        <span className="text-ink">{category}</span>
       </nav>
-      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">
-        {displayCategory(category)}
-      </h1>
-      <p className="text-ink-soft mb-8 max-w-2xl">
-        For laboratory research use only.
+      <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-3">{category}</h1>
+      <p className="text-ink-soft mb-10 max-w-2xl">
+        {products.length} compound{products.length === 1 ? "" : "s"} in this
+        research category. For laboratory research use only.
       </p>
-      <FilteredProductGrid products={products} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        {products.map((product) => (
+          <ProductCard key={product.slug} product={product} approved={approved} />
+        ))}
+      </div>
     </div>
   );
 }

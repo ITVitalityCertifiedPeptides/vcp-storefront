@@ -11,7 +11,7 @@ import type {
 // Types + display helpers live in catalog-shared.ts (no server-only
 // guard) so client components can use them too; re-exported here so
 // server code keeps one import path.
-export { displayCategory } from "./catalog-shared";
+export { displayCategory, filterVisible } from "./catalog-shared";
 export type {
   Product,
   ProductOption,
@@ -61,6 +61,7 @@ type SwellProduct = {
     cas_number?: string;
     ruo_disclaimer?: string;
     made_in_usa?: boolean;
+    researcher_only?: boolean;
   };
   options?: Array<{
     id?: string;
@@ -138,6 +139,7 @@ function mapProduct(p: SwellProduct): Product {
     subscription,
     priceFrom,
     madeInUsa: content.made_in_usa !== false,
+    researcherOnly: content.researcher_only === true,
     images: galleryImages(slugify(p.name)),
   };
 }

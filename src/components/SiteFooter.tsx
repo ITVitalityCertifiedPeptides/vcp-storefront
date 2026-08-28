@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { getAllCategories, categorySlug, displayCategory } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
-import { isApprovedResearcher } from "@/lib/current-session";
 import FooterSignup from "./FooterSignup";
 
+// Researcher-gate (2026-08-28, revised per Josh): categories are public
+// (see middleware.ts / SiteHeader.tsx), so the footer's category list
+// shows for everyone now - no auth check needed here.
 export default async function SiteFooter() {
-  const approved = await isApprovedResearcher();
-  const categories = approved ? await getAllCategories() : [];
+  const categories = await getAllCategories();
   const year = new Date().getFullYear();
 
   return (
@@ -35,41 +36,19 @@ export default async function SiteFooter() {
           <FooterSignup />
         </div>
         <div>
-          {approved ? (
-            <>
-              <div className="label-eyebrow text-gold mb-3">Research Areas</div>
-              <ul className="space-y-2">
-                {categories.map((category) => (
-                  <li key={category}>
-                    <Link
-                      href={`/categories/${categorySlug(category)}`}
-                      className="text-cream/70 hover:text-cream transition-colors"
-                    >
-                      {displayCategory(category)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            // Researcher-gate (2026-08-27): no category names for logged-out
-            // visitors - a Get Access column instead of the catalog list.
-            <>
-              <div className="label-eyebrow text-gold mb-3">Get Access</div>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/register" className="text-cream/70 hover:text-cream transition-colors">
-                    Register as a Researcher
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/login" className="text-cream/70 hover:text-cream transition-colors">
-                    Sign In
-                  </Link>
-                </li>
-              </ul>
-            </>
-          )}
+          <div className="label-eyebrow text-gold mb-3">Research Areas</div>
+          <ul className="space-y-2">
+            {categories.map((category) => (
+              <li key={category}>
+                <Link
+                  href={`/categories/${categorySlug(category)}`}
+                  className="text-cream/70 hover:text-cream transition-colors"
+                >
+                  {displayCategory(category)}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
         <div>
           <div className="label-eyebrow text-gold mb-3">Trust &amp; Compliance</div>

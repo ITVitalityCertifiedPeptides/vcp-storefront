@@ -1,39 +1,32 @@
-// Researcher-gate: blocks the catalog/pricing/checkout routes from anyone
-// without an approved session (2026-08-27, Josh's spec - "gate the whole
-// catalog", approved manually per-account in Swell admin).
+// Researcher-gate (2026-08-28, revised per Josh): the catalog is public -
+// product/category pages, descriptions, CAS numbers, COAs, lab results,
+// and search all serve their research/reference value to anyone, signed
+// in or not, which keeps the site indexable and useful as a reference.
+// What actually requires an approved account is BUYING: seeing a real
+// price and putting something in a cart. That's enforced two ways:
+//   1. Here: /cart and /checkout hard-redirect to /login if not approved,
+//      as a backstop.
+//   2. In the pages themselves: ProductCard and BuyBox never render a
+//      price or an Add to Cart control for an unapproved visitor - they
+//      show "Sign in to see pricing" instead (see filterVisible() in
+//      catalog-shared.ts, and the `approved` prop threaded through the
+//      product-listing pages and components).
+// A small number of individual products can also be hidden ENTIRELY
+// (not just their price) via the per-product "Researcher Only" flag in
+// Swell - that's handled in products/[slug]/page.tsx (redirects if
+// !approved) and filterVisible() (removes it from every listing/search/
+// related-products/header-search for anyone not approved), not here -
+// checking that flag per-request in middleware would mean a Swell lookup
+// on every catalog page view.
 //
-// Only covers routes that actually show product names/prices or let
-// someone buy - NOT the whole site. Marketing/compliance pages
-// (/, /about, /research, /quality-assurance, /affiliates, legal pages,
-// /support, /login, /register, /pending-approval, /account) stay public on
-// purpose: that's what keeps them indexable and is where a prospective
-// researcher lands before they can see pricing. The homepage additionally
-// hides its own product grid client-side when logged out/pending (see
-// src/app/page.tsx) rather than being redirected here, so the root domain
-// still renders real marketing content instead of bouncing to /login.
-//
-// Gated: /products, /categories, /search, /cart, /checkout, /coa,
-// /lab-results - anywhere a product name or price actually renders.
-//
-// This only checks our own signed cookie (see src/lib/session.ts), which
-// is fast and works on any runtime - it never calls Swell on each request.
-// A staff approval in Swell admin (group: pending -> researcher) takes
-// effect the next time the visitor logs in, or within 24h since the
-// session is short-lived. See "Known limitations" in
-// claude/Researcher Gate - Build Notes.md.
+// (Earlier version of this file gated the whole catalog - see git history
+// / claude/Researcher Gate - Build Notes.md for that design and why it
+// changed.)
 
 import { NextResponse, type NextRequest } from "next/server";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
-const GATED_PREFIXES = [
-  "/products",
-  "/categories",
-  "/search",
-  "/cart",
-  "/checkout",
-  "/coa",
-  "/lab-results",
-];
+const GATED_PREFIXES = ["/cart", "/checkout"];
 
 function isGated(pathname: string): boolean {
   return GATED_PREFIXES.some(
@@ -66,13 +59,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/products/:path*",
-    "/categories/:path*",
-    "/search/:path*",
-    "/cart/:path*",
-    "/checkout/:path*",
-    "/coa/:path*",
-    "/lab-results/:path*",
-  ],
+  matcher: ["/cart/:path*", "/checkout/:path*"],
 };
