@@ -103,7 +103,7 @@ export default async function SiteHeader() {
     <header className="sticky top-0 z-40">
       <div className="bg-ink text-center py-2 px-4">
         <p className="label-eyebrow text-[0.66rem] tracking-[0.16em] text-gold">
-          Most orders ship within 3-5 business days
+          Most orders ship within 1-3 business days
           <span className="text-cream/40 mx-2">&#8226;</span>
           Free US shipping over $250
           <span className="text-cream/40 mx-2 hidden sm:inline">&#8226;</span>
