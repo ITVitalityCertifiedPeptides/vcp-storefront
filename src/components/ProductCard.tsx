@@ -3,7 +3,6 @@ import Link from "next/link";
 import type { Product } from "@/lib/catalog-shared";
 import { displayCategory } from "@/lib/catalog-shared";
 import { productImages } from "@/lib/product-images";
-import VialIcon from "./VialIcon";
 import QuickAdd from "./QuickAdd";
 
 // Product card for the shop grids: the hero shot only, kept clean.
@@ -35,17 +34,13 @@ export default function ProductCard({
           photography, so wider compositions letterbox invisibly instead
           of showing gray bars. */}
       <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
-        {image ? (
-          <Image
-            src={image}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-contain"
-          />
-        ) : (
-          <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />
-        )}
+        <Image
+          src={image}
+          alt={product.name}
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-contain"
+        />
         {product.madeInUsa && (
           <span className="absolute top-1 right-1 border border-gold/50 text-gold text-[0.58rem] font-semibold uppercase tracking-wide px-2 py-1">
             Made in USA
