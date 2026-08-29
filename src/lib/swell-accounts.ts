@@ -2,16 +2,12 @@
 // (2026-08-27), talking to Swell's Backend API with SWELL_SECRET_KEY (same
 // auth pattern already used in /api/subscribe).
 //
-// IMPORTANT - NOT YET LIVE-TESTED: account creation with a `group` field
-// and the login endpoint below are both built from Swell's documented
-// REST conventions, not verified against a real request (no authenticated
-// Swell admin session was available while building this). Both functions
-// fail CLOSED - any unexpected response shape or non-2xx status is treated
-// as failure rather than success, so a wrong guess about the exact
-// response shape denies access rather than granting it. This needs a real
-// end-to-end test (register a throwaway account, confirm it lands in the
-// "pending" group in Swell admin, then test login) before relying on it.
-// See claude/Researcher Gate - Build Notes.md.
+// STATUS (2026-08-29): createPendingAccount() is confirmed working end to
+// end - fresh accounts land in Swell as group "pending". verifyLogin() is
+// confirmed BROKEN - it rejects known-correct passwords on freshly created
+// accounts. Temporary diagnostic logging was added below to capture
+// Swell's raw response and find the real cause. Remove the console.log
+// once this is fixed. See claude/Researcher Gate - Build Notes.md.
 
 import "server-only";
 import type { SessionGroup } from "./session";
@@ -83,13 +79,26 @@ export async function verifyLogin(
     body: JSON.stringify({ email, password }),
   });
 
+  const rawText = await res.text();
+
+  // TEMPORARY DIAGNOSTIC LOGGING (2026-08-29) - remove once login is
+  // confirmed working. Logs Swell's exact response so we can see why
+  // verifyLogin() is rejecting known-correct credentials. Never logs the
+  // password itself.
+  console.log("[verifyLogin] Swell /accounts/login response", {
+    email,
+    status: res.status,
+    ok: res.ok,
+    body: rawText.slice(0, 1000),
+  });
+
   if (!res.ok) {
     return { ok: false, error: "Incorrect email or password." };
   }
 
   let body: unknown = null;
   try {
-    body = await res.json();
+    body = JSON.parse(rawText);
   } catch {
     return { ok: false, error: "Incorrect email or password." };
   }
