@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/catalog-shared";
-import { displayCategory } from "@/lib/catalog-shared";
+import { structuralClassFor } from "@/lib/structural-class";
 import { productImages } from "@/lib/product-images";
+import VialIcon from "./VialIcon";
 import QuickAdd from "./QuickAdd";
 
 // Product card for the shop grids: the hero shot only, kept clean.
@@ -14,6 +15,11 @@ import QuickAdd from "./QuickAdd";
 // public regardless. Callers that don't pass `approved` (none currently
 // should exist, but this keeps the component safe by default) get the
 // gated "Sign in" treatment rather than accidentally leaking a price.
+//
+// Category label (2026-08-29, per Josh): shop-facing surfaces show
+// chemical STRUCTURAL class (what the compound structurally is), not
+// research-area naming (what it's studied for) - that framing now lives
+// only on the Research Library page. See structural-class.ts for why.
 export default function ProductCard({
   product,
   approved = false,
@@ -21,10 +27,11 @@ export default function ProductCard({
   product: Product;
   approved?: boolean;
 }) {
+  // 2026-08-29: any product with no real photo yet (new supplier-catalog
+  // products, mostly) falls back to a shared "photo coming soon" graphic
+  // instead of the bare VialIcon placeholder, per Josh.
   const image =
-    product.images?.[0] ||
-    productImages[product.slug] ||
-    "/products/photo-coming-soon.png";
+    product.images?.[0] || productImages[product.slug] || "/products/photo-coming-soon.png";
   return (
     <Link
       href={`/products/${product.slug}`}
@@ -34,30 +41,41 @@ export default function ProductCard({
           photography, so wider compositions letterbox invisibly instead
           of showing gray bars. */}
       <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
-        <Image
-          src={image}
-          alt={product.name}
-          fill
-          sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-contain"
-        />
+        {image ? (
+          <Image
+            src={image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-contain"
+          />
+        ) : (
+          <VialIcon className="h-20 w-20 md:h-24 md:w-24 text-cream/20 group-hover:text-gold/40 transition-colors" />
+        )}
         {product.madeInUsa && (
           <span className="absolute top-1 right-1 border border-gold/50 text-gold text-[0.58rem] font-semibold uppercase tracking-wide px-2 py-1">
             Made in USA
           </span>
         )}
-        {/* Out of Stock sits on the left so it never collides with the
-            Made in USA badge, which lives on the right. */}
-        {!product.inStock && (
+        {/* Out of Stock and "ships fast" are mutually exclusive, so they
+            share the top-left slot. 2026-08-29 (Josh): most orders ship in
+            3-5 business days; only in-stock items ship same/next business
+            day, and that should be visible from the grid, not just after
+            clicking in. */}
+        {!product.inStock ? (
           <span className="absolute top-1 left-1 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
             Out of Stock
+          </span>
+        ) : (
+          <span className="absolute top-1 left-1 bg-gold-deep text-cream text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
+            Ships in 1 Business Day
           </span>
         )}
       </div>
       <div className="p-5">
         {product.category && (
           <p className="label-eyebrow text-gold-deep text-[0.65rem] mb-1.5">
-            {displayCategory(product.category)}
+            {structuralClassFor(product.name)}
           </p>
         )}
         <div className="font-medium text-[1.05rem] text-ink group-hover:text-gold-deep transition-colors">

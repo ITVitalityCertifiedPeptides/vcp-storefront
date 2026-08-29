@@ -8,6 +8,7 @@ import {
   displayCategory,
   filterVisible,
 } from "@/lib/products";
+import { structuralClassFor } from "@/lib/structural-class";
 import { productImages } from "@/lib/product-images";
 import { isApprovedResearcher } from "@/lib/current-session";
 import CartButton from "./CartButton";
@@ -85,10 +86,15 @@ export default async function SiteHeader() {
   const products = filterVisible(allProducts, approved);
   // Lightweight index for the header's live-search dropdown: getAllProducts()
   // is cached per server process, so this doesn't add a second Swell call.
+  //
+  // 2026-08-29 (Josh): shop-facing surfaces, including search results,
+  // show structural class rather than research-area naming - see
+  // structural-class.ts. Research-area naming now lives only on the
+  // Research Library page (/research).
   const searchIndex = products.map((product) => ({
     slug: product.slug,
     name: product.name,
-    category: displayCategory(product.category),
+    category: structuralClassFor(product.name),
     price: approved ? (product.priceFrom ?? product.price) : null,
     image: product.images?.[0] || productImages[product.slug] || null,
   }));
@@ -97,7 +103,7 @@ export default async function SiteHeader() {
     <header className="sticky top-0 z-40">
       <div className="bg-ink text-center py-2 px-4">
         <p className="label-eyebrow text-[0.66rem] tracking-[0.16em] text-gold">
-          Ships within 1 business day
+          Most orders ship within 3-5 business days
           <span className="text-cream/40 mx-2">&#8226;</span>
           Free US shipping over $250
           <span className="text-cream/40 mx-2 hidden sm:inline">&#8226;</span>
@@ -106,7 +112,13 @@ export default async function SiteHeader() {
       </div>
       <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">
         <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
-          <Wordmark />
+          {/* 2026-08-29 (Josh): search moved next to the wordmark so it's
+              the first thing visible, on every breakpoint, instead of
+              being buried at the end of the right-hand action cluster. */}
+          <div className="flex items-center gap-3 md:gap-5 min-w-0">
+            <Wordmark />
+            <HeaderSearch products={searchIndex} />
+          </div>
           {/* CSS-only hover dropdown so this stays a server component. */}
           <nav className="hidden lg:flex items-center gap-4">
             <div className="relative group">
@@ -147,7 +159,6 @@ export default async function SiteHeader() {
             <LegalDropdown />
           </nav>
           <div className="flex items-center gap-3 shrink-0">
-            <HeaderSearch products={searchIndex} />
             <Link
               href="/categories"
               className={`hidden ${approved ? "md:inline-flex" : "xl:inline-flex"} items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors`}
@@ -184,7 +195,8 @@ export default async function SiteHeader() {
           </div>
         </div>
         {/* Compact category row for smaller viewports, since the primary
-            nav above hides below lg. */}
+            nav above hides below lg. This is still the shop-browse
+            (research-area) taxonomy, matching /categories - left as-is. */}
         <div className="lg:hidden max-w-6xl mx-auto px-4 pb-3 flex items-center gap-4 overflow-x-auto">
           {categories.map((category) => (
             <Link

@@ -10,6 +10,7 @@ import {
   displayCategory,
   filterVisible,
 } from "@/lib/products";
+import { structuralClassFor } from "@/lib/structural-class";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
 import { technicalDataFor, componentDataFor } from "@/lib/technical-data";
@@ -107,6 +108,11 @@ export default async function ProductPage({
   const tech = technicalDataFor(product.name);
   const isLiquid = product.name.toLowerCase().includes("bacteriostatic");
 
+  // Breadcrumb + JSON-LD deliberately still use the research-area
+  // taxonomy (displayCategory/categorySlug), not structural class - these
+  // drive real URLs and search-engine schema tied to /categories, which
+  // is untouched by the 2026-08-29 structural-class change. See
+  // structural-class.ts and Site Build Priorities and Decisions.md.
   const jsonLd = [
     productSchema(product),
     breadcrumbSchema([
@@ -152,9 +158,11 @@ export default async function ProductPage({
         />
 
         <div>
+          {/* 2026-08-29 (Josh): shop-facing label is structural class, not
+              research area - see structural-class.ts. */}
           {product.category && (
             <p className="label-eyebrow text-gold-deep mb-2">
-              {displayCategory(product.category)}
+              {structuralClassFor(product.name)}
             </p>
           )}
           <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-4">
@@ -167,22 +175,18 @@ export default async function ProductPage({
               <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">CAS Number</dt>
               <dd className="font-medium text-ink">{product.casNumber || "N/A"}</dd>
             </div>
+            {/* 2026-08-29 (Josh): dropped the on-page "Research Area(s)"
+                label (was displayCategory(area) links to /categories) -
+                that framing now lives only on the Research Library, so
+                this points there instead of naming an area here. */}
             <div>
               <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">
-                {product.areas.length > 1 ? "Research Areas" : "Research Area"}
+                Published Research
               </dt>
               <dd className="font-medium text-ink">
-                {product.areas.map((area, i) => (
-                  <span key={area}>
-                    {i > 0 && <span className="text-ink-soft/60">, </span>}
-                    <Link
-                      href={`/categories/${categorySlug(area)}`}
-                      className="hover:text-gold-deep transition-colors"
-                    >
-                      {displayCategory(area)}
-                    </Link>
-                  </span>
-                ))}
+                <Link href="/research" className="hover:text-gold-deep transition-colors">
+                  View studies &rarr;
+                </Link>
               </dd>
             </div>
             <div>
