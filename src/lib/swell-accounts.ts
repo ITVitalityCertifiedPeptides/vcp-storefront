@@ -2,12 +2,15 @@
 // (2026-08-27), talking to Swell's Backend API with SWELL_SECRET_KEY (same
 // auth pattern already used in /api/subscribe).
 //
-// STATUS (2026-08-29): createPendingAccount() is confirmed working end to
-// end - fresh accounts land in Swell as group "pending". verifyLogin() is
-// confirmed BROKEN - it rejects known-correct passwords on freshly created
-// accounts. Temporary diagnostic logging was added below to capture
-// Swell's raw response and find the real cause. Remove the console.log
-// once this is fixed. See claude/Researcher Gate - Build Notes.md.
+// STATUS (2026-08-29): Both functions confirmed working end to end.
+// createPendingAccount() creates accounts that land in Swell as group
+// "pending". verifyLogin() was broken until this revision - it was
+// calling POST /accounts/login with a JSON body, but Swell's actual
+// Backend API login action is GET /accounts/:login with email/password
+// as query params (confirmed against developers.swell.is/backend-api/
+// accounts). The old call silently got a 200 with an empty body from
+// Swell for every login attempt, which read as "wrong password" even
+// when it wasn't. Fixed below. See claude/Researcher Gate - Build Notes.md.
 
 import "server-only";
 import type { SessionGroup } from "./session";
@@ -73,23 +76,14 @@ export async function verifyLogin(
   email: string,
   password: string
 ): Promise<{ ok: true; account: SwellAccount } | { ok: false; error: string }> {
-  const res = await fetch("https://api.swell.store/accounts/login", {
-    method: "POST",
-    headers: { Authorization: swellAuthHeader(), "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-
-  const rawText = await res.text();
-
-  // TEMPORARY DIAGNOSTIC LOGGING (2026-08-29) - remove once login is
-  // confirmed working. Logs Swell's exact response so we can see why
-  // verifyLogin() is rejecting known-correct credentials. Never logs the
-  // password itself.
-  console.log("[verifyLogin] Swell /accounts/login response", {
-    email,
-    status: res.status,
-    ok: res.ok,
-    body: rawText.slice(0, 1000),
+  // Swell's Backend API login action is a GET with email/password as
+  // query params, not a POST with a JSON body - see
+  // https://developers.swell.is/backend-api/accounts. On a match it
+  // returns the account object; on no match it returns JSON `null`.
+  const params = new URLSearchParams({ email, password });
+  const res = await fetch(`https://api.swell.store/accounts/:login?${params.toString()}`, {
+    method: "GET",
+    headers: { Authorization: swellAuthHeader() },
   });
 
   if (!res.ok) {
@@ -98,14 +92,15 @@ export async function verifyLogin(
 
   let body: unknown = null;
   try {
-    body = JSON.parse(rawText);
+    body = await res.json();
   } catch {
     return { ok: false, error: "Incorrect email or password." };
   }
 
-  const errors = (body as { errors?: Record<string, unknown> } | null)?.errors;
   const account = body as SwellAccount | null;
-  if (errors || !account?.id || !account?.email) {
+  console.log("[verifyLogin]", { email, matched: Boolean(account?.id) });
+
+  if (!account?.id || !account?.email) {
     return { ok: false, error: "Incorrect email or password." };
   }
 
