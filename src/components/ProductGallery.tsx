@@ -14,7 +14,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import VialIcon from "./VialIcon";
 
 export default function ProductGallery({
   images,
@@ -38,8 +37,13 @@ export default function ProductGallery({
   if (images.length === 0) {
     return (
       <div className="relative aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-dot-grid text-cream/[0.06]" aria-hidden />
-        <VialIcon className="relative h-32 w-32 md:h-40 md:w-40 text-cream/25" />
+        <Image
+          src="/products/photo-coming-soon.png"
+          alt={`${name} - photo coming soon`}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-contain"
+        />
         {badge}
       </div>
     );

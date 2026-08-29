@@ -22,7 +22,10 @@ export default function ProductCard({
   product: Product;
   approved?: boolean;
 }) {
-  const image = product.images?.[0] || productImages[product.slug];
+  const image =
+    product.images?.[0] ||
+    productImages[product.slug] ||
+    "/products/photo-coming-soon.png";
   return (
     <Link
       href={`/products/${product.slug}`}
