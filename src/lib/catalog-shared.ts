@@ -53,6 +53,16 @@ export type Product = {
   // Gallery image URLs discovered server-side from public/products
   // (see lib/product-gallery.ts): hero first, then molecule card(s).
   images: string[];
+  // Friends & Family (2026-08-29): the discounted price for accounts in
+  // the "friends-family" Swell customer group, set via the
+  // `friends_family_price` content field (same pattern as category/
+  // cas_number/etc). This is DISPLAY ONLY - the actual charge is enforced
+  // by a matching Swell Promotion (type "product", scoped to the
+  // friends-family group) created by sync-friends-family-pricing.js, which
+  // auto-applies at cart/checkout regardless of what this field says. Keep
+  // the two in sync by always running that script from the same pricing
+  // sheet. null when the product has no F&F pricing.
+  friendsFamilyPrice: number | null;
 };
 
 // Researcher-gate helper: the one place that decides which products an

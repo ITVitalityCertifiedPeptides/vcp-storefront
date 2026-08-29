@@ -14,7 +14,7 @@ import { structuralClassFor } from "@/lib/structural-class";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
 import { technicalDataFor, componentDataFor } from "@/lib/technical-data";
-import { isApprovedResearcher } from "@/lib/current-session";
+import { isApprovedResearcher, isFriendsFamily } from "@/lib/current-session";
 import ProductGallery from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
 import ProductFaq from "@/components/ProductFaq";
@@ -91,7 +91,10 @@ export default async function ProductPage({
   ]);
   if (!product) notFound();
 
-  const approved = await isApprovedResearcher();
+  const [approved, friendsFamily] = await Promise.all([
+    isApprovedResearcher(),
+    isFriendsFamily(),
+  ]);
 
   // Researcher-gate (2026-08-28): individual products can be flagged
   // "Researcher Only" in Swell (content.researcher_only). Anyone not
@@ -211,6 +214,11 @@ export default async function ProductPage({
                 inStock: product.inStock,
                 options: product.options,
                 subscription: product.subscription,
+                // Friends & Family (2026-08-29): only ever passed through
+                // for accounts actually in that group - a plain approved
+                // researcher never sees this, even if the product has F&F
+                // pricing set.
+                friendsFamilyPrice: friendsFamily ? product.friendsFamilyPrice : null,
               }}
             />
           ) : (

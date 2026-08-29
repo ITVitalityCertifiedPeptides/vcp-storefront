@@ -20,3 +20,14 @@ export async function isApprovedResearcher(): Promise<boolean> {
   const session = await getCurrentSession();
   return !!session && (session.group === "researcher" || session.group === "friends-family");
 }
+
+// Friends & Family (2026-08-29): distinct from isApprovedResearcher() above
+// - both groups can buy, but only friends-family accounts should see the
+// discounted price (friendsFamilyPrice on Product) and the "Friends &
+// Family" savings callout on BuyBox/the cart. A plain "researcher" account
+// is approved to buy but is NOT friends-family and should see the normal
+// retail price.
+export async function isFriendsFamily(): Promise<boolean> {
+  const session = await getCurrentSession();
+  return session?.group === "friends-family";
+}

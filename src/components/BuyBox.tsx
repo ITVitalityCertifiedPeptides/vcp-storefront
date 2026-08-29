@@ -24,6 +24,17 @@ type BuyBoxProduct = {
   inStock: boolean;
   options: ProductOption[];
   subscription: SubscriptionPlan[] | null;
+  // Friends & Family (2026-08-29): only ever set (by the caller) for
+  // accounts actually in the friends-family group. This is DISPLAY ONLY -
+  // the real discount is enforced by a matching Swell Promotion (see
+  // friendsFamilyPrice on Product in catalog-shared.ts). We deliberately
+  // show it as a flat "you save $X" note rather than recomputing a new
+  // unit price, because the Promotion's discount is a flat dollar amount
+  // off the base product - it doesn't know how to adjust for option-value
+  // price deltas the way unitPrice below does, so recomputing a "final"
+  // price here could show a number that doesn't match what Swell actually
+  // charges once an option is selected.
+  friendsFamilyPrice: number | null;
 };
 
 function money(n: number) {
@@ -60,6 +71,11 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
   }
   const restockPrice =
     unitPrice != null ? unitPrice * (1 - RESTOCK_DISCOUNT) : null;
+
+  const friendsFamilySavings =
+    product.friendsFamilyPrice != null && product.price != null
+      ? product.price - product.friendsFamilyPrice
+      : null;
 
   async function add() {
     setBusy(true);
@@ -186,6 +202,26 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
         )
       )}
 
+      {/* 2026-08-29 (Josh): Friends & Family savings callout - only ever
+          rendered for accounts in that group (see friendsFamilyPrice above).
+          Shown as a flat "you save $X" note rather than a computed final
+          price so it stays accurate whether or not options are selected;
+          the actual discount is applied automatically once this item is in
+          the cart, via a matching Swell Promotion scoped to this product
+          and the friends-family customer group - not a code the shopper
+          has to enter. */}
+      {friendsFamilySavings != null && friendsFamilySavings > 0 && (
+        <div className="mb-5 rounded-sm border border-gold-deep/40 bg-gold/10 px-4 py-3">
+          <p className="label-eyebrow text-[0.65rem] text-gold-deep mb-0.5">
+            Friends &amp; Family
+          </p>
+          <p className="text-sm text-ink">
+            You save {money(friendsFamilySavings)} on this item - applied
+            automatically at checkout.
+          </p>
+        </div>
+      )}
+
       {!product.inStock ? (
         <span
           className="inline-flex items-center justify-center rounded-full px-8 py-3.5 label-eyebrow text-[0.72rem] bg-cream-soft text-ink-soft/70 cursor-not-allowed"
@@ -205,9 +241,14 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
           {justAdded ? "Added" : "Add to Cart"}
         </button>
       )}
+      {/* 2026-08-29 (Josh): dropped the "Ships within 1 business day" claim
+          here too - product.inStock isn't a reliable signal of which items
+          actually ship that fast, so this was making a promise the data
+          couldn't back up. The header banner's general "1-3 business days"
+          range is the only shipping-time claim left on the site. */}
       {product.inStock && (
         <p className="text-xs text-ink-soft mt-3">
-          In stock. Ships within 1 business day.
+          In stock.
         </p>
       )}
     </div>

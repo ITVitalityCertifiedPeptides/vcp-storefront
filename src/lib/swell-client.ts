@@ -28,6 +28,11 @@ export type SwellCartItem = {
   price?: number;
   price_total?: number;
   product?: { name?: string };
+  // Friends & Family (2026-08-29): the per-item amount knocked off by any
+  // applied Promotion (see sync-friends-family-pricing.js). Swell computes
+  // this automatically once a matching product+customer-group Promotion
+  // applies to the cart - nothing client-side triggers it.
+  discount_total?: number;
 };
 
 export type SwellCart = {
@@ -36,4 +41,8 @@ export type SwellCart = {
   sub_total?: number;
   grand_total?: number;
   items?: SwellCartItem[];
+  // Friends & Family (2026-08-29): cart-level sum of every item's
+  // discount_total. Shown as a "Friends & Family Discount" line on the
+  // cart page when > 0.
+  discount_total?: number;
 };
