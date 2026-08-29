@@ -56,6 +56,7 @@ type SwellProduct = {
   price?: number | null;
   stock_level?: number;
   stock_status?: string | null;
+  active?: boolean;
   content?: {
     category?: string;
     cas_number?: string;
@@ -158,18 +159,42 @@ async function fetchAllProducts(): Promise<Product[]> {
     page++;
   }
 
-  return all.map(mapProduct);
+  // Belt-and-braces on Swell's own "active" toggle (Swell admin > product >
+  // Active). We init with the Frontend API key, which is expected to return
+  // only active products and may not send `active` at all - in which case
+  // this is a no-op. `active !== false` deliberately keeps anything where the
+  // field is missing, so it can never drop a product the API declined to
+  // label; it only bites if the field does start arriving. This was NOT the
+  // reason Bacteriostatic Water 30mL kept rendering after being deactivated
+  // in Swell - see the cache note below for that.
+  return all.filter((p) => p.active !== false).map(mapProduct);
 }
 
-// Cache the in-flight/resolved fetch for the lifetime of this server
-// process, so every page and layout that needs product data during a build
-// (or a single request in dev) shares one Swell API call instead of firing
-// one per route.
-let cached: Promise<Product[]> | null = null;
+// Share one Swell API call across every page and layout that needs product
+// data during a build (or a single render pass in dev) instead of firing one
+// per route - but expire the entry rather than holding it for the lifetime of
+// the process. A permanent cache silently defeats the hourly refresh that
+// layout.tsx sets up (`export const revalidate = 3600`): the ISR pass reruns
+// in the same server process, gets this pinned array back, and re-renders the
+// catalog exactly as it looked at boot. That is why a product deactivated in
+// Swell (Bacteriostatic Water 30mL) kept rendering for weeks - not a missing
+// active-flag check. Sixty seconds is long enough to dedupe a whole build's
+// worth of routes and short enough that the next regeneration sees Swell.
+const CACHE_TTL_MS = 60_000;
+let cached: { at: number; promise: Promise<Product[]> } | null = null;
 
 export async function getAllProducts(): Promise<Product[]> {
-  if (!cached) cached = fetchAllProducts();
-  return cached;
+  if (!cached || Date.now() - cached.at > CACHE_TTL_MS) {
+    const promise = fetchAllProducts();
+    cached = { at: Date.now(), promise };
+    // Never pin a failed fetch: caching a rejected promise would make every
+    // later call fail for as long as the entry lived, turning one blip in the
+    // Swell API into a permanently empty catalog.
+    promise.catch(() => {
+      if (cached?.promise === promise) cached = null;
+    });
+  }
+  return cached.promise;
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
