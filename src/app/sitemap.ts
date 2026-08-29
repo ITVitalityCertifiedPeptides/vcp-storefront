@@ -5,7 +5,12 @@ import { siteConfig } from "@/lib/site";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteConfig.url, changeFrequency: "weekly", priority: 1 },
-    { url: `${siteConfig.url}/categories`, changeFrequency: "weekly", priority: 0.9 },
+    // 2026-08-29: /shop (full catalog, no category-picker step) is now the
+    // primary shopping entry point - see shop/page.tsx - so it takes the
+    // priority /categories used to have; /categories is still indexed as
+    // a secondary browse path.
+    { url: `${siteConfig.url}/shop`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${siteConfig.url}/categories`, changeFrequency: "weekly", priority: 0.7 },
     // /coa is intentionally omitted: it's QR-code-only access (order +
     // vial label), not a publicly linked or indexed page.
     { url: `${siteConfig.url}/quality-assurance`, changeFrequency: "monthly", priority: 0.6 },

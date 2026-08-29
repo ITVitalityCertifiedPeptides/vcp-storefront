@@ -57,21 +57,16 @@ export default function ProductCard({
             Made in USA
           </span>
         )}
-        {/* 2026-08-29 (Josh): most orders ship in 1-3 business days; only
-            in-stock items ship same/next business day. Out of Stock stays
-            a small corner tag, but "ships fast" is a bigger deal to a
-            shopper, so it's centered over the image and in a color
-            nothing else on the card uses, so it actually stands out. */}
+        {/* 2026-08-29 (Josh): the per-card "Ships in 1 Business Day" badge
+            (the centered green pill) is removed entirely, not just
+            re-tuned - product.inStock was never a reliable signal for
+            that specific 1-day claim (as opposed to the site-wide 1-3 day
+            range in the header banner), so the badge was making a promise
+            the data couldn't back up. Out of Stock stays: that's a real
+            inventory fact, not a shipping-time claim. */}
         {!product.inStock && (
           <span className="absolute top-1 left-1 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
             Out of Stock
-          </span>
-        )}
-        {product.inStock && (
-          <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="bg-emerald-600 text-white text-[0.62rem] font-bold uppercase tracking-wide px-3 py-1.5 rounded-full shadow-[0_4px_12px_-2px_rgba(0,0,0,0.4)]">
-              Ships in 1 Business Day
-            </span>
           </span>
         )}
       </div>

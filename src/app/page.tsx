@@ -126,7 +126,7 @@ export default async function HomePage() {
           </h1>
           <div className="mt-7 md:mt-9 flex flex-wrap items-center gap-6">
             <Link
-              href="/categories"
+              href="/shop"
               className="inline-flex items-center gap-2 rounded-full bg-gold text-ink px-8 py-3.5 label-eyebrow text-[0.72rem] hover:bg-cream transition-colors"
             >
               Shop

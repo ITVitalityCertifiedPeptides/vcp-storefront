@@ -69,7 +69,7 @@ export default function CartPage() {
         <div>
           <p className="text-ink-soft mb-6">Your cart is empty.</p>
           <Link
-            href="/categories"
+            href="/shop"
             className="inline-flex items-center gap-2 rounded-full bg-gold-deep text-cream px-7 py-3.5 label-eyebrow text-[0.72rem] hover:bg-ink transition-colors"
           >
             Shop Peptides
