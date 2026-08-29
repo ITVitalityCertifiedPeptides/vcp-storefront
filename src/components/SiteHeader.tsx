@@ -105,10 +105,10 @@ export default async function SiteHeader() {
         </p>
       </div>
       <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">
-        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
           <Wordmark />
           {/* CSS-only hover dropdown so this stays a server component. */}
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-4">
             <div className="relative group">
               <span className="inline-flex items-center gap-1.5 label-eyebrow text-[0.7rem] text-ink-soft group-hover:text-gold-deep transition-colors cursor-default py-3">
                 Research Areas
@@ -146,11 +146,11 @@ export default async function SiteHeader() {
             </Link>
             <LegalDropdown />
           </nav>
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             <HeaderSearch products={searchIndex} />
             <Link
               href="/categories"
-              className="hidden md:inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
+              className={`hidden ${approved ? "md:inline-flex" : "xl:inline-flex"} items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors`}
             >
               Shop Catalog
             </Link>
