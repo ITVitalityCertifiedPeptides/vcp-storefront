@@ -145,6 +145,37 @@ function mapProduct(p: SwellProduct): Product {
   };
 }
 
+// Swell's API intermittently fails a request outright during a Vercel build
+// ("connection_error"), which is enough to fail the whole build: every static
+// product page and sitemap.xml funnel through fetchAllProducts. Retry the
+// individual list call a couple of times before giving up - the failures are
+// transient, so a short pause is usually all it takes.
+const MAX_ATTEMPTS = 3;
+// Linear backoff: 1s before the second attempt, 2s before the third.
+const RETRY_BASE_DELAY_MS = 1_000;
+
+async function withRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      // Out of attempts: fall through and rethrow rather than sleeping for
+      // nothing.
+      if (attempt === MAX_ATTEMPTS) break;
+      const delay = attempt * RETRY_BASE_DELAY_MS;
+      console.warn(
+        `Swell request failed (${label}, attempt ${attempt} of ` +
+          `${MAX_ATTEMPTS}); retrying in ${delay}ms`,
+        error
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
 async function fetchAllProducts(): Promise<Product[]> {
   ensureInit();
   const all: SwellProduct[] = [];
@@ -152,7 +183,9 @@ async function fetchAllProducts(): Promise<Product[]> {
   let page = 1;
 
   for (;;) {
-    const result = await swell.products.list({ limit, page });
+    const result = await withRetry(`products.list page ${page}`, () =>
+      swell.products.list({ limit, page })
+    );
     const results = (result?.results || []) as SwellProduct[];
     all.push(...results);
     if (results.length < limit) break;
