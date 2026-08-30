@@ -1,13 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, User } from "lucide-react";
-import {
-  getAllProducts,
-  filterVisible,
-  getAllCategories,
-  categorySlug,
-  displayCategory,
-} from "@/lib/products";
+import { getAllProducts, filterVisible } from "@/lib/products";
 import { structuralClassFor } from "@/lib/structural-class";
 import { productImages } from "@/lib/product-images";
 import { isApprovedResearcher } from "@/lib/current-session";
@@ -68,43 +62,6 @@ function LegalDropdown() {
   );
 }
 
-// Categories dropdown (2026-08-30, Josh): brought back into the nav so
-// visitors can browse by research area again, alongside (not instead of)
-// the direct "Shop Catalog" link into the full grid. Same CSS-only
-// hover-dropdown pattern as LegalDropdown, so this stays a server
-// component - categories come from the live catalog via
-// getAllCategories(), which reuses the already-cached getAllProducts()
-// call this component makes below, so no extra Swell request.
-function CategoriesDropdown({ categories }: { categories: string[] }) {
-  return (
-    <div className="relative group">
-      <span className="inline-flex items-center gap-1.5 label-eyebrow text-[0.7rem] text-ink-soft group-hover:text-gold-deep transition-colors cursor-default py-3">
-        Categories
-        <ChevronDown className="h-3.5 w-3.5" aria-hidden />
-      </span>
-      <div className="absolute left-0 top-full hidden group-hover:block bg-white border border-line shadow-[0_12px_32px_-16px_rgba(21,19,15,0.35)] min-w-[240px] py-2 z-50">
-        {categories.map((category) => (
-          <Link
-            key={category}
-            href={`/categories/${categorySlug(category)}`}
-            className="block px-5 py-2.5 text-sm text-ink hover:bg-cream-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-          >
-            {displayCategory(category)}
-          </Link>
-        ))}
-        <div className="border-t border-line mt-2 pt-2">
-          <Link
-            href="/categories"
-            className="block px-5 py-2.5 text-sm text-gold-deep hover:bg-cream-soft transition-colors whitespace-nowrap"
-          >
-            View all categories
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Researcher-gate (2026-08-28, revised per Josh): the catalog itself -
 // categories, product names, the header search - is public, so this is
 // one header for everyone. What changes with approval status is only the
@@ -118,7 +75,6 @@ export default async function SiteHeader() {
 
   const allProducts = await getAllProducts();
   const products = filterVisible(allProducts, approved);
-  const categories = await getAllCategories();
   // Lightweight index for the header's live-search dropdown: getAllProducts()
   // is cached per server process, so this doesn't add a second Swell call.
   //
@@ -166,13 +122,16 @@ export default async function SiteHeader() {
               Shop Catalog
             </Link>
           </div>
-          {/* 2026-08-30 (Josh): Categories dropdown is back, alongside the
-              direct Shop Catalog entry point above rather than replacing
-              it - browsing by research area is a real path in again, not
-              just search-or-full-grid. CSS-only hover dropdown (like
-              Legal) so this stays a server component. */}
+          {/* 2026-08-30 (Josh, 2nd pass): the standalone Categories dropdown
+              tried here didn't last the day - Josh wants browsing by
+              research area to happen AS A FILTER ON THE SHOP PAGE itself
+              (see FilteredProductGrid's category select), not as a second
+              nav item next to Shop Catalog. So this nav is back to just
+              the informational/legal links; Shop Catalog is still the one
+              button that gets you into the catalog, and once you're there
+              you filter by category, stock, etc. /categories and
+              /categories/[slug] still exist unchanged for SEO/footer use. */}
           <nav className="hidden lg:flex items-center gap-4">
-            <CategoriesDropdown categories={categories} />
             <Link
               href="/quality-assurance"
               className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
@@ -206,20 +165,17 @@ export default async function SiteHeader() {
                 <CartButton />
               </>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors whitespace-nowrap"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors whitespace-nowrap"
-                >
-                  Register
-                </Link>
-              </>
+              // 2026-08-30 (Josh): Sign In and Register used to be two
+              // separate links here. Collapsed into one button - /login
+              // already has a "Not registered yet? Request access" link
+              // for anyone who lands there without an account, so this one
+              // button covers both paths without splitting the header CTA.
+              <Link
+                href="/login"
+                className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors whitespace-nowrap"
+              >
+                Sign In / Register
+              </Link>
             )}
           </div>
         </div>
@@ -228,21 +184,20 @@ export default async function SiteHeader() {
             Catalog" button is also hidden below this breakpoint, it's
             replaced with the same single Shop Catalog link so mobile
             visitors still have a one-tap way straight into the catalog,
-            no category step. 2026-08-30: also add a "Browse Categories"
-            link beside it on mobile, since the Categories dropdown above
-            is desktop-only (lg:flex). */}
-        <div className="lg:hidden max-w-6xl mx-auto px-4 pb-3 flex items-center gap-3">
+            no category step. 2026-08-30 (Josh, 2nd pass): dropped the
+            separate "Browse Categories" mobile button added earlier the
+            same day, for the same reason as the desktop nav above -
+            category browsing lives as a filter on /shop now. Also
+            narrowed this row to sm:hidden (was lg:hidden): the desktop
+            Shop Catalog button is already visible from sm up, so this
+            row only needs to exist below sm - it used to render empty
+            padding on tablet widths. */}
+        <div className="sm:hidden max-w-6xl mx-auto px-4 pb-3">
           <Link
             href="/shop"
-            className="sm:hidden inline-flex items-center rounded-full bg-ink text-cream px-5 py-2 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
+            className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
           >
             Shop Catalog
-          </Link>
-          <Link
-            href="/categories"
-            className="inline-flex items-center rounded-full border border-line bg-white text-ink px-5 py-2 label-eyebrow text-[0.68rem] hover:border-gold-deep hover:text-gold-deep transition-colors"
-          >
-            Browse Categories
           </Link>
         </div>
       </div>

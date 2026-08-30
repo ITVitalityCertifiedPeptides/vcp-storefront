@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAllProducts, filterVisible } from "@/lib/products";
+import { getAllProducts, filterVisible, getAllCategories } from "@/lib/products";
 import { isApprovedResearcher } from "@/lib/current-session";
 import FilteredProductGrid from "@/components/FilteredProductGrid";
 
@@ -26,6 +26,9 @@ export const metadata: Metadata = {
 export default async function ShopPage() {
   const approved = await isApprovedResearcher();
   const products = filterVisible(await getAllProducts(), approved);
+  // 2026-08-30 (Josh): category browsing moved from a header nav dropdown
+  // to a filter right here on the shop page - see FilteredProductGrid.
+  const categories = await getAllCategories();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-14">
@@ -38,7 +41,7 @@ export default async function ShopPage() {
         every lot backed by a Certificate of Analysis. For laboratory
         research use only.
       </p>
-      <FilteredProductGrid products={products} approved={approved} />
+      <FilteredProductGrid products={products} approved={approved} categories={categories} />
     </div>
   );
 }
