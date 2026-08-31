@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, User } from "lucide-react";
-import { getAllProducts, filterVisible } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 import { structuralClassFor } from "@/lib/structural-class";
 import { productImages } from "@/lib/product-images";
-import { isApprovedResearcher } from "@/lib/current-session";
 import CartButton from "./CartButton";
 import HeaderSearch from "./HeaderSearch";
 
@@ -62,19 +61,13 @@ function LegalDropdown() {
   );
 }
 
-// Researcher-gate (2026-08-28, revised per Josh): the catalog itself -
-// categories, product names, the header search - is public, so this is
-// one header for everyone. What changes with approval status is only the
-// right-hand actions (Sign In/Register vs. Account/Cart) and the header
-// search results: an unapproved visitor's search index has no price on
-// it and never includes a "Researcher Only" product (see filterVisible()
-// in catalog-shared.ts). middleware.ts is what actually blocks /cart and
-// /checkout for anyone not approved.
+// 2026-08-31 (Josh): the researcher gate is gone from retail entirely -
+// catalog, pricing, and purchasing are public to every visitor, no login
+// required, no customer-group check anywhere in this header. Account/Cart
+// render unconditionally now; /account itself handles "not signed in yet"
+// (see app/account/page.tsx) rather than this header branching on it.
 export default async function SiteHeader() {
-  const approved = await isApprovedResearcher();
-
-  const allProducts = await getAllProducts();
-  const products = filterVisible(allProducts, approved);
+  const products = await getAllProducts();
   // Lightweight index for the header's live-search dropdown: getAllProducts()
   // is cached per server process, so this doesn't add a second Swell call.
   //
@@ -86,7 +79,7 @@ export default async function SiteHeader() {
     slug: product.slug,
     name: product.name,
     category: structuralClassFor(product.name),
-    price: approved ? (product.priceFrom ?? product.price) : null,
+    price: product.priceFrom ?? product.price,
     image: product.images?.[0] || productImages[product.slug] || null,
   }));
 
@@ -153,30 +146,14 @@ export default async function SiteHeader() {
             <LegalDropdown />
           </nav>
           <div className="flex items-center gap-3 shrink-0">
-            {approved ? (
-              <>
-                <Link
-                  href="/account"
-                  className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-line bg-white text-ink hover:border-gold-deep hover:text-gold-deep transition-colors"
-                  aria-label="Account"
-                >
-                  <User className="h-4.5 w-4.5" aria-hidden />
-                </Link>
-                <CartButton />
-              </>
-            ) : (
-              // 2026-08-30 (Josh): Sign In and Register used to be two
-              // separate links here. Collapsed into one button - /login
-              // already has a "Not registered yet? Request access" link
-              // for anyone who lands there without an account, so this one
-              // button covers both paths without splitting the header CTA.
-              <Link
-                href="/login"
-                className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors whitespace-nowrap"
-              >
-                Sign In / Register
-              </Link>
-            )}
+            <Link
+              href="/account"
+              className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-line bg-white text-ink hover:border-gold-deep hover:text-gold-deep transition-colors"
+              aria-label="Account"
+            >
+              <User className="h-4.5 w-4.5" aria-hidden />
+            </Link>
+            <CartButton />
           </div>
         </div>
         {/* 2026-08-29 (Josh): this used to be a row of category chips

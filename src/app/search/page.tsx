@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllProducts, filterVisible } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 import { displayCategory } from "@/lib/catalog-shared";
-import { isApprovedResearcher } from "@/lib/current-session";
 import ProductCard from "@/components/ProductCard";
 
 export const metadata: Metadata = {
@@ -25,8 +24,7 @@ export default async function SearchPage({
   const { q } = await searchParams;
   const query = (q || "").trim();
 
-  const approved = await isApprovedResearcher();
-  const products = filterVisible(await getAllProducts(), approved);
+  const products = await getAllProducts();
   const results = query
     ? products.filter((p) =>
         matches(query, [
@@ -79,7 +77,7 @@ export default async function SearchPage({
       {results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {results.map((product) => (
-            <ProductCard key={product.slug} product={product} approved={approved} />
+            <ProductCard key={product.slug} product={product} />
           ))}
         </div>
       )}

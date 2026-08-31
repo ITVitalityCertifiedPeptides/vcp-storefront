@@ -6,11 +6,9 @@ import {
   getProductsByCategory,
   categoryFromSlug,
   categorySlug,
-  filterVisible,
 } from "@/lib/products";
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
-import { isApprovedResearcher } from "@/lib/current-session";
 import ProductCard from "@/components/ProductCard";
 
 export async function generateStaticParams() {
@@ -48,8 +46,7 @@ export default async function CategoryPage({
   const category = await categoryFromSlug(slug);
   if (!category) notFound();
 
-  const approved = await isApprovedResearcher();
-  const products = filterVisible(await getProductsByCategory(category), approved);
+  const products = await getProductsByCategory(category);
   const jsonLd = breadcrumbSchema([
     { name: "Home", url: siteConfig.url },
     { name: "Categories", url: `${siteConfig.url}/categories` },
@@ -76,7 +73,7 @@ export default async function CategoryPage({
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
         {products.map((product) => (
-          <ProductCard key={product.slug} product={product} approved={approved} />
+          <ProductCard key={product.slug} product={product} />
         ))}
       </div>
     </div>

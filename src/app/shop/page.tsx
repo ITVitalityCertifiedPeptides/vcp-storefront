@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { getAllProducts, filterVisible, getAllCategories } from "@/lib/products";
-import { isApprovedResearcher } from "@/lib/current-session";
+import { getAllProducts, getAllCategories } from "@/lib/products";
 import FilteredProductGrid from "@/components/FilteredProductGrid";
 
 // Traditional shopping catalog (2026-08-29, Josh): the "Shop Catalog" nav
@@ -24,8 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopPage() {
-  const approved = await isApprovedResearcher();
-  const products = filterVisible(await getAllProducts(), approved);
+  const products = await getAllProducts();
   // 2026-08-30 (Josh): category browsing moved from a header nav dropdown
   // to a filter right here on the shop page - see FilteredProductGrid.
   const categories = await getAllCategories();
@@ -41,7 +39,7 @@ export default async function ShopPage() {
         every lot backed by a Certificate of Analysis. For laboratory
         research use only.
       </p>
-      <FilteredProductGrid products={products} approved={approved} categories={categories} />
+      <FilteredProductGrid products={products} categories={categories} />
     </div>
   );
 }

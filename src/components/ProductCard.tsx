@@ -10,23 +10,16 @@ import QuickAdd from "./QuickAdd";
 // Additional gallery images (molecule cards) live on the product page,
 // browsable with arrows and the thumbnail strip.
 //
-// Researcher-gate (2026-08-28): `approved` controls only the price/Add to
-// Cart block at the bottom - name, image, category, and CAS number are
-// public regardless. Callers that don't pass `approved` (none currently
-// should exist, but this keeps the component safe by default) get the
-// gated "Sign in" treatment rather than accidentally leaking a price.
+// 2026-08-31 (Josh): pricing and Add to Cart are public now - no login
+// required to see a price or buy. This used to have an `approved` prop
+// that swapped in a "Sign in to see pricing" prompt; that's gone along
+// with the rest of the researcher-gate.
 //
 // Category label (2026-08-29, per Josh): shop-facing surfaces show
 // chemical STRUCTURAL class (what the compound structurally is), not
 // research-area naming (what it's studied for) - that framing now lives
 // only on the Research Library page. See structural-class.ts for why.
-export default function ProductCard({
-  product,
-  approved = false,
-}: {
-  product: Product;
-  approved?: boolean;
-}) {
+export default function ProductCard({ product }: { product: Product }) {
   // 2026-08-29: any product with no real photo yet (new supplier-catalog
   // products, mostly) falls back to a shared "photo coming soon" graphic
   // instead of the bare VialIcon placeholder, per Josh.
@@ -86,40 +79,30 @@ export default function ProductCard({
         )}
         {product.price != null && (
           <div className="mt-4 pt-3 border-t border-line">
-            {approved ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-ink font-semibold">
-                    {product.priceFrom != null
-                      ? `From $${product.priceFrom.toFixed(2)}`
-                      : `$${product.price.toFixed(2)}`}
-                  </span>
-                  {product.options.length > 0 ? (
-                    <span className="inline-flex items-center justify-center rounded-full px-3.5 py-1.5 label-eyebrow text-[0.6rem] bg-gold-deep text-cream group-hover:bg-ink transition-colors">
-                      Select Options
-                    </span>
-                  ) : (
-                    <QuickAdd
-                      productId={product.id}
-                      name={product.name}
-                      price={product.price}
-                      inStock={product.inStock}
-                      plans={product.subscription}
-                    />
-                  )}
-                </div>
-                {product.subscription && (
-                  <p className="text-[0.7rem] text-gold-deep mt-2">
-                    Restock &amp; Save 10% with Autoship
-                  </p>
-                )}
-              </>
-            ) : (
-              // Researcher-gate: pricing/purchasing needs an approved
-              // login. No number renders here at all for anon/pending.
-              <span className="label-eyebrow text-[0.65rem] text-gold-deep">
-                Sign in to see pricing
+            <div className="flex items-center justify-between">
+              <span className="text-ink font-semibold">
+                {product.priceFrom != null
+                  ? `From $${product.priceFrom.toFixed(2)}`
+                  : `$${product.price.toFixed(2)}`}
               </span>
+              {product.options.length > 0 ? (
+                <span className="inline-flex items-center justify-center rounded-full px-3.5 py-1.5 label-eyebrow text-[0.6rem] bg-gold-deep text-cream group-hover:bg-ink transition-colors">
+                  Select Options
+                </span>
+              ) : (
+                <QuickAdd
+                  productId={product.id}
+                  name={product.name}
+                  price={product.price}
+                  inStock={product.inStock}
+                  plans={product.subscription}
+                />
+              )}
+            </div>
+            {product.subscription && (
+              <p className="text-[0.7rem] text-gold-deep mt-2">
+                Restock &amp; Save 10% with Autoship
+              </p>
             )}
           </div>
         )}

@@ -128,17 +128,16 @@ export default function CartPage() {
             ))}
           </ul>
 
-          {/* 2026-08-29 (Josh): Friends & Family discount line - only ever
-              non-zero when a Promotion on this cart's items actually
-              applied (see sync-friends-family-pricing.js), which only
-              happens for accounts in the friends-family customer group.
-              Nothing here computes a discount; it just surfaces what Swell
-              already calculated, so it can never disagree with the total
-              charged at checkout. */}
+          {/* 2026-08-31 (Josh): Friends & Family is now a separate Swell
+              store/storefront, so a retail cart never has an F&F
+              Promotion applied - but if any other store-wide discount
+              is ever configured in Swell, this still surfaces it rather
+              than silently disagreeing with the total charged at
+              checkout. */}
           {!!cart?.discount_total && cart.discount_total > 0 && (
             <div className="flex items-center justify-between mb-3">
               <p className="label-eyebrow text-[0.7rem] text-gold-deep">
-                Friends &amp; Family Discount
+                Discount
               </p>
               <p className="font-medium text-gold-deep">
                 -{money(cart.discount_total)}

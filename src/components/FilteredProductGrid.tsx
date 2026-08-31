@@ -11,6 +11,10 @@
 // inclusion rule as /categories/[slug] (a product can appear under more
 // than one research area - see getProductsByCategory in lib/products.ts)
 // so filtering here and browsing a category page agree on what belongs.
+//
+// 2026-08-31 (Josh): pricing is public to every visitor now, so the price
+// sort options that used to be gated behind an `approved` prop (login
+// required) are on unconditionally.
 
 import { useMemo, useState } from "react";
 import type { Product } from "@/lib/catalog-shared";
@@ -21,11 +25,9 @@ type SortOption = "featured" | "name_asc" | "name_desc" | "price_asc" | "price_d
 
 export default function FilteredProductGrid({
   products,
-  approved = false,
   categories = [],
 }: {
   products: Product[];
-  approved?: boolean;
   // Optional: pass the live category list to show a "Category" filter.
   // Omitted (e.g. on the homepage's smaller featured grid), the select
   // just doesn't render - everything else behaves as before.
@@ -123,8 +125,8 @@ export default function FilteredProductGrid({
           <option value="featured">Sort: Featured</option>
           <option value="name_asc">Name: A to Z</option>
           <option value="name_desc">Name: Z to A</option>
-          {approved && <option value="price_asc">Price: Low to High</option>}
-          {approved && <option value="price_desc">Price: High to Low</option>}
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
         </select>
       </div>
 
@@ -137,7 +139,7 @@ export default function FilteredProductGrid({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {shown.map((product) => (
-            <ProductCard key={product.slug} product={product} approved={approved} />
+            <ProductCard key={product.slug} product={product} />
           ))}
         </div>
       )}

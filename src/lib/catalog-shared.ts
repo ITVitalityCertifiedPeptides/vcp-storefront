@@ -3,6 +3,16 @@
 // so server modules keep importing from "@/lib/products"; client
 // components import from this file directly to avoid pulling the
 // server-only guard into the client bundle.
+//
+// 2026-08-31 (Josh): retail no longer gates pricing or catalog visibility
+// behind a login. Pricing is public everywhere, to every visitor, so the
+// researcher-gate fields that used to live on Product - researcherOnly
+// (hid a product entirely pre-approval) and friendsFamilyPrice (a
+// discount shown only to friends-family accounts) - are gone from this
+// store. Friends & Family is now its own separate Swell storefront with
+// its own product line and pricing; see that project's docs, not this
+// file, for how F&F pricing works. filterVisible() is gone with them -
+// every caller now just uses the product list Swell returns directly.
 
 export type ProductOptionValue = {
   id: string;
@@ -41,39 +51,10 @@ export type Product = {
   subscription: SubscriptionPlan[] | null;
   priceFrom: number | null;
   madeInUsa: boolean;
-  // Researcher-gate (2026-08-28, revised per Josh): most of the catalog is
-  // public for its research/reference value - pricing and purchasing are
-  // what require an approved login (see filterVisible()/ProductCard/BuyBox).
-  // This one flag is for the rare product Josh wants hidden ENTIRELY from
-  // anyone not signed in - not just its price. Set per-product in Swell
-  // admin (Developer > Models > Product > Content fields > "Researcher
-  // Only", same pattern as Category/CAS Number/RUO Disclaimer). Defaults
-  // to false/public when unset.
-  researcherOnly: boolean;
   // Gallery image URLs discovered server-side from public/products
   // (see lib/product-gallery.ts): hero first, then molecule card(s).
   images: string[];
-  // Friends & Family (2026-08-29): the discounted price for accounts in
-  // the "friends-family" Swell customer group, set via the
-  // `friends_family_price` content field (same pattern as category/
-  // cas_number/etc). This is DISPLAY ONLY - the actual charge is enforced
-  // by a matching Swell Promotion (type "product", scoped to the
-  // friends-family group) created by sync-friends-family-pricing.js, which
-  // auto-applies at cart/checkout regardless of what this field says. Keep
-  // the two in sync by always running that script from the same pricing
-  // sheet. null when the product has no F&F pricing.
-  friendsFamilyPrice: number | null;
 };
-
-// Researcher-gate helper: the one place that decides which products an
-// unapproved visitor gets to see at all. approved=false strips out every
-// researcherOnly product; approved=true (or omitted) returns everything.
-// Used wherever a product LIST is built for rendering (grids, search
-// results, the header search index, related-products) - the single
-// product page does its own redirect instead (see products/[slug]/page.tsx).
-export function filterVisible(products: Product[], approved: boolean): Product[] {
-  return approved ? products : products.filter((p) => !p.researcherOnly);
-}
 
 // Display-layer renames pending a counsel-approved rename of the
 // underlying Swell category values (raw values and URL slugs still carry

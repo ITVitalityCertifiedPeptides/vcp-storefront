@@ -7,11 +7,9 @@ import {
   getAllProducts,
   categorySlug,
   displayCategory,
-  filterVisible,
 } from "@/lib/products";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
-import { isApprovedResearcher } from "@/lib/current-session";
 import FilteredProductGrid from "@/components/FilteredProductGrid";
 import ProductCard from "@/components/ProductCard";
 import QualityBadges from "@/components/QualityBadges";
@@ -75,15 +73,12 @@ const faqs = [
 ];
 
 export default async function HomePage() {
-  // Researcher-gate (2026-08-28, revised per Josh): the catalog itself is
-  // public now - `approved` only controls whether ProductCard shows a
-  // real price/Add to Cart or a "Sign in to see pricing" prompt, and
-  // filters out any individual "Researcher Only" product (see
-  // filterVisible() in catalog-shared.ts).
-  const approved = await isApprovedResearcher();
+  // 2026-08-31 (Josh): retail dropped the researcher-gate entirely -
+  // catalog, pricing, and purchasing are all public to every visitor, no
+  // login required. See catalog-shared.ts for the history of what this
+  // used to gate.
   const categories = await getAllCategories();
-  const allProducts = await getAllProducts();
-  const products = filterVisible(allProducts, approved);
+  const products = await getAllProducts();
   const blends = products.filter((p) => BLEND_SLUGS.includes(p.slug));
 
   return (
@@ -170,7 +165,7 @@ export default async function HomePage() {
                 Shop by research area &rarr;
               </Link>
             </div>
-            <FilteredProductGrid products={products} approved={approved} />
+            <FilteredProductGrid products={products} />
           </div>
         </section>
       )}
@@ -189,7 +184,7 @@ export default async function HomePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {blends.map((product) => (
-                <ProductCard key={product.slug} product={product} approved={approved} />
+                <ProductCard key={product.slug} product={product} />
               ))}
             </div>
           </div>
@@ -220,35 +215,6 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
-      {!approved && (
-        <section className="bg-cream-soft border-y border-line py-12">
-          <div className="max-w-2xl mx-auto px-4 text-center">
-            <h2 className="text-xl md:text-2xl font-semibold text-ink mb-3">
-              Sign In to See Pricing &amp; Order
-            </h2>
-            <p className="text-ink-soft text-sm leading-relaxed mb-6">
-              Browse the full catalog freely. Pricing and ordering are
-              available to approved researchers - register and our team
-              will review your account, usually within one business day.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href="/register"
-                className="inline-flex items-center rounded-full bg-gold-deep text-cream px-7 py-3 label-eyebrow text-[0.68rem] hover:bg-ink transition-colors"
-              >
-                Request Access
-              </Link>
-              <Link
-                href="/login"
-                className="label-eyebrow text-[0.7rem] text-ink-soft hover:text-gold-deep transition-colors"
-              >
-                Already approved? Sign in
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       <section className="border-b border-line">
         <div className="max-w-6xl mx-auto px-4 pt-14 pb-8 text-center">
