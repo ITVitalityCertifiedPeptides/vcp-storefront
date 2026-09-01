@@ -93,12 +93,20 @@ export function productSchema(product: Product) {
           "@type": "Offer",
           price: product.price,
           priceCurrency: "USD",
-          // Matches the storefront labels: anything not currently in_stock
-          // displays as "Out of Stock" on the site, so the structured data
-          // says the same thing.
-          availability: product.inStock
-            ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
+          // 2026-09-01: native Swell backorder is on for the whole catalog,
+          // so `product.inStock` (see lib/products.ts) is true for both
+          // literal in-stock and backordered items - both are purchasable,
+          // which is what the storefront now shows. Structured data can be
+          // more precise than a boolean: schema.org has a dedicated
+          // BackOrder value, and Google Merchant/rich-results treat it
+          // differently from InStock, so use the raw stockStatus here
+          // instead of collapsing to the same "InStock" for both.
+          availability:
+            product.stockStatus === "backorder"
+              ? "https://schema.org/BackOrder"
+              : product.inStock
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
           url: `${siteConfig.url}/products/${product.slug}`,
         }
       : undefined,

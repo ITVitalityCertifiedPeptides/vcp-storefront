@@ -134,7 +134,17 @@ function mapProduct(p: SwellProduct): Product {
     ruoDisclaimer: content.ruo_disclaimer || "",
     stockLevel: p.stock_level || 0,
     stockStatus: p.stock_status ?? null,
-    inStock: p.stock_status === "in_stock",
+    // 2026-09-01 (Josh): native Swell backorder is on for every active
+    // product (enable-backorder-all-products.js), which means a
+    // zero-stock product still ships an order fine - Swell just marks it
+    // stock_status "backorder" instead of "in_stock". `inStock` used to
+    // mean literally "stock_status is in_stock", which made every
+    // backordered product look (and act, see QuickAdd/BuyBox) sold out
+    // even though it was fully purchasable. Redefined to mean
+    // "purchasable": true unless Swell explicitly says out_of_stock (or a
+    // product somehow has no stock_status at all, e.g. stock_tracking is
+    // off, which also means nothing is blocking a sale).
+    inStock: p.stock_status !== "out_of_stock",
     options,
     subscription,
     priceFrom,

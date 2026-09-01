@@ -1,8 +1,10 @@
 "use client";
 
-// Product grid with filters: availability, category, and sort. Defaults
-// to showing in-stock products only, sorted the same "in stock first"
-// way as before, with one click to see the full list.
+// Product grid with filters: category and sort. Always shows the full
+// product list Swell returns - see lib/products.ts's `inStock` comment
+// for why: native backorder is on for the whole catalog now, so a
+// product's stock count doesn't determine whether it can be bought, and
+// it shouldn't determine whether it's shown either.
 //
 // 2026-08-30 (Josh): added the category and sort filters. Category
 // browsing used to live as its own header nav item; Josh wants it as a
@@ -15,6 +17,11 @@
 // 2026-08-31 (Josh): pricing is public to every visitor now, so the price
 // sort options that used to be gated behind an `approved` prop (login
 // required) are on unconditionally.
+//
+// 2026-09-01 (Josh): removed the "In Stock" / "All Products" toggle
+// entirely - with backorder live, filtering by stock level was hiding
+// products that are genuinely available to order. The grid now always
+// shows everything; only the Category and Sort selects remain.
 
 import { useMemo, useState } from "react";
 import type { Product } from "@/lib/catalog-shared";
@@ -33,14 +40,11 @@ export default function FilteredProductGrid({
   // just doesn't render - everything else behaves as before.
   categories?: string[];
 }) {
-  const [availability, setAvailability] = useState<"in_stock" | "all">("in_stock");
   const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState<SortOption>("featured");
 
-  const inStockCount = products.filter((p) => p.inStock).length;
-
   const shown = useMemo(() => {
-    let list = products.filter((p) => (availability === "in_stock" ? p.inStock : true));
+    let list = products;
     if (category !== "all") {
       list = list.filter((p) => p.areas.includes(category));
     }
@@ -70,14 +74,7 @@ export default function FilteredProductGrid({
         list.sort((a, b) => Number(b.inStock) - Number(a.inStock));
     }
     return list;
-  }, [products, availability, category, sort]);
-
-  const chip = (active: boolean) =>
-    `rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-      active
-        ? "border-gold-deep bg-gold-deep text-cream"
-        : "border-line bg-white text-ink hover:border-gold-deep"
-    }`;
+  }, [products, category, sort]);
 
   const selectClass =
     "rounded-full border border-line bg-white px-4 py-2 text-sm text-ink focus:outline-none focus:border-gold-deep cursor-pointer";
@@ -85,21 +82,6 @@ export default function FilteredProductGrid({
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-8">
-        <button
-          type="button"
-          className={chip(availability === "in_stock")}
-          onClick={() => setAvailability("in_stock")}
-        >
-          In Stock
-        </button>
-        <button
-          type="button"
-          className={chip(availability === "all")}
-          onClick={() => setAvailability("all")}
-        >
-          All Products
-        </button>
-
         {categories.length > 0 && (
           <select
             className={selectClass}
@@ -131,11 +113,7 @@ export default function FilteredProductGrid({
       </div>
 
       {shown.length === 0 ? (
-        <p className="text-ink-soft">
-          {inStockCount === 0
-            ? "Nothing in stock in this view right now. Switch to All Products to browse the full list."
-            : "No products match these filters."}
-        </p>
+        <p className="text-ink-soft">No products match these filters.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {shown.map((product) => (
