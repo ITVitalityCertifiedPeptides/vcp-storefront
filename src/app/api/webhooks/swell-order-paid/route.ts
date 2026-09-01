@@ -19,6 +19,15 @@
 // (already set for the /api/subscribe route), NEXT_PUBLIC_SWELL_STORE_ID
 // (already set), RESEND_API_KEY, RESEND_FROM_EMAIL (optional).
 //
+// Design (2026-09-02): rebuilt to use the same branded template shell as
+// the Order confirmation email (logo header, order-details table) instead
+// of the plain inline HTML this shipped with - see payment-received-email.ts.
+// Also switched to the shared checkAuth()/fetchOrder() in
+// swell-backend-notify.ts (fetchOrder already includes ?expand=account,
+// the fix that made this route's emails actually reach customers -
+// confirmed live 2026-09-01) instead of this route's own duplicated
+// inline versions, so both stay in sync automatically going forward.
+//
 // Known limitation: no idempotency guard yet. If Swell retries a delivery
 // (e.g. our endpoint times out after sending but before returning 200) the
 // email could send twice for the same order. Low risk in practice - add an
@@ -27,86 +36,18 @@
 // ruo_disclaimer fields) and check/set it here if duplicates become a
 // real problem.
 
+import {
+  checkAuth,
+  fetchOrder,
+  customerEmailFor,
+  alertTeamNoEmail,
+  type SwellWebhookBody,
+} from "@/lib/swell-backend-notify";
+import { buildPaymentReceivedEmailHtml, buildPaymentReceivedEmailText } from "@/lib/payment-received-email";
 import { sendEmail } from "@/lib/resend";
 
-type SwellWebhookBody = {
-  type?: string;
-  model?: string;
-  data?: { id?: string };
-};
-
-type SwellOrder = {
-  id: string;
-  number?: string | number;
-  email?: string;
-  account?: { email?: string };
-  billing?: { email?: string };
-  shipping?: { email?: string; name?: string };
-  grand_total?: number;
-  currency?: string;
-  date_created?: string;
-};
-
-function formatCurrency(amount: number | undefined, currency = "USD") {
-  if (typeof amount !== "number") return "";
-  try {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
-  } catch {
-    return `$${amount.toFixed(2)}`;
-  }
-}
-
-async function fetchOrder(orderId: string): Promise<SwellOrder> {
-  const storeId = process.env.NEXT_PUBLIC_SWELL_STORE_ID;
-  const secretKey = process.env.SWELL_SECRET_KEY;
-  if (!storeId || !secretKey) {
-    throw new Error("SWELL_SECRET_KEY / NEXT_PUBLIC_SWELL_STORE_ID not configured");
-  }
-  const auth = Buffer.from(`${storeId}:${secretKey}`).toString("base64");
-  // `?expand=account` is required - GET /orders/{id} returns only
-  // `account_id` (a string) by default, not a nested `account` object.
-  // Confirmed live via Swell's Console (2026-09-01, order #100008): every
-  // order we checked stored the customer's email solely on the linked
-  // Account record - order.email/order.billing.email/order.shipping.email
-  // were all absent. Without this expand, the customerEmail lookup below
-  // never finds an address and this route silently emails the team's
-  // "no email on file" fallback instead of the customer - almost certainly
-  // why "payment received" emails haven't been confirmed reaching real
-  // customers since this route went live on 2026-08-21.
-  const res = await fetch(`https://api.swell.store/orders/${orderId}?expand=account`, {
-    headers: { Authorization: `Basic ${auth}` },
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch order ${orderId}: ${res.status}`);
-  }
-  return (await res.json()) as SwellOrder;
-}
-
-function buildEmail(order: SwellOrder) {
-  const number = order.number ? String(order.number) : order.id;
-  const total = formatCurrency(order.grand_total, order.currency || "USD");
-  const subject = `Payment received - order #${number} is being processed`;
-  const text = `Hi,
-
-We've received your payment for order #${number}${total ? ` (${total})` : ""}. Your order is now being processed.
-
-Our team reviews and approves orders Monday through Friday during business hours, and your order ships within 1 business day of approval. You'll get a separate email with tracking and your Certificate of Analysis once it ships.
-
-Thank you,
-Vitality Certified Peptides`;
-  const html = `<p>Hi,</p>
-<p>We've received your payment for order <strong>#${number}</strong>${total ? ` (${total})` : ""}. Your order is now being processed.</p>
-<p>Our team reviews and approves orders Monday through Friday during business hours, and your order ships within 1 business day of approval. You'll get a separate email with tracking and your Certificate of Analysis once it ships.</p>
-<p>Thank you,<br/>Vitality Certified Peptides</p>`;
-  return { subject, text, html };
-}
-
 export async function POST(request: Request) {
-  const url = new URL(request.url);
-  const token = url.searchParams.get("token");
-  const expected = process.env.SWELL_WEBHOOK_SECRET;
-
-  if (!expected || token !== expected) {
+  if (!checkAuth(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -124,22 +65,17 @@ export async function POST(request: Request) {
 
   try {
     const order = await fetchOrder(orderId);
-    const customerEmail =
-      order.email || order.account?.email || order.billing?.email || order.shipping?.email;
+    const number = order.number ? String(order.number) : order.id;
+    const email = customerEmailFor(order);
 
-    const { subject, text, html } = buildEmail(order);
+    const subject = `Payment received - order #${number} is being processed`;
+    const html = buildPaymentReceivedEmailHtml(order);
+    const text = buildPaymentReceivedEmailText(order);
 
-    if (customerEmail) {
-      await sendEmail({ to: customerEmail, subject, html, text });
+    if (email) {
+      await sendEmail({ to: email, subject, html, text });
     } else {
-      // No resolvable customer email - alert the team instead of silently
-      // dropping the notification, so a human sends it manually.
-      await sendEmail({
-        to: "customerservice@vitalitycertifiedpeptides.com",
-        subject: `[Action needed] No email on file for paid order #${order.number ?? order.id}`,
-        text: `Order ${order.number ?? order.id} was marked paid but no customer email was found on the order record. Please send the payment-received email manually (see Invoice Email Template.md, Template 3).`,
-        html: `<p>Order <strong>${order.number ?? order.id}</strong> was marked paid but no customer email was found on the order record. Please send the payment-received email manually (see Invoice Email Template.md, Template 3).</p>`,
-      });
+      await alertTeamNoEmail("Paid order", number);
     }
 
     return Response.json({ ok: true });
