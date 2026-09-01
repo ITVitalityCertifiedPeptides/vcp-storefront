@@ -10,10 +10,12 @@
 // native sends). This route replaces it, on the same Resend channel already
 // proven to work for the "Payment received" email.
 //
-// Content matches what the Swell "Preparation note" field was supposed to
-// say (Invoice Email Template.md, fixed 2026-08-30) - order details plus all
-// four payment methods, since checkout is invoice-based and nothing is
-// charged online.
+// Design (2026-09-02): rebuilt to match the fuller, invoice-styled format
+// Josh asked for - logo header, an order-details table, and a 2x2 grid of
+// payment method cards (PayPal has a real QR code; see
+// order-confirmation-email-assets.ts for why Zelle/Venmo don't have one yet)
+// - instead of the plain text-first wrapEmailHtml() output this shipped
+// with originally. See order-confirmation-email.ts for the template itself.
 //
 // Setup needed in Swell admin (Developer > Webhooks): add a webhook, event =
 // whatever the picker calls order creation/placement (try "Order Created" or
@@ -32,31 +34,12 @@
 import {
   checkAuth,
   fetchOrder,
-  formatCurrency,
   customerEmailFor,
-  wrapEmailHtml,
-  itemsListHtml,
   alertTeamNoEmail,
   type SwellWebhookBody,
 } from "@/lib/swell-backend-notify";
+import { buildOrderConfirmationEmailHtml, buildOrderConfirmationEmailText } from "@/lib/order-confirmation-email";
 import { sendEmail } from "@/lib/resend";
-
-// Keep this in sync with Invoice Email Template.md's "Preparation note"
-// content if the payment handles/copy ever change.
-const PAYMENT_OPTIONS_HTML = `<p>To complete your order, send the total above using <strong>ONE</strong> of the following:</p>
-<p style="margin:4px 0;">Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts)<br/>
-Venmo: @vcpllc (Vitality Certified Peptides LLC)<br/>
-Apple Cash: (626) 825-2165<br/>
-PayPal (Friends &amp; Family only): Marina E Coss - <a href="https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912">pay via PayPal</a></p>
-<p>Be sure to include your order number in the payment note or memo for faster processing. Once sent, reply to this email and let us know which method you used - our team confirms payments and approves orders Monday through Friday during business hours. Once approved, it's processed the same day, and you'll receive tracking along with the Certificate of Analysis for your exact lot once it ships.</p>`;
-
-const PAYMENT_OPTIONS_TEXT = `To complete your order, send the total above using ONE of the following:
-Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts)
-Venmo: @vcpllc (Vitality Certified Peptides LLC)
-Apple Cash: (626) 825-2165
-PayPal (Friends & Family only): Marina E Coss - https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912
-
-Be sure to include your order number in the payment note or memo for faster processing. Once sent, reply to this email and let us know which method you used - our team confirms payments and approves orders Monday through Friday during business hours. Once approved, it's processed the same day, and you'll receive tracking along with the Certificate of Analysis for your exact lot once it ships.`;
 
 export async function POST(request: Request) {
   if (!checkAuth(request)) {
@@ -86,25 +69,14 @@ export async function POST(request: Request) {
     }
 
     const number = order.number ? String(order.number) : order.id;
-    const total = formatCurrency(order.grand_total, order.currency || "USD");
     const email = customerEmailFor(order);
 
     const subject = `Order received - #${number}`;
-    const bodyHtml = `<p>Thanks for your order with Vitality Certified Peptides.</p>
-<p><strong>Order #${number}</strong>${total ? ` &mdash; Total: ${total}` : ""}</p>
-${itemsListHtml(order.items)}
-${PAYMENT_OPTIONS_HTML}
-<p style="font-size:12px; color:#777;">Reminder: all products are for laboratory research use only and are not for human or veterinary use.</p>`;
-    const text = `Thanks for your order with Vitality Certified Peptides.
-
-Order #${number}${total ? ` - Total: ${total}` : ""}
-
-${PAYMENT_OPTIONS_TEXT}
-
-Reminder: all products are for laboratory research use only and are not for human or veterinary use.`;
+    const html = buildOrderConfirmationEmailHtml(order);
+    const text = buildOrderConfirmationEmailText(order);
 
     if (email) {
-      await sendEmail({ to: email, subject, html: wrapEmailHtml(bodyHtml), text });
+      await sendEmail({ to: email, subject, html, text });
     } else {
       await alertTeamNoEmail("Order", number);
     }
