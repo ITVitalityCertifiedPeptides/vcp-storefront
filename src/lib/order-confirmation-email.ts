@@ -13,16 +13,25 @@
 // round-trip verified (Zelle and Venmo were decoded from fresh screenshots
 // Josh sent that day; PayPal was regenerated from the URL already live in
 // this route's payment copy).
+//
+// Images are hosted (public/email-assets/*.png), NOT inlined as base64
+// data: URIs (2026-09-02 fix). Gmail - and most other webmail clients -
+// strip or refuse to render `<img src="data:...">` in received HTML email
+// for security/spam reasons; only a handful of very permissive clients
+// (some desktop apps) show them. Josh confirmed the base64 version arrived
+// with no images at all. `order-confirmation-email-assets.ts` still holds
+// the base64 source of truth (useful for regenerating the PNG files if the
+// QR/logo ever needs to change) but nothing here imports it anymore.
 
 import "server-only";
 import type { SwellOrder } from "./swell-backend-notify";
 import { formatCurrency } from "./swell-backend-notify";
-import {
-  LOGO_EMBLEM_PNG_BASE64,
-  PAYPAL_QR_PNG_BASE64,
-  ZELLE_QR_PNG_BASE64,
-  VENMO_QR_PNG_BASE64,
-} from "./order-confirmation-email-assets";
+import { siteConfig } from "./site";
+
+const LOGO_EMBLEM_URL = `${siteConfig.url}/email-assets/logo-emblem.png`;
+const PAYPAL_QR_URL = `${siteConfig.url}/email-assets/qr-paypal.png`;
+const ZELLE_QR_URL = `${siteConfig.url}/email-assets/qr-zelle.png`;
+const VENMO_QR_URL = `${siteConfig.url}/email-assets/qr-venmo.png`;
 
 const GOLD = "#a67c27";
 const INK = "#1a1a1a";
@@ -61,13 +70,13 @@ function itemsTableHtml(items: SwellOrder["items"], currency: string): string {
 function paymentCard(opts: {
   label: string;
   detail: string;
-  qrBase64?: string;
+  qrUrl?: string;
   linkUrl?: string;
   linkLabel?: string;
 }): string {
-  const { label, detail, qrBase64, linkUrl, linkLabel } = opts;
-  const qrBlock = qrBase64
-    ? `<img src="data:image/png;base64,${qrBase64}" width="120" height="120" alt="${label} QR code" style="display:block; margin:0 auto 10px; border-radius:6px;" />`
+  const { label, detail, qrUrl, linkUrl, linkLabel } = opts;
+  const qrBlock = qrUrl
+    ? `<img src="${qrUrl}" width="120" height="120" alt="${label} QR code" style="display:block; margin:0 auto 10px; border-radius:6px;" />`
     : "";
   const linkBlock = linkUrl
     ? `<a href="${linkUrl}" style="display:inline-block; margin-top:8px; font-size:12px; color:${GOLD}; text-decoration:underline;">${linkLabel ?? "Tap to pay"}</a>`
@@ -97,18 +106,18 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
 
   const cards = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:8px 0 4px;">
     <tr>
-      ${paymentCard({ label: "ZELLE", detail: "vcp-llc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC Accounts</span>", qrBase64: ZELLE_QR_PNG_BASE64, linkUrl: zelleUrl, linkLabel: "Scan the QR or tap to pay" })}
-      ${paymentCard({ label: "VENMO", detail: "@vcpllc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC</span>", qrBase64: VENMO_QR_PNG_BASE64, linkUrl: venmoUrl, linkLabel: "Scan the QR or tap to pay" })}
+      ${paymentCard({ label: "ZELLE", detail: "vcp-llc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC Accounts</span>", qrUrl: ZELLE_QR_URL, linkUrl: zelleUrl, linkLabel: "Scan the QR or tap to pay" })}
+      ${paymentCard({ label: "VENMO", detail: "@vcpllc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC</span>", qrUrl: VENMO_QR_URL, linkUrl: venmoUrl, linkLabel: "Scan the QR or tap to pay" })}
     </tr>
     <tr>
       ${paymentCard({ label: "APPLE CASH", detail: "(626) 825-2165", linkUrl: "sms:+16268252165", linkLabel: "Open Messages to pay" })}
-      ${paymentCard({ label: "PAYPAL — FRIENDS &amp; FAMILY ONLY", detail: "Marina E Coss", qrBase64: PAYPAL_QR_PNG_BASE64, linkUrl: paypalUrl, linkLabel: "Scan the QR or tap to pay" })}
+      ${paymentCard({ label: "PAYPAL — FRIENDS &amp; FAMILY ONLY", detail: "Marina E Coss", qrUrl: PAYPAL_QR_URL, linkUrl: paypalUrl, linkLabel: "Scan the QR or tap to pay" })}
     </tr>
   </table>`;
 
   return `<div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: 0 auto; color: ${INK}; background:#ffffff;">
   <div style="padding: 28px 0 18px; text-align:center; border-bottom: 2px solid ${GOLD};">
-    <img src="data:image/png;base64,${LOGO_EMBLEM_PNG_BASE64}" width="48" height="48" alt="Vitality Certified Peptides" style="display:block; margin:0 auto 10px;" />
+    <img src="${LOGO_EMBLEM_URL}" width="48" height="48" alt="Vitality Certified Peptides" style="display:block; margin:0 auto 10px;" />
     <span style="font-size: 19px; font-weight: bold; letter-spacing: 0.5px;">VITALITY <span style="font-weight: normal;">CERTIFIED PEPTIDES</span></span>
   </div>
 

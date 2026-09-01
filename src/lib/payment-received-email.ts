@@ -11,10 +11,18 @@
 // we're processing your order" - no payment instructions needed here, that
 // was the Order confirmation email's job.
 
+// Logo is hosted (public/email-assets/logo-emblem.png), NOT inlined as a
+// base64 data: URI - Gmail and most other webmail clients strip/refuse to
+// render `<img src="data:...">` in received email, so the base64 version
+// shipped with no images at all (confirmed by Josh, 2026-09-02). See the
+// same fix/note in order-confirmation-email.ts.
+
 import "server-only";
 import type { SwellOrder } from "./swell-backend-notify";
 import { formatCurrency } from "./swell-backend-notify";
-import { LOGO_EMBLEM_PNG_BASE64 } from "./order-confirmation-email-assets";
+import { siteConfig } from "./site";
+
+const LOGO_EMBLEM_URL = `${siteConfig.url}/email-assets/logo-emblem.png`;
 
 const GOLD = "#a67c27";
 const GREEN = "#2f7a3d";
@@ -59,7 +67,7 @@ export function buildPaymentReceivedEmailHtml(order: SwellOrder): string {
 
   return `<div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: 0 auto; color: ${INK}; background:#ffffff;">
   <div style="padding: 28px 0 18px; text-align:center; border-bottom: 2px solid ${GOLD};">
-    <img src="data:image/png;base64,${LOGO_EMBLEM_PNG_BASE64}" width="48" height="48" alt="Vitality Certified Peptides" style="display:block; margin:0 auto 10px;" />
+    <img src="${LOGO_EMBLEM_URL}" width="48" height="48" alt="Vitality Certified Peptides" style="display:block; margin:0 auto 10px;" />
     <span style="font-size: 19px; font-weight: bold; letter-spacing: 0.5px;">VITALITY <span style="font-weight: normal;">CERTIFIED PEPTIDES</span></span>
   </div>
 
