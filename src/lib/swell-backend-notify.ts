@@ -114,17 +114,28 @@ async function swellGet<T>(path: string): Promise<T> {
   return (await res.json()) as T;
 }
 
+// `?expand=account` is required - confirmed live via Swell's Console
+// (2026-09-01, order #100008) that GET /orders/{id} returns only
+// `account_id` (a string) by default, NOT a nested `account` object. Every
+// checkout we tested stored the customer's email solely on the linked
+// Account record - order.email, order.billing.email, and
+// order.shipping.email were all absent on the raw order. Without this
+// expand, customerEmailFor() below never finds an email and every route
+// silently falls back to the "no email on file" team alert instead of
+// emailing the customer - this was the real reason order #100008's test
+// still didn't reach the customer even after the Vercel firewall/env-var
+// fixes were applied.
 export async function fetchOrder(orderId: string): Promise<SwellOrder> {
-  return swellGet<SwellOrder>(`/orders/${orderId}`);
+  return swellGet<SwellOrder>(`/orders/${orderId}?expand=account`);
 }
 
 // Best-effort - Swell's Backend API reference does not document a top-level
 // Carts endpoint as clearly as Orders. If this 404s, Josh/next session
 // should check Swell admin (Developer > API Explorer, if it has one, or
 // Console) for the real path and this one-line fetch is the only thing that
-// needs correcting.
+// needs correcting. Same `?expand=account` reasoning as fetchOrder above.
 export async function fetchCart(cartId: string): Promise<SwellCart> {
-  return swellGet<SwellCart>(`/carts/${cartId}`);
+  return swellGet<SwellCart>(`/carts/${cartId}?expand=account`);
 }
 
 export function formatCurrency(amount: number | undefined, currency = "USD") {

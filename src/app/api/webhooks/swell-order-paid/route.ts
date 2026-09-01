@@ -63,7 +63,17 @@ async function fetchOrder(orderId: string): Promise<SwellOrder> {
     throw new Error("SWELL_SECRET_KEY / NEXT_PUBLIC_SWELL_STORE_ID not configured");
   }
   const auth = Buffer.from(`${storeId}:${secretKey}`).toString("base64");
-  const res = await fetch(`https://api.swell.store/orders/${orderId}`, {
+  // `?expand=account` is required - GET /orders/{id} returns only
+  // `account_id` (a string) by default, not a nested `account` object.
+  // Confirmed live via Swell's Console (2026-09-01, order #100008): every
+  // order we checked stored the customer's email solely on the linked
+  // Account record - order.email/order.billing.email/order.shipping.email
+  // were all absent. Without this expand, the customerEmail lookup below
+  // never finds an address and this route silently emails the team's
+  // "no email on file" fallback instead of the customer - almost certainly
+  // why "payment received" emails haven't been confirmed reaching real
+  // customers since this route went live on 2026-08-21.
+  const res = await fetch(`https://api.swell.store/orders/${orderId}?expand=account`, {
     headers: { Authorization: `Basic ${auth}` },
   });
   if (!res.ok) {
