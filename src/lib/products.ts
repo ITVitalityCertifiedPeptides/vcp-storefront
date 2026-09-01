@@ -62,6 +62,13 @@ type SwellProduct = {
     cas_number?: string;
     ruo_disclaimer?: string;
     made_in_usa?: boolean;
+    // Set on a product Josh wants sold ONLY through Inner Circle (Swell
+    // admin > Products > that product > Content fields > "Circle
+    // Exclusive"). The only place this is read is the active-product
+    // filter in fetchAllProducts() below - once filtered there, nothing
+    // downstream (mapProduct, Product, any component) ever sees it, so
+    // there's no risk of it leaking onto a retail page some other way.
+    circle_exclusive?: boolean;
   };
   options?: Array<{
     id?: string;
@@ -208,7 +215,19 @@ async function fetchAllProducts(): Promise<Product[]> {
   // label; it only bites if the field does start arriving. This was NOT the
   // reason Bacteriostatic Water 30mL kept rendering after being deactivated
   // in Swell - see the cache note below for that.
-  return all.filter((p) => p.active !== false).map(mapProduct);
+  //
+  // 2026-09-01 (Josh: "we're gonna have products that are gonna be
+  // available for the inner circle that are not gonna be available on
+  // retail"): also drop anything flagged content.circle_exclusive in
+  // Swell. This is the ONLY place that flag is checked - once dropped
+  // here it never reaches mapProduct, so it can't surface on the shop
+  // grid, a category page, search, or (since getProductBySlug is built
+  // from this same array) a direct /products/[slug] URL either. Inner
+  // Circle's own products.ts has no such filter, by design - Circle
+  // shows the full catalog regardless of this flag.
+  return all
+    .filter((p) => p.active !== false && p.content?.circle_exclusive !== true)
+    .map(mapProduct);
 }
 
 // Share one Swell API call across every page and layout that needs product
