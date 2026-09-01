@@ -35,9 +35,7 @@ export default async function ShopPage() {
         Shop Catalog
       </h1>
       <p className="text-ink-soft mb-10 max-w-2xl leading-relaxed">
-        {products.length} research-grade compound{products.length === 1 ? "" : "s"},
-        every lot backed by a Certificate of Analysis. For laboratory
-        research use only.
+        Research Grade Compounds. For laboratory research use only.
       </p>
       <FilteredProductGrid products={products} categories={categories} />
     </div>
