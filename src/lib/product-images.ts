@@ -17,7 +17,10 @@ export const productImages: Record<string, string> = {
   "epitalon-10mg": "/products/epitalon-10mg-hero.jpg",
   "ghk-cu-50mg": "/products/ghk-cu-50mg-hero.jpg",
   "ghrp-6-5mg": "/products/ghrp-6-5mg-hero.jpg",
-  "igf-1-lr3-1mg": "/products/igf-1-lr3-1mg-hero.jpg",
+  // Renamed from "IGF-1 LR3" to "IGF-LR3" at some point - the photo file
+  // is the same shot, just renamed to match the current slug so the
+  // filesystem auto-discovery in product-gallery.ts finds it again.
+  "igf-lr3-1mg": "/products/igf-lr3-1mg-hero.jpg",
   "ipamorelin-10mg": "/products/ipamorelin-10mg-hero.jpg",
   "kisspeptin-5mg": "/products/kisspeptin-5mg-hero.jpg",
   "kisspeptin-10mg": "/products/kisspeptin-10mg-hero.jpg",
