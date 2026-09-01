@@ -65,6 +65,15 @@ export const productImages: Record<string, string> = {
   "ss-31-30mg": "/products/ss-31-30mg-hero.jpg",
   "tesamorelin-20mg": "/products/tesamorelin-20mg-hero.jpg",
   "tesamorelin-ipamorelin-10mg-3mg": "/products/tesamorelin-ipamorelin-10mg-3mg-hero.jpg",
+  // ---- New heroes, 2026-09-01 batch (Josh: "here are the product photos
+  // please add these and remove the product coming soon photos" - only
+  // for products that had no photo yet; Josh: "if there is already a
+  // product photo ignore the new one") ----
+  "5-amino-1mq-50mg": "/products/5-amino-1mq-50mg-hero.png",
+  "adamax-10mg": "/products/adamax-10mg-hero.png",
+  "adamax-5mg": "/products/adamax-5mg-hero.png",
+  "aod-9604-10mg": "/products/aod-9604-10mg-hero.png",
+  "aod-9604-2mg": "/products/aod-9604-2mg-hero.png",
   // Every product now has a 2:3 hero except Bacteriostatic Water 30mL,
   // which falls back to the drawn vial icon until its image lands.
 };
