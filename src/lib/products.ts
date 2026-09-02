@@ -69,6 +69,22 @@ type SwellProduct = {
     // downstream (mapProduct, Product, any component) ever sees it, so
     // there's no risk of it leaking onto a retail page some other way.
     circle_exclusive?: boolean;
+    // 2026-09-02 (Josh: "we have products that are wholesale and circle
+    // only and some that show on all 3 so we need a way to supress
+    // products somehow"): the general per-storefront suppression
+    // mechanism that supersedes circle_exclusive going forward - one
+    // independent boolean per storefront (show_on_retail here,
+    // show_on_circle in ff-app's products.ts, show_on_wholesale in the
+    // new wholesale app's), each defaulting to "show" when unset so
+    // every existing product's current visibility is unaffected until
+    // Josh deliberately unchecks one. circle_exclusive is still honored
+    // too (see the filter below) rather than removed outright, since
+    // real live products already rely on it and dropping that check
+    // would silently un-suppress them the moment this ships, before
+    // anyone has gone through and set show_on_retail=false to match.
+    // Safe to migrate individual products off circle_exclusive onto
+    // show_on_retail over time; both can coexist indefinitely.
+    show_on_retail?: boolean;
   };
   options?: Array<{
     id?: string;
@@ -226,7 +242,12 @@ async function fetchAllProducts(): Promise<Product[]> {
   // Circle's own products.ts has no such filter, by design - Circle
   // shows the full catalog regardless of this flag.
   return all
-    .filter((p) => p.active !== false && p.content?.circle_exclusive !== true)
+    .filter(
+      (p) =>
+        p.active !== false &&
+        p.content?.circle_exclusive !== true &&
+        p.content?.show_on_retail !== false
+    )
     .map(mapProduct);
 }
 
