@@ -48,9 +48,9 @@ export default function CartPage() {
   }
 
   // Checkout is invoice-based: the order is created in Swell as pending
-  // payment and the buyer receives an invoice with payment details. Card
-  // (PaymentCloud) and crypto (BitPay) become selectable in /checkout once
-  // those merchant accounts are approved.
+  // payment and the buyer receives an invoice with payment details for the
+  // four live methods - Zelle, Venmo, Apple Cash, and PayPal (friends &
+  // family only).
   function checkout() {
     router.push("/checkout");
   }

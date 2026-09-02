@@ -106,12 +106,12 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
 
   const cards = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:8px 0 4px;">
     <tr>
-      ${paymentCard({ label: "ZELLE", detail: "vcp-llc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC Accounts</span>", qrUrl: ZELLE_QR_URL, linkUrl: zelleUrl, linkLabel: "Scan the QR or tap to pay" })}
+      ${paymentCard({ label: "ZELLE", detail: "vcp-llc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC Accounts</span><br/>marina@vitalitycertifiedpeptides.com", qrUrl: ZELLE_QR_URL, linkUrl: zelleUrl, linkLabel: "Scan the QR or tap to pay" })}
       ${paymentCard({ label: "VENMO", detail: "@vcpllc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC</span>", qrUrl: VENMO_QR_URL, linkUrl: venmoUrl, linkLabel: "Scan the QR or tap to pay" })}
     </tr>
     <tr>
       ${paymentCard({ label: "APPLE CASH", detail: "(626) 825-2165", linkUrl: "sms:+16268252165", linkLabel: "Open Messages to pay" })}
-      ${paymentCard({ label: "PAYPAL — FRIENDS &amp; FAMILY ONLY", detail: "Marina E Coss", qrUrl: PAYPAL_QR_URL, linkUrl: paypalUrl, linkLabel: "Scan the QR or tap to pay" })}
+      ${paymentCard({ label: "PAYPAL — FRIENDS &amp; FAMILY ONLY", detail: "Marina E Coss<br/>marina@vitalitycertifiedpeptides.com", qrUrl: PAYPAL_QR_URL, linkUrl: paypalUrl, linkLabel: "Scan the QR or tap to pay" })}
     </tr>
   </table>`;
 
@@ -170,10 +170,10 @@ export function buildOrderConfirmationEmailText(order: SwellOrder): string {
 Order #${number}${total ? ` - Total: ${total}` : ""}
 ${items ? `\n${items}\n` : ""}
 To complete your order, send the total above using ONE of the following:
-Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts)
+Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts) - marina@vitalitycertifiedpeptides.com
 Venmo: @vcpllc (Vitality Certified Peptides LLC)
 Apple Cash: (626) 825-2165
-PayPal (Friends & Family only): Marina E Coss - https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912?utm_source=consapp_download
+PayPal (Friends & Family only): Marina E Coss - marina@vitalitycertifiedpeptides.com - https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912?utm_source=consapp_download
 
 Be sure to include your order number, #${number}, in the payment note or memo for faster processing. Once sent, reply to this email and let us know which method you used - our team confirms payments and approves orders Monday through Friday during business hours. Once approved, it's processed the same day, and you'll receive tracking along with the Certificate of Analysis for your exact lot once it ships.
 
