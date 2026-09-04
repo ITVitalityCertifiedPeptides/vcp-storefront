@@ -15,6 +15,10 @@ import {
   customerEmailFor,
   wrapEmailHtml,
   alertTeamNoEmail,
+  badgeHtml,
+  summaryCardHtml,
+  ctaButtonHtml,
+  BRAND,
   type SwellWebhookBody,
 } from "@/lib/swell-backend-notify";
 import { sendEmail } from "@/lib/resend";
@@ -48,9 +52,11 @@ export async function POST(request: Request) {
     const subject = delivered
       ? `Your order #${number} was delivered`
       : `Update on your order #${number}`;
-    const bodyHtml = `<p>Hi,</p>
+    const bodyHtml = `${badgeHtml(delivered ? "DELIVERED" : "SHIPMENT UPDATE", delivered ? BRAND.green : BRAND.gold)}
+<p>Hi,</p>
 <p>${delivered ? `Order <strong>#${number}</strong> has been delivered.` : `There's an update on order <strong>#${number}</strong>'s shipment.`}</p>
-${tracking ? `<p>Tracking: ${trackingUrl ? `<a href="${trackingUrl}">${tracking}</a>` : tracking}</p>` : ""}
+${summaryCardHtml([{ label: "Order", value: `#${number}` }, { label: "Tracking", value: tracking || "—" }])}
+${trackingUrl ? ctaButtonHtml("Track your package", trackingUrl) : ""}
 <p>Questions? Just reply to this email.</p>`;
     const text = `Hi,
 

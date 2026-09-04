@@ -91,12 +91,11 @@ function paymentCard(opts: {
   </td>`;
 }
 
-export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
-  const number = order.number ? String(order.number) : order.id;
-  const currency = order.currency || "USD";
-  const total = formatCurrency(order.grand_total, currency);
-  const itemsHtml = itemsTableHtml(order.items, currency);
-
+// Promoted out of buildOrderConfirmationEmailHtml (2026-09-03) so
+// swell-draft-order-invoice/route.ts can reuse the exact same payment-method
+// grid - a draft-order invoice needs the same "how do I pay" content an
+// order confirmation does, and duplicating it invited drift.
+export function paymentMethodCardsHtml(): string {
   const paypalUrl =
     "https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912?utm_source=consapp_download";
   const zelleUrl =
@@ -104,7 +103,7 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
   const venmoUrl =
     "https://www.paypal.com/qrcodes/venmocs/f953a8fe-edd4-4225-9c5a-9046eb30cd4f?created=1788015862.237005";
 
-  const cards = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:8px 0 4px;">
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:8px 0 4px;">
     <tr>
       ${paymentCard({ label: "ZELLE", detail: "vcp-llc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC Accounts</span><br/>marina@vitalitycertifiedpeptides.com", qrUrl: ZELLE_QR_URL, linkUrl: zelleUrl, linkLabel: "Scan the QR or tap to pay" })}
       ${paymentCard({ label: "VENMO", detail: "@vcpllc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC</span>", qrUrl: VENMO_QR_URL, linkUrl: venmoUrl, linkLabel: "Scan the QR or tap to pay" })}
@@ -114,6 +113,14 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
       ${paymentCard({ label: "PAYPAL — FRIENDS &amp; FAMILY ONLY", detail: "Marina E Coss<br/>marina@vitalitycertifiedpeptides.com", qrUrl: PAYPAL_QR_URL, linkUrl: paypalUrl, linkLabel: "Scan the QR or tap to pay" })}
     </tr>
   </table>`;
+}
+
+export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
+  const number = order.number ? String(order.number) : order.id;
+  const currency = order.currency || "USD";
+  const total = formatCurrency(order.grand_total, currency);
+  const itemsHtml = itemsTableHtml(order.items, currency);
+  const cards = paymentMethodCardsHtml();
 
   return `<div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: 0 auto; color: ${INK}; background:#ffffff;">
   <div style="padding: 28px 0 18px; text-align:center; border-bottom: 2px solid ${GOLD};">

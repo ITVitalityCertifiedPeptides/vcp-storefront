@@ -3,6 +3,7 @@ import path from "node:path";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getProductBySlug } from "@/lib/products";
+import LabResultsBrowser, { type LotEntry } from "@/components/LabResultsBrowser";
 
 export const metadata: Metadata = {
   title: "Lab Results",
@@ -15,13 +16,6 @@ export const metadata: Metadata = {
 // page reads the folder at request time instead of baking a list in at
 // build time.
 export const dynamic = "force-dynamic";
-
-type LotEntry = {
-  slug: string;
-  lot: string;
-  file: string;
-  productName: string;
-};
 
 async function getLots(): Promise<LotEntry[]> {
   const dir = path.join(process.cwd(), "public", "coas");
@@ -62,7 +56,8 @@ export default async function LabResultsPage() {
       <p className="text-ink-soft leading-relaxed mb-4">
         Every lot we sell is tested by an independent laboratory for
         identity, purity, and net content. The reports below are the actual
-        Certificates of Analysis for lots we have carried.
+        Certificates of Analysis for every lot we have carried, across our
+        full history - searchable by product name or lot number.
       </p>
       <p className="text-ink-soft leading-relaxed mb-10">
         When your order ships you receive tracking and a digital copy of
@@ -75,29 +70,7 @@ export default async function LabResultsPage() {
           Analysis for any lot.
         </p>
       ) : (
-        <div className="border-y border-line divide-y divide-line">
-          {lots.map((lot) => (
-            <div
-              key={lot.file}
-              className="py-4 flex items-center justify-between gap-4"
-            >
-              <div>
-                <p className="font-medium text-ink">{lot.productName}</p>
-                <p className="text-sm text-ink-soft font-mono mt-0.5">
-                  Lot {lot.lot}
-                </p>
-              </div>
-              <a
-                href={`/coas/${lot.file}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center rounded-full border border-gold-deep/40 text-gold-deep px-4 py-2 label-eyebrow text-[0.65rem] hover:bg-gold-deep hover:text-cream transition-colors shrink-0"
-              >
-                View Report
-              </a>
-            </div>
-          ))}
-        </div>
+        <LabResultsBrowser lots={lots} />
       )}
 
       <p className="text-xs text-ink-soft mt-8">

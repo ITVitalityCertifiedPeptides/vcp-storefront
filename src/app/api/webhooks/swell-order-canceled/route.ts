@@ -15,6 +15,10 @@ import {
   customerEmailFor,
   wrapEmailHtml,
   alertTeamNoEmail,
+  badgeHtml,
+  summaryCardHtml,
+  itemsListHtml,
+  BRAND,
   type SwellWebhookBody,
 } from "@/lib/swell-backend-notify";
 import { sendEmail } from "@/lib/resend";
@@ -39,12 +43,16 @@ export async function POST(request: Request) {
   try {
     const order = await fetchOrder(orderId);
     const number = order.number ? String(order.number) : order.id;
-    const total = formatCurrency(order.grand_total, order.currency || "USD");
+    const currency = order.currency || "USD";
+    const total = formatCurrency(order.grand_total, currency);
     const email = customerEmailFor(order);
 
     const subject = `Your order #${number} has been canceled`;
-    const bodyHtml = `<p>Hi,</p>
-<p>Your order <strong>#${number}</strong>${total ? ` (${total})` : ""} has been canceled. No payment is required.</p>
+    const bodyHtml = `${badgeHtml("ORDER CANCELED", BRAND.red)}
+<p>Hi,</p>
+<p>Your order <strong>#${number}</strong> has been canceled. No payment is required.</p>
+${summaryCardHtml([{ label: "Order", value: `#${number}` }, { label: "Total", value: total || "—" }])}
+${itemsListHtml(order.items, currency)}
 <p>If this wasn't expected, or you'd still like these items, just reply to this email or place a new order any time.</p>`;
     const text = `Hi,
 

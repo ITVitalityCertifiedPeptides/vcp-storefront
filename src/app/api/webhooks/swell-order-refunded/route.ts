@@ -18,6 +18,10 @@ import {
   customerEmailFor,
   wrapEmailHtml,
   alertTeamNoEmail,
+  badgeHtml,
+  summaryCardHtml,
+  itemsListHtml,
+  BRAND,
   type SwellWebhookBody,
 } from "@/lib/swell-backend-notify";
 import { sendEmail } from "@/lib/resend";
@@ -42,12 +46,16 @@ export async function POST(request: Request) {
   try {
     const order = await fetchOrder(orderId);
     const number = order.number ? String(order.number) : order.id;
-    const refundAmount = formatCurrency(order.refund_total, order.currency || "USD");
+    const currency = order.currency || "USD";
+    const refundAmount = formatCurrency(order.refund_total, currency);
     const email = customerEmailFor(order);
 
     const subject = `Refund processed for order #${number}`;
-    const bodyHtml = `<p>Hi,</p>
-<p>A refund${refundAmount ? ` of ${refundAmount}` : ""} has been processed for order <strong>#${number}</strong>. Depending on your payment method, it may take a few business days to appear.</p>
+    const bodyHtml = `${badgeHtml("REFUND PROCESSED", BRAND.green)}
+<p>Hi,</p>
+<p>A refund has been processed for order <strong>#${number}</strong>. Depending on your payment method, it may take a few business days to appear.</p>
+${summaryCardHtml([{ label: "Order", value: `#${number}` }, { label: "Refunded", value: refundAmount || "—", emphasize: true }])}
+${itemsListHtml(order.items, currency)}
 <p>Questions? Just reply to this email.</p>`;
     const text = `Hi,
 

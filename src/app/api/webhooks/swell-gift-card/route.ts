@@ -26,6 +26,9 @@ import {
   wrapEmailHtml,
   alertTeamNoEmail,
   formatCurrency,
+  badgeHtml,
+  ctaButtonHtml,
+  BRAND,
   type SwellWebhookBody,
 } from "@/lib/swell-backend-notify";
 import { sendEmail } from "@/lib/resend";
@@ -58,9 +61,21 @@ export async function POST(request: Request) {
     const code = giftcard?.code;
 
     const subject = "Your Vitality Certified Peptides gift card";
-    const bodyHtml = `<p>Hi,</p>
-<p>Here's your gift card${amount ? ` (${amount})` : ""}${code ? `: <strong>${code}</strong>` : ""}.</p>
-<p>Enter it at checkout on vitalitycertifiedpeptides.com to redeem.</p>`;
+    const codeCardHtml = code
+      ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:16px 0;">
+      <tr><td style="padding:20px; text-align:center; background:${BRAND.cardBg}; border:2px dashed ${BRAND.gold}; border-radius:10px;">
+        <div style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:${BRAND.muted}; margin-bottom:8px;">Gift Card Code</div>
+        <div style="font-family:'Courier New', monospace; font-size:24px; font-weight:bold; letter-spacing:2px; color:${BRAND.ink};">${code}</div>
+        ${amount ? `<div style="font-size:15px; color:${BRAND.gold}; font-weight:bold; margin-top:8px;">${amount}</div>` : ""}
+      </td></tr>
+    </table>`
+      : "";
+    const bodyHtml = `${badgeHtml("GIFT CARD")}
+<p>Hi,</p>
+<p>Here's your gift card${amount ? ` (${amount})` : ""}.</p>
+${codeCardHtml}
+<p>Enter it at checkout on vitalitycertifiedpeptides.com to redeem.</p>
+${ctaButtonHtml("Shop now", "https://www.vitalitycertifiedpeptides.com/shop")}`;
     const text = `Hi,
 
 Here's your gift card${amount ? ` (${amount})` : ""}${code ? `: ${code}` : ""}.

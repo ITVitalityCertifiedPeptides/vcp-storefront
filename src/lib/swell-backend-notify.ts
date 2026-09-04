@@ -37,11 +37,21 @@
 
 import "server-only";
 import { sendEmail } from "@/lib/resend";
+import { siteConfig } from "@/lib/site";
 
 export type SwellWebhookBody = {
   type?: string;
   model?: string;
-  data?: { id?: string; order_id?: string };
+  data?: { id?: string; order_id?: string; account_id?: string };
+};
+
+export type SwellAccount = {
+  id: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  group?: string;
+  date_created?: string;
 };
 
 export type SwellOrder = {
@@ -138,6 +148,12 @@ export async function fetchCart(cartId: string): Promise<SwellCart> {
   return swellGet<SwellCart>(`/carts/${cartId}?expand=account`);
 }
 
+// Used by the Customer Welcome replacement (swell-account-created/route.ts).
+// Same Backend API pattern as fetchOrder/fetchCart above.
+export async function fetchAccount(accountId: string): Promise<SwellAccount> {
+  return swellGet<SwellAccount>(`/accounts/${accountId}`);
+}
+
 export function formatCurrency(amount: number | undefined, currency = "USD") {
   if (typeof amount !== "number") return "";
   try {
@@ -151,20 +167,85 @@ export function customerEmailFor(order: SwellOrder | SwellCart): string | undefi
   return order.email || order.account?.email || ("billing" in order ? order.billing?.email : undefined) || ("shipping" in order ? order.shipping?.email : undefined);
 }
 
-// Consistent, simple branded wrapper so all 9 emails look like they came
-// from the same system, without needing to embed the logo/QR images that
-// invoice_email.html uses (those are for the one manually-sent, fully
-// designed invoice - these are automated and text-first by design, same
-// spirit as the existing Template 3 payment-received email).
+// ---------------------------------------------------------------------------
+// Branded shell (2026-09-03) - every Resend email in this app now shares the
+// exact visual system built for Order confirmation / Payment received
+// (logo header, Georgia serif, gold accents, hosted images, matching
+// footer), instead of the plain no-logo wrapper this file shipped with
+// originally. Josh's direction: "everything should be built for [Resend] so
+// that we have proper formatting and hosting for the images."
+//
+// Images are HOSTED (public/email-assets/*.png), never base64 - see the
+// 2026-09-02 fix note in order-confirmation-email.ts for why (Gmail strips
+// data: URIs).
+
+export const BRAND = {
+  gold: "#a67c27",
+  ink: "#1a1a1a",
+  muted: "#6b6b6b",
+  border: "#e6e1d6",
+  cardBg: "#faf8f3",
+  green: "#2f7a3d",
+  red: "#a13a3a",
+} as const;
+
+export const LOGO_EMBLEM_URL = `${siteConfig.url}/email-assets/logo-emblem.png`;
+
+// Small colored pill shown just under the logo header, e.g. "ORDER CANCELED"
+// or "SHIPMENT DELIVERED" - gives each notification type a distinct,
+// glanceable identity the way the payment-received email's green
+// "PAYMENT RECEIVED" pill already did, without needing a different layout
+// per email.
+export function badgeHtml(label: string, color: string = BRAND.gold): string {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin: 0 0 16px;">
+    <tr>
+      <td style="padding:6px 14px; background:${color}; border-radius:20px; text-align:center;">
+        <span style="color:#ffffff; font-size:12px; font-weight:bold; letter-spacing:0.5px;">${label}</span>
+      </td>
+    </tr>
+  </table>`;
+}
+
+// Generalized version of the Order/Total two-cell card used on Order
+// confirmation and Payment received - accepts any number of {label, value}
+// cells so Refund amount, Tracking number, etc. can reuse the same look.
+export function summaryCardHtml(cells: Array<{ label: string; value: string; emphasize?: boolean }>): string {
+  const tds = cells
+    .map(
+      (c, i) => `<td style="padding:14px 18px; ${i > 0 ? "text-align:right;" : ""}">
+        <span style="font-size:12px; letter-spacing:0.5px; text-transform:uppercase; color:${BRAND.muted};">${c.label}</span><br/>
+        <span style="font-size:18px; font-weight:bold; ${c.emphasize ? `color:${BRAND.gold};` : ""}">${c.value}</span>
+      </td>`
+    )
+    .join("");
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; background:${BRAND.cardBg}; border:1px solid ${BRAND.border}; border-radius:10px; margin: 16px 0;">
+    <tr>${tds}</tr>
+  </table>`;
+}
+
+// A gold, button-styled link - used for "Track your package", "Finish your
+// order", etc. wherever a plain <a> isn't prominent enough.
+export function ctaButtonHtml(label: string, url: string): string {
+  return `<p style="margin:20px 0;">
+    <a href="${url}" style="display:inline-block; background:${BRAND.gold}; color:#ffffff; text-decoration:none; padding:12px 26px; border-radius:24px; font-size:13px; font-weight:bold; letter-spacing:0.5px;">${label}</a>
+  </p>`;
+}
+
+// The shared shell every automated email renders inside: logo header (gold
+// rule underneath, matching Order confirmation/Payment received exactly),
+// the caller's body content, then the standard footer/RUO line. Pass a
+// badge via bodyHtml (badgeHtml() above) rather than as a separate param,
+// so callers keep full control of ordering within the body.
 export function wrapEmailHtml(bodyHtml: string): string {
-  return `<div style="font-family: Georgia, 'Times New Roman', serif; max-width: 560px; margin: 0 auto; color: #1a1a1a;">
-  <div style="padding: 24px 0 16px; border-bottom: 2px solid #a67c27;">
-    <span style="font-size: 20px; font-weight: bold; letter-spacing: 0.5px;">VITALITY <span style="font-weight: normal;">CERTIFIED PEPTIDES</span></span>
+  return `<div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: 0 auto; color: ${BRAND.ink}; background:#ffffff;">
+  <div style="padding: 28px 0 18px; text-align:center; border-bottom: 2px solid ${BRAND.gold};">
+    <img src="${LOGO_EMBLEM_URL}" width="48" height="48" alt="Vitality Certified Peptides" style="display:block; margin:0 auto 10px;" />
+    <span style="font-size: 19px; font-weight: bold; letter-spacing: 0.5px;">VITALITY <span style="font-weight: normal;">CERTIFIED PEPTIDES</span></span>
   </div>
-  <div style="padding: 24px 0; font-size: 15px; line-height: 1.6;">
+  <div style="padding: 24px 8px; font-size: 15px; line-height: 1.6;">
     ${bodyHtml}
   </div>
-  <div style="padding: 16px 0; border-top: 1px solid #ddd; font-size: 12px; color: #777;">
+  <div style="padding: 16px 8px; border-top: 1px solid ${BRAND.border}; font-size: 12px; color: ${BRAND.muted}; text-align:center;">
     Vitality Certified Peptides &middot; www.vitalitycertifiedpeptides.com<br/>
     Products are for laboratory research use only and are not for human or veterinary use.
   </div>
@@ -183,15 +264,36 @@ export async function alertTeamNoEmail(kind: string, id: string | number) {
   });
 }
 
-export function itemsListHtml(items: SwellOrder["items"] | SwellCart["items"]): string {
+// Same bordered, gold-ruled table used on Order confirmation/Payment
+// received - promoted here so every email (canceled/refunded/draft
+// invoice/abandoned cart/shipment) shows line items in the same style
+// instead of the old bare 3-column table with no header or shading.
+export function itemsListHtml(items: SwellOrder["items"] | SwellCart["items"], currency = "USD"): string {
   if (!items || items.length === 0) return "";
   const rows = items
-    .map(
-      (i) =>
-        `<tr><td style="padding:4px 8px 4px 0;">${i.product_name ?? "Item"}</td><td style="padding:4px 8px;">x${i.quantity ?? 1}</td><td style="padding:4px 0 4px 8px; text-align:right;">${formatCurrency(i.price)}</td></tr>`
-    )
+    .map((i) => {
+      const price = formatCurrency(i.price, currency);
+      const qty = i.quantity ?? 1;
+      const lineTotal = formatCurrency((i.price ?? 0) * qty, currency);
+      return `<tr>
+        <td style="padding:10px 8px; border-bottom:1px solid ${BRAND.border}; font-size:14px; color:${BRAND.ink};">${i.product_name ?? "Item"}</td>
+        <td style="padding:10px 8px; border-bottom:1px solid ${BRAND.border}; font-size:14px; color:${BRAND.muted}; text-align:center;">x${qty}</td>
+        <td style="padding:10px 8px; border-bottom:1px solid ${BRAND.border}; font-size:14px; color:${BRAND.muted}; text-align:right;">${price}</td>
+        <td style="padding:10px 8px; border-bottom:1px solid ${BRAND.border}; font-size:14px; color:${BRAND.ink}; text-align:right; font-weight:bold;">${lineTotal}</td>
+      </tr>`;
+    })
     .join("");
-  return `<table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:14px;">${rows}</table>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:16px 0;">
+    <thead>
+      <tr>
+        <th align="left" style="padding:0 8px 8px; font-size:11px; letter-spacing:0.5px; text-transform:uppercase; color:${BRAND.muted}; border-bottom:2px solid ${BRAND.gold};">Item</th>
+        <th align="center" style="padding:0 8px 8px; font-size:11px; letter-spacing:0.5px; text-transform:uppercase; color:${BRAND.muted}; border-bottom:2px solid ${BRAND.gold};">Qty</th>
+        <th align="right" style="padding:0 8px 8px; font-size:11px; letter-spacing:0.5px; text-transform:uppercase; color:${BRAND.muted}; border-bottom:2px solid ${BRAND.gold};">Price</th>
+        <th align="right" style="padding:0 8px 8px; font-size:11px; letter-spacing:0.5px; text-transform:uppercase; color:${BRAND.muted}; border-bottom:2px solid ${BRAND.gold};">Total</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
 }
 
 export function checkAuth(request: Request): boolean {
