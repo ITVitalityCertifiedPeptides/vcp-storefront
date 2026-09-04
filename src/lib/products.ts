@@ -117,13 +117,18 @@ function mapProduct(p: SwellProduct): Product {
         })),
     }));
 
-  const plans = (p.purchase_options?.subscription?.plans || []).filter(
-    (plan) => plan.active !== false && plan.id
-  );
-  const subscription: SubscriptionPlan[] | null =
-    p.purchase_options?.subscription?.active !== false && plans.length > 0
-      ? plans.map((plan) => ({ id: plan.id!, name: plan.name || "Recurring" }))
-      : null;
+  // 2026-09-04 (Josh: "we don't take credit cards so we want to remove
+  // that option"): Restock & Save / Autoship (Swell subscriptions)
+  // required a card on file for recurring billing, which this store has
+  // never actually supported (Zelle/Venmo/Apple Cash/PayPal manual
+  // payment only) - forcing this to null turns the purchase option off
+  // everywhere it's read (BuyBox, QuickAdd, ProductCard) without having
+  // to touch each component. Swell's plans may still be configured on
+  // the product; we just stop surfacing them. Account page's existing
+  // "Autoship subscriptions" list is unaffected - that reads live
+  // subscriptions from the customer's Swell account directly, not this
+  // field, so any legacy subscriber can still see/cancel theirs.
+  const subscription: SubscriptionPlan[] | null = null;
 
   // Option value prices are additive on top of the base price; the
   // cheapest selectable configuration is base + the lowest value delta.
