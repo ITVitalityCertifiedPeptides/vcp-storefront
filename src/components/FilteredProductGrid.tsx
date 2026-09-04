@@ -22,13 +22,19 @@
 // entirely - with backorder live, filtering by stock level was hiding
 // products that are genuinely available to order. The grid now always
 // shows everything; only the Category and Sort selects remain.
+//
+// 2026-09-04 (Josh): default sort renamed "Featured" -> "Most Popular" and
+// now ranks by actual stock quantity (higher stock first) instead of the
+// old in-stock-boolean ranking. This is intentionally an internal signal,
+// not something exposed as "sorted by stock" in the UI - customers just
+// see "Most Popular".
 
 import { useMemo, useState } from "react";
 import type { Product } from "@/lib/catalog-shared";
 import { displayCategory } from "@/lib/catalog-shared";
 import ProductCard from "./ProductCard";
 
-type SortOption = "featured" | "name_asc" | "name_desc" | "price_asc" | "price_desc";
+type SortOption = "most_popular" | "name_asc" | "name_desc" | "price_asc" | "price_desc";
 
 export default function FilteredProductGrid({
   products,
@@ -41,7 +47,7 @@ export default function FilteredProductGrid({
   categories?: string[];
 }) {
   const [category, setCategory] = useState<string>("all");
-  const [sort, setSort] = useState<SortOption>("featured");
+  const [sort, setSort] = useState<SortOption>("most_popular");
 
   const shown = useMemo(() => {
     let list = products;
@@ -70,8 +76,11 @@ export default function FilteredProductGrid({
             (a.priceFrom ?? a.price ?? Number.NEGATIVE_INFINITY)
         );
         break;
+      case "most_popular":
       default:
-        list.sort((a, b) => Number(b.inStock) - Number(a.inStock));
+        // "Most Popular" - ranked by stock quantity, highest first. Not
+        // shown to the customer as such; see header comment.
+        list.sort((a, b) => (b.stockLevel ?? 0) - (a.stockLevel ?? 0));
     }
     return list;
   }, [products, category, sort]);
@@ -104,7 +113,7 @@ export default function FilteredProductGrid({
           onChange={(e) => setSort(e.target.value as SortOption)}
           aria-label="Sort products"
         >
-          <option value="featured">Sort: Featured</option>
+          <option value="most_popular">Sort: Most Popular</option>
           <option value="name_asc">Name: A to Z</option>
           <option value="name_desc">Name: Z to A</option>
           <option value="price_asc">Price: Low to High</option>
