@@ -75,13 +75,25 @@ export default async function SiteHeader() {
   // show structural class rather than research-area naming - see
   // structural-class.ts. Research-area naming now lives only on the
   // Research Library page (/research).
-  const searchIndex = products.map((product) => ({
-    slug: product.slug,
-    name: product.name,
-    category: structuralClassFor(product.name),
-    price: product.priceFrom ?? product.price,
-    image: product.images?.[0] || productImages[product.slug] || null,
-  }));
+  //
+  // 2026-09-05 (GLP-1 login gate): GLP-1 products are ALWAYS left out of
+  // this index, for signed-in and anonymous visitors alike - not
+  // filtered by hasGlp1Access() the way /shop, categories, search, and
+  // the homepage are. SiteHeader renders on every single page via the
+  // root layout, so checking cookies() here would force the entire site
+  // into per-request dynamic rendering, not just the handful of
+  // catalog-listing pages that already accept that cost. A signed-in
+  // visitor can still find and buy GLP-1 products via /shop, a category
+  // page, /search, or a direct link - just not this quick dropdown.
+  const searchIndex = products
+    .filter((product) => !product.isGlp1)
+    .map((product) => ({
+      slug: product.slug,
+      name: product.name,
+      category: structuralClassFor(product.name),
+      price: product.priceFrom ?? product.price,
+      image: product.images?.[0] || productImages[product.slug] || null,
+    }));
 
   return (
     <header className="sticky top-0 z-40">

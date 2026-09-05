@@ -7,7 +7,9 @@ import {
   getAllProducts,
   categorySlug,
   displayCategory,
+  filterVisible,
 } from "@/lib/products";
+import { hasGlp1Access } from "@/lib/current-session";
 import { siteConfig } from "@/lib/site";
 import { faqSchema } from "@/lib/schema";
 import FilteredProductGrid from "@/components/FilteredProductGrid";
@@ -19,6 +21,12 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   alternates: { canonical: "/" },
 };
+
+// 2026-09-05 (GLP-1 login gate): the homepage renders the full catalog
+// grid directly (see below), so it needs the same per-visitor
+// filterVisible() check as /shop - see that page's comment for the
+// static-vs-dynamic tradeoff this accepts.
+export const dynamic = "force-dynamic";
 
 const BLEND_SLUGS = ["glow", "klow", "cjc-1295-ipamorelin"];
 
@@ -76,9 +84,15 @@ export default async function HomePage() {
   // 2026-08-31 (Josh): retail dropped the researcher-gate entirely -
   // catalog, pricing, and purchasing are all public to every visitor, no
   // login required. See catalog-shared.ts for the history of what this
-  // used to gate.
-  const categories = await getAllCategories();
-  const products = await getAllProducts();
+  // used to gate. 2026-09-05: the one exception is the GLP-1 compound
+  // family, gated back in behind filterVisible()/hasGlp1Access() - see
+  // that file's header comment.
+  const [categories, allProducts, access] = await Promise.all([
+    getAllCategories(),
+    getAllProducts(),
+    hasGlp1Access(),
+  ]);
+  const products = filterVisible(allProducts, access);
   const blends = products.filter((p) => BLEND_SLUGS.includes(p.slug));
 
   return (

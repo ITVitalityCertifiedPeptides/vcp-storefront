@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getAllProducts, getAllCategories } from "@/lib/products";
+import { getAllProducts, getAllCategories, filterVisible } from "@/lib/products";
+import { hasGlp1Access } from "@/lib/current-session";
 import FilteredProductGrid from "@/components/FilteredProductGrid";
 
 // Traditional shopping catalog (2026-08-29, Josh): the "Shop Catalog" nav
@@ -22,11 +23,26 @@ export const metadata: Metadata = {
   alternates: { canonical: "/shop" },
 };
 
+// 2026-09-05 (Josh, GLP-1 login gate): this page now checks the
+// visitor's session (hasGlp1Access(), which reads cookies()) so GLP-1
+// products can actually be dropped from the grid for anonymous
+// visitors, not just hidden with CSS. That forces /shop to render
+// per-request instead of being served from the static/ISR cache it used
+// before - an accepted tradeoff so "not visible until you login" is
+// real, not cosmetic. See SiteHeader.tsx for why the header's
+// quick-search stays static instead of taking the same hit sitewide.
+export const dynamic = "force-dynamic";
+
 export default async function ShopPage() {
-  const products = await getAllProducts();
-  // 2026-08-30 (Josh): category browsing moved from a header nav dropdown
-  // to a filter right here on the shop page - see FilteredProductGrid.
-  const categories = await getAllCategories();
+  const [allProducts, categories, access] = await Promise.all([
+    getAllProducts(),
+    // 2026-08-30 (Josh): category browsing moved from a header nav
+    // dropdown to a filter right here on the shop page - see
+    // FilteredProductGrid.
+    getAllCategories(),
+    hasGlp1Access(),
+  ]);
+  const products = filterVisible(allProducts, access);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-14">

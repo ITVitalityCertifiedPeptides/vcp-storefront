@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllProducts } from "@/lib/products";
+import { getAllProducts, filterVisible } from "@/lib/products";
+import { hasGlp1Access } from "@/lib/current-session";
 import { displayCategory } from "@/lib/catalog-shared";
 import ProductCard from "@/components/ProductCard";
 
@@ -10,6 +11,12 @@ export const metadata: Metadata = {
   // out of the index; the catalog and category pages are what should rank.
   robots: { index: false, follow: true },
 };
+
+// 2026-09-05 (GLP-1 login gate): reading `searchParams` below already
+// forces this page to render per request (Next.js can't statically
+// prebuild a page whose output depends on the query string), so calling
+// hasGlp1Access() here doesn't cost anything /shop and the homepage
+// don't already pay - full results, minus GLP-1 for anonymous visitors.
 
 function matches(query: string, haystacks: Array<string | undefined>) {
   const q = query.toLowerCase();
@@ -24,7 +31,8 @@ export default async function SearchPage({
   const { q } = await searchParams;
   const query = (q || "").trim();
 
-  const products = await getAllProducts();
+  const [allProducts, access] = await Promise.all([getAllProducts(), hasGlp1Access()]);
+  const products = filterVisible(allProducts, access);
   const results = query
     ? products.filter((p) =>
         matches(query, [

@@ -12,6 +12,7 @@ import { Package, MapPin, RefreshCw, ChevronDown } from "lucide-react";
 import { getSwell } from "@/lib/swell-client";
 
 type Account = {
+  id?: string;
   email?: string;
   first_name?: string;
   last_name?: string;
@@ -26,6 +27,37 @@ type Account = {
     phone?: string;
   };
 } | null;
+
+// 2026-09-05 (Josh, GLP-1 login gate): swell-js's own session lives only
+// in the browser, so it can't be read by the Server Components that
+// render product/shop/category/search pages. This mints (or refreshes)
+// this app's own signed cookie (see lib/session.ts) whenever we learn
+// the visitor has a real Swell account - right after sign-in/create
+// below, and on page load if a swell-js session is already active.
+// verifyAccountExists() on the server re-checks id+email before signing
+// anything, so this is safe to call with whatever swell-js hands back.
+// Best-effort: if it fails, the visitor just gets asked to sign in again
+// the next time they hit a GLP-1 page - not a broken account.
+async function syncGlp1Session(acct: Account) {
+  if (!acct?.id || !acct.email) return;
+  try {
+    await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accountId: acct.id, email: acct.email }),
+    });
+  } catch {
+    // Non-fatal - see comment above.
+  }
+}
+
+async function clearGlp1Session() {
+  try {
+    await fetch("/api/session", { method: "DELETE" });
+  } catch {
+    // Non-fatal - the cookie will just expire on its own (30 days).
+  }
+}
 
 type OrderItem = {
   id?: string;
@@ -168,6 +200,12 @@ function AccountContent() {
           setAccount(current);
           hydrateShippingForm(current);
           await loadAccountData();
+          // Already has a live swell-js session (e.g. returning visitor,
+          // or this ships while they're mid-session) but may not have
+          // our signed cookie yet, or it may have expired - refresh it
+          // so a GLP-1 product page they hit next doesn't bounce them
+          // back here despite already being signed in.
+          void syncGlp1Session(current);
         } else {
           setAccount(null);
         }
@@ -228,12 +266,19 @@ function AccountContent() {
             : "Could not create the account. It may already exist, try signing in."
         );
       } else if (returnTo) {
+        // Awaited (not fire-and-forget): returnTo is often a GLP-1
+        // product page redirected here by hasGlp1Access() - the signed
+        // cookie has to actually be set before we navigate back, or that
+        // Server Component's next request still looks anonymous and
+        // bounces the visitor right back here.
+        await syncGlp1Session(logged);
         router.push(returnTo);
         return;
       } else {
         setAccount(logged);
         hydrateShippingForm(logged);
         await loadAccountData();
+        void syncGlp1Session(logged);
       }
     } catch {
       setError(
@@ -278,6 +323,7 @@ function AccountContent() {
 
   async function logout() {
     await getSwell().account.logout();
+    await clearGlp1Session();
     setAccount(null);
     setOrders([]);
     setSubscriptions([]);

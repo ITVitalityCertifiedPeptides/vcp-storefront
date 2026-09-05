@@ -11,7 +11,7 @@ import type {
 // Types + display helpers live in catalog-shared.ts (no server-only
 // guard) so client components can use them too; re-exported here so
 // server code keeps one import path.
-export { displayCategory } from "./catalog-shared";
+export { displayCategory, filterVisible } from "./catalog-shared";
 export type {
   Product,
   ProductOption,
@@ -25,6 +25,31 @@ function slugify(name: string): string {
     .replace(/\+/g, "plus")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+// 2026-09-05 (Josh): GLP-1 class peptides stay on retail but are hidden
+// until the visitor has an account (see lib/session.ts). Same
+// case-insensitive name-substring match, against the same compound list,
+// as set-glp1-retail-off.js used on 2026-09-03 to pull these 22 products
+// off retail entirely (see VCP_State_Legal_Risk_Matrix.docx /
+// VCP_GTM_Strategy.pdf Section 10.4 for why this group is treated as one
+// unit for compliance). Keep this list in sync with that script's
+// GLP1_FAMILY constant and with set-glp1-retail-on.js (the companion
+// script that flips content.show_on_retail back to true for this
+// feature) - if Josh names another compound as "GLP" later, update all
+// three places.
+const GLP1_FAMILY = [
+  "semaglutide",
+  "tirzepatide",
+  "retatrutide",
+  "cagrilintide",
+  "liraglutide",
+  "survodutide",
+];
+
+function isGlp1Name(name: string): boolean {
+  const lower = (name || "").toLowerCase();
+  return GLP1_FAMILY.some((compound) => lower.includes(compound));
 }
 
 const STORE_ID = process.env.NEXT_PUBLIC_SWELL_STORE_ID;
@@ -178,6 +203,7 @@ function mapProduct(p: SwellProduct): Product {
     priceFrom,
     madeInUsa: content.made_in_usa !== false,
     images: galleryImages(slugify(p.name)),
+    isGlp1: isGlp1Name(p.name),
   };
 }
 
@@ -246,6 +272,18 @@ async function fetchAllProducts(): Promise<Product[]> {
   // from this same array) a direct /products/[slug] URL either. Inner
   // Circle's own products.ts has no such filter, by design - Circle
   // shows the full catalog regardless of this flag.
+  //
+  // show_on_retail is what hid the 22 GLP-1 products from retail
+  // entirely between 2026-09-03 and 2026-09-05 (set-glp1-retail-off.js).
+  // 2026-09-05: Josh now wants them sold on retail, just hidden until
+  // login - a visibility rule, not an exclude-from-fetch rule - so
+  // that's handled downstream instead (isGlp1 above + filterVisible() in
+  // catalog-shared.ts, applied per-surface). This filter itself is
+  // untouched and still a real, general "don't fetch this at all"
+  // escape valve for any future case that isn't login-gated - Josh (or
+  // set-glp1-retail-on.js, the companion script for this change) needs
+  // to flip show_on_retail back to true on those 22 products in Swell
+  // first, or they'll still be dropped here before isGlp1 ever runs.
   return all
     .filter(
       (p) =>

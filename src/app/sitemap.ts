@@ -37,11 +37,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${siteConfig.url}/products/${product.slug}`,
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  // 2026-09-05 (GLP-1 login gate): excluded the same way /coa already is
+  // above - a gated page shouldn't be offered to crawlers as something
+  // to index, since an anonymous crawler hit just redirects to /account
+  // (see products/[slug]/page.tsx).
+  const productRoutes: MetadataRoute.Sitemap = products
+    .filter((product) => !product.isGlp1)
+    .map((product) => ({
+      url: `${siteConfig.url}/products/${product.slug}`,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
 
   return [...staticRoutes, ...categoryRoutes, ...productRoutes];
 }

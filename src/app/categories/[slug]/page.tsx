@@ -6,10 +6,18 @@ import {
   getProductsByCategory,
   categoryFromSlug,
   categorySlug,
+  filterVisible,
 } from "@/lib/products";
+import { hasGlp1Access } from "@/lib/current-session";
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
 import ProductCard from "@/components/ProductCard";
+
+// 2026-09-05 (GLP-1 login gate): a category page can include GLP-1
+// products (e.g. Metabolic/Weight Loss), so it needs the same
+// per-visitor filterVisible() check as /shop - see that page's comment
+// for the static-vs-dynamic tradeoff this accepts.
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   const categories = await getAllCategories();
@@ -46,7 +54,11 @@ export default async function CategoryPage({
   const category = await categoryFromSlug(slug);
   if (!category) notFound();
 
-  const products = await getProductsByCategory(category);
+  const [rawProducts, access] = await Promise.all([
+    getProductsByCategory(category),
+    hasGlp1Access(),
+  ]);
+  const products = filterVisible(rawProducts, access);
   const jsonLd = breadcrumbSchema([
     { name: "Home", url: siteConfig.url },
     { name: "Categories", url: `${siteConfig.url}/categories` },

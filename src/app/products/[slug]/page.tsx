@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import {
   getAllProducts,
@@ -9,6 +9,7 @@ import {
   categorySlug,
   displayCategory,
 } from "@/lib/products";
+import { hasGlp1Access } from "@/lib/current-session";
 import { structuralClassFor } from "@/lib/structural-class";
 import { productSchema, breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
@@ -20,7 +21,14 @@ import BuyBox from "@/components/BuyBox";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
-  return products.map((product) => ({ slug: product.slug }));
+  // 2026-09-05 (GLP-1 login gate): GLP-1 products need hasGlp1Access()
+  // checked fresh on every request (it reads the request's cookies,
+  // which only exist at request time, never at build time) - excluding
+  // them here means Next.js renders them on demand instead of
+  // prebuilding a static page that would otherwise get served to every
+  // visitor, logged in or not, straight from cache. Every other product
+  // is unaffected and still statically generated exactly as before.
+  return products.filter((p) => !p.isGlp1).map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({
@@ -88,7 +96,28 @@ export default async function ProductPage({
   ]);
   if (!product) notFound();
 
-  const allProducts = rawAllProducts;
+  // 2026-09-05 (Josh: "we do not want them visible until you login...
+  // the glps we want to show and be available for purchase after
+  // someone has created an account"): the one place this gate is
+  // enforced for a direct hit on a GLP-1 product URL (old link, search
+  // engine, shared link) - hasGlp1Access() reads the request's cookies,
+  // which is only safe to call for GLP-1 products specifically (see the
+  // generateStaticParams comment above for why every other product page
+  // stays static). Any signed-in Swell account passes; there's no
+  // approval step. Same redirect target the old /login page used.
+  if (product.isGlp1 && !(await hasGlp1Access())) {
+    redirect(`/account?return=${encodeURIComponent(`/products/${slug}`)}`);
+  }
+
+  // "Related compounds" never surfaces a GLP-1 product on a non-GLP
+  // product's page - that page is statically generated and has no
+  // access check of its own, so it can't safely know whether THIS
+  // visitor is signed in. A GLP-1 product's own page already gated
+  // above (every visitor who reaches this point is verified signed in),
+  // so its related list can include other GLP-1 products freely.
+  const allProducts = product.isGlp1
+    ? rawAllProducts
+    : rawAllProducts.filter((p) => !p.isGlp1);
 
   const images = product.images;
   const coas = coaDocs(product.slug);
