@@ -72,11 +72,12 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="font-medium text-[1.05rem] text-ink group-hover:text-gold-deep transition-colors">
           {product.name}
         </div>
-        {product.casNumber && (
-          <div className="text-xs text-ink-soft mt-1 font-mono">
-            CAS {product.casNumber}
-          </div>
-        )}
+        {/* 2026-09-05 (Josh): always render this line. Blends, bioregulators,
+            supplies etc. have no CAS, and hiding the line made those cards a
+            row shorter so the price bar sat higher than its neighbours. */}
+        <div className="text-xs text-ink-soft mt-1 font-mono">
+          CAS {product.casNumber || "N/A"}
+        </div>
         {product.price != null && (
           <div className="mt-4 pt-3 border-t border-line">
             <div className="flex items-center justify-between">

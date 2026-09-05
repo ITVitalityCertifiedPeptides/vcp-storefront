@@ -38,11 +38,9 @@ export default function RelatedProducts({
               <span className="font-medium text-ink text-sm block mb-1">
                 {p.name}
               </span>
-              {p.casNumber && (
-                <span className="text-xs text-ink-soft font-mono">
-                  CAS {p.casNumber}
-                </span>
-              )}
+              <span className="text-xs text-ink-soft font-mono">
+                CAS {p.casNumber || "N/A"}
+              </span>
             </Link>
           </li>
         ))}
