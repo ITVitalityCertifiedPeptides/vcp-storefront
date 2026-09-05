@@ -168,13 +168,13 @@ export const productImages: Record<string, string> = {
   "ghrp-2-10mg": "/products/ghrp-2-10mg-hero.png", // GHRP-2 10mg
   "ghrp-2-5mg": "/products/ghrp-2-5mg-hero.png", // GHRP-2 5mg
   "ghrp-6-10mg": "/products/ghrp-6-10mg-hero.png", // GHRP-6 10mg
-  "glow-ghk-cu-bpc-tb4-100-20-20mg": "/products/glow-ghk-cu-bpc-tb4-100-20-20mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 100/20/20mg
-  "glow-ghk-cu-bpc-tb4-50-10-10mg": "/products/glow-ghk-cu-bpc-tb4-50-10-10mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 50/10/10mg
+  "glow-100-20-20mg": "/products/glow-100-20-20mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 100/20/20mg
+  "glow-50-10-10mg": "/products/glow-50-10-10mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 50/10/10mg
   "hcg-5000iu": "/products/hcg-5000iu-hero.png", // HCG 5000IU
   "ipamorelin-5mg": "/products/ipamorelin-5mg-hero.png", // Ipamorelin 5mg
   "cjc-1295-ipamorelin-10-10mg": "/products/cjc-1295-ipamorelin-10-10mg-hero.png", // Ipamorelin/CJC-1295 10/10mg
-  "klow-ghk-cu-bpc-tb4-kpv-100-20-20-20mg": "/products/klow-ghk-cu-bpc-tb4-kpv-100-20-20-20mg-hero.png", // KLOW (GHK-Cu/BPC/TB4/KPV) 100/20/20/20mg
-  "klow-ghk-cu-bpc-tb4-kpv-50-10-10-10mg": "/products/klow-ghk-cu-bpc-tb4-kpv-50-10-10-10mg-hero.png", // KLOW (GHK-Cu/BPC/TB4/KPV) 50/10/10/10mg
+  "klow-100-20-20-20mg": "/products/klow-100-20-20-20mg-hero.png", // KLOW (GHK-Cu/BPC/TB4/KPV) 100/20/20/20mg
+  "klow-50-10-10-10mg": "/products/klow-50-10-10-10mg-hero.png", // KLOW (GHK-Cu/BPC/TB4/KPV) 50/10/10/10mg
   "l-carnitine": "/products/l-carnitine-hero.png", // L-Carnitine
   "oxytocin-10mg": "/products/oxytocin-10mg-hero.png", // Oxytocin 10mg
   "p-21-5mg": "/products/p-21-5mg-hero.png", // P-21 5mg
