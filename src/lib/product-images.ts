@@ -40,7 +40,18 @@ export const productImages: Record<string, string> = {
   "bpc-157-tb-500-30mg-30mg": "/products/bpc-157-tb-500-30mg-30mg-hero.jpg",
   "cjc-1295-ipamorelin-5mg-5mg": "/products/cjc-1295-ipamorelin-5mg-5mg-hero.jpg",
   "cjc-1295-ipamorelin-10mg-10mg": "/products/cjc-1295-ipamorelin-10mg-10mg-hero.jpg",
+  // "bacteriostatic-water-10ml" below is a DEAD slug, same problem as the
+  // orphaned "glow-70mg"/"klow-80mg" keys a few lines down: the live Swell
+  // product is actually named "BAC Water 10mL" (confirmed 2026-09-05
+  // against VCP_Master_Catalog.xlsx, which pulls its Product Name column
+  // directly off real live Swell records), which slugifies to
+  // "bac-water-10ml" - not "bacteriostatic-water-10ml". That's why the
+  // 2026-09-05 photo delivery never actually showed up on either site
+  // despite landing in public/products/ under the old slug's filename.
+  // Kept the old key harmlessly in place (unused, matches nothing) rather
+  // than delete it, same as glow-70mg/klow-80mg below.
   "bacteriostatic-water-10ml": "/products/bacteriostatic-water-10ml-hero.jpg",
+  "bac-water-10ml": "/products/bac-water-10ml-hero.jpg",
   "glow-70mg": "/products/glow-70mg-hero.jpg",
   "hcg-10000iu": "/products/hcg-10000iu-hero.jpg",
   "klow-80mg": "/products/klow-80mg-hero.jpg",
