@@ -110,6 +110,19 @@ type SwellProduct = {
     // Safe to migrate individual products off circle_exclusive onto
     // show_on_retail over time; both can coexist indefinitely.
     show_on_retail?: boolean;
+    // 2026-09-05 (Josh): a couple of blend products ("Deadpool Blend
+    // (BPC/TB/Cartalax)", "Beauty Blend GHK/KPV") carry an informal
+    // working name as their actual Swell product name - Circle should
+    // keep seeing that name unchanged, but retail should show the real
+    // compound blend as the title instead (the nickname still gets a
+    // mention in the description text). Since retail and Circle read the
+    // exact same Swell product record, there was no way to show a
+    // different title per storefront - this field is that override,
+    // read ONLY here in retail's mapProduct(). ff-app/products.ts has no
+    // equivalent and keeps reading the base `name` field directly, so
+    // Circle is completely unaffected by this. Unset on every other
+    // product, so this is a no-op everywhere else.
+    retail_display_name?: string;
   };
   options?: Array<{
     id?: string;
@@ -177,7 +190,11 @@ function mapProduct(p: SwellProduct): Product {
   return {
     id: p.id,
     sku: p.sku || "",
-    name: p.name,
+    // retail_display_name overrides the shown title only - slug, gallery
+    // lookup, GLP-1 detection, and secondary research areas above all
+    // stay keyed on the real Swell name (p.name) so nothing else about
+    // how this product is found or categorized changes.
+    name: content.retail_display_name || p.name,
     slug: slugify(p.name),
     category: primaryArea,
     areas,
