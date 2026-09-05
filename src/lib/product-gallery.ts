@@ -54,24 +54,46 @@ export function galleryImages(slug: string): string[] {
   // base, e.g. bpc-157-5mg -> bpc-157, klow-80mg -> klow. Only size-shaped
   // tokens are stripped, so bpc-157-tb-500-10mg-10mg resolves to
   // bpc-157-tb-500 and can never collapse into a component compound.
+  // 2026-09-05 (Josh): blend sizes are now written "5/5mg" (slug
+  // bpc-157-tb-500-5-5mg), not "5mg/5mg", so only the LAST token carries a
+  // unit. Walk back through trailing size-shaped tokens (a unit token, then
+  // any bare numbers behind it) and stop at the first base that is either a
+  // known blend or has its own molecule card. Stopping at the first hit is
+  // what keeps bpc-157-tb-500-5-5mg from collapsing past "bpc-157-tb-500"
+  // into "bpc-157-tb" or "bpc-157".
   const parts = slug.split("-");
-  while (parts.length > 1 && /^\d+(mg|ml|iu|mcg)$/i.test(parts[parts.length - 1])) {
+  const candidates: string[] = [];
+  if (parts.length > 1 && /^\d+(mg|ml|iu|mcg)$/i.test(parts[parts.length - 1])) {
     parts.pop();
+    candidates.push(parts.join("-"));
+    while (parts.length > 1 && /^\d+$/.test(parts[parts.length - 1])) {
+      parts.pop();
+      candidates.push(parts.join("-"));
+    }
   }
-  const base = parts.join("-");
+  const molecules: string[] = [];
   // Molecule cards: single compounds get their own card, shared by every
   // size (bpc-157-molecule.png serves bpc-157-5mg/10mg/20mg). Blends get
   // one card PER COMPONENT compound, in blend-profile order.
-  const molecules: string[] = [];
-  const blendComponents = BLEND_MOLECULE_COMPONENTS[base];
-  if (blendComponents) {
-    for (const component of blendComponents) {
-      const card = find(`${component}-molecule`);
-      if (card) molecules.push(card);
-    }
+  const ownCard = find(`${slug}-molecule`);
+  if (ownCard) {
+    molecules.push(ownCard);
   } else {
-    const single = find(`${slug}-molecule`) || find(`${base}-molecule`);
-    if (single) molecules.push(single);
+    for (const base of candidates) {
+      const blendComponents = BLEND_MOLECULE_COMPONENTS[base];
+      if (blendComponents) {
+        for (const component of blendComponents) {
+          const card = find(`${component}-molecule`);
+          if (card) molecules.push(card);
+        }
+        break;
+      }
+      const single = find(`${base}-molecule`);
+      if (single) {
+        molecules.push(single);
+        break;
+      }
+    }
   }
   const vial = find(`${slug}-vial`);
   return [hero, hero ? null : legacy, ...molecules, vial].filter(

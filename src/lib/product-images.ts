@@ -35,7 +35,7 @@ export const productImages: Record<string, string> = {
   "vip-10mg": "/products/vip-10mg-hero.jpg",
   "bpc-157-tb-500-10mg-10mg": "/products/bpc-157-tb-500-10mg-10mg-hero.jpg",
   "bpc-157-tb-500-30mg-30mg": "/products/bpc-157-tb-500-30mg-30mg-hero.jpg",
-  "cjc-1295-ipamorelin-5mg-5mg": "/products/cjc-1295-ipamorelin-5mg-5mg-hero.jpg",
+  "cjc-1295-ipamorelin-5-5mg": "/products/cjc-1295-ipamorelin-5-5mg-hero.jpg",
   "cjc-1295-ipamorelin-10mg-10mg": "/products/cjc-1295-ipamorelin-10mg-10mg-hero.jpg",
   // "bacteriostatic-water-10ml" below is a DEAD slug, same problem as the
   // orphaned "glow-70mg"/"klow-80mg" keys a few lines down: the live Swell
@@ -56,7 +56,7 @@ export const productImages: Record<string, string> = {
   "mots-c-20mg": "/products/mots-c-20mg-hero.jpg",
   "ss-31-30mg": "/products/ss-31-30mg-hero.jpg",
   "tesamorelin-20mg": "/products/tesamorelin-20mg-hero.jpg",
-  "tesamorelin-ipamorelin-10mg-3mg": "/products/tesamorelin-ipamorelin-10mg-3mg-hero.jpg",
+  "tesamorelin-ipamorelin-10-3mg": "/products/tesamorelin-ipamorelin-10-3mg-hero.jpg",
   // Every product now has a 2:3 hero except Bacteriostatic Water 30mL,
   // which falls back to the drawn vial icon until its image lands.
 
@@ -121,7 +121,7 @@ export const productImages: Record<string, string> = {
   "retatrutide-6mg": "/products/retatrutide-6mg-hero.png",
   "semaglutide-20mg": "/products/semaglutide-20mg-hero.png",
   "semaglutide-5mg": "/products/semaglutide-5mg-hero.png",
-  "semax-acetyl-30mg": "/products/semax-acetyl-30mg-hero.png",
+  "n-acetyl-semax-30mg": "/products/n-acetyl-semax-30mg-hero.png",
   "testagen-20mg": "/products/testagen-20mg-hero.png",
   "thymalin-20mg": "/products/thymalin-20mg-hero.png",
   "tirzepatide-15mg": "/products/tirzepatide-15mg-hero.png",
@@ -155,7 +155,7 @@ export const productImages: Record<string, string> = {
   "bpc-157-tb-500-20mg": "/products/bpc-157-tb-500-20mg-hero.png", // BPC-157/TB-500 20mg
   "bpc-157-tb-500-5-5mg": "/products/bpc-157-tb-500-5-5mg-hero.png", // BPC-157/TB-500 5/5mg
   "bronchogen": "/products/bronchogen-hero.png", // Bronchogen
-  "cartalax": "/products/cartalax-hero.png", // Cartalax
+  "cartalax-10mg": "/products/cartalax-10mg-hero.png", // Cartalax
   "cartalax-20mg": "/products/cartalax-20mg-hero.png", // Cartalax 20mg
   "cjc-1295-no-dac-10mg": "/products/cjc-1295-no-dac-10mg-hero.png", // CJC-1295 No DAC 10mg
   "cjc-1295-no-dac-5mg": "/products/cjc-1295-no-dac-5mg-hero.png", // CJC-1295 No DAC 5mg
@@ -164,16 +164,15 @@ export const productImages: Record<string, string> = {
   "deadpool-blend-bpc-tb-cartalax": "/products/deadpool-blend-bpc-tb-cartalax-hero.png", // Deadpool Blend (BPC/TB/Cartalax)
   "dihexa-10mg": "/products/dihexa-10mg-hero.png", // Dihexa 10mg
   "dsip-10mg": "/products/dsip-10mg-hero.png", // DSIP 10mg
-  "fox04-dri-10mg": "/products/fox04-dri-10mg-hero.png", // FOX04-DRI 10mg
+  "foxo4-dri-10mg": "/products/foxo4-dri-10mg-hero.png", // FOX04-DRI 10mg
   "ghrp-2-10mg": "/products/ghrp-2-10mg-hero.png", // GHRP-2 10mg
   "ghrp-2-5mg": "/products/ghrp-2-5mg-hero.png", // GHRP-2 5mg
   "ghrp-6-10mg": "/products/ghrp-6-10mg-hero.png", // GHRP-6 10mg
   "glow-ghk-cu-bpc-tb4-100-20-20mg": "/products/glow-ghk-cu-bpc-tb4-100-20-20mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 100/20/20mg
   "glow-ghk-cu-bpc-tb4-50-10-10mg": "/products/glow-ghk-cu-bpc-tb4-50-10-10mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 50/10/10mg
   "hcg-5000iu": "/products/hcg-5000iu-hero.png", // HCG 5000IU
-  "igf-lr3-1mg": "/products/igf-lr3-1mg-hero.png", // IGF-LR3 1mg
   "ipamorelin-5mg": "/products/ipamorelin-5mg-hero.png", // Ipamorelin 5mg
-  "ipamorelin-cjc-1295-10-10mg": "/products/ipamorelin-cjc-1295-10-10mg-hero.png", // Ipamorelin/CJC-1295 10/10mg
+  "cjc-1295-ipamorelin-10-10mg": "/products/cjc-1295-ipamorelin-10-10mg-hero.png", // Ipamorelin/CJC-1295 10/10mg
   "klow-ghk-cu-bpc-tb4-kpv-100-20-20-20mg": "/products/klow-ghk-cu-bpc-tb4-kpv-100-20-20-20mg-hero.png", // KLOW (GHK-Cu/BPC/TB4/KPV) 100/20/20/20mg
   "klow-ghk-cu-bpc-tb4-kpv-50-10-10-10mg": "/products/klow-ghk-cu-bpc-tb4-kpv-50-10-10-10mg-hero.png", // KLOW (GHK-Cu/BPC/TB4/KPV) 50/10/10/10mg
   "l-carnitine": "/products/l-carnitine-hero.png", // L-Carnitine
@@ -186,15 +185,14 @@ export const productImages: Record<string, string> = {
   "semax-selank-10-10mg": "/products/semax-selank-10-10mg-hero.png", // Semax/Selank 10/10mg
   "semax-selank-30-10mg": "/products/semax-selank-30-10mg-hero.png", // Semax/Selank 30/10mg
   "sermorelin-5mg": "/products/sermorelin-5mg-hero.png", // Sermorelin 5mg
-  "slu-pp-332-10-mg": "/products/slu-pp-332-10-mg-hero.png", // SLU-PP-332 10 mg
-  "snap8-10mg": "/products/snap8-10mg-hero.png", // Snap8 10mg
-  "snap8-20mg": "/products/snap8-20mg-hero.png", // Snap8 20mg
+  "snap-8-10mg": "/products/snap-8-10mg-hero.png", // Snap8 10mg
+  "snap-8-20mg": "/products/snap-8-20mg-hero.png", // Snap8 20mg
   "tb-500-frag-17-23": "/products/tb-500-frag-17-23-hero.png", // TB-500 Frag 17-23
   "tesamorelin-5mg": "/products/tesamorelin-5mg-hero.png", // Tesamorelin 5mg
   "tesamorelin-ipamorelin-10-10mg": "/products/tesamorelin-ipamorelin-10-10mg-hero.png", // Tesamorelin/Ipamorelin 10/10mg
   "tesamorelin-ipamorelin-10-5mg": "/products/tesamorelin-ipamorelin-10-5mg-hero.png", // Tesamorelin/Ipamorelin 10/5mg
-  "tesamorelin-ipamorelin-13mg-3mg": "/products/tesamorelin-ipamorelin-13mg-3mg-hero.png", // Tesamorelin/Ipamorelin 13mg/3mg
-  "tesamorelin-ipamorelin-6mg-3mg": "/products/tesamorelin-ipamorelin-6mg-3mg-hero.png", // Tesamorelin/Ipamorelin 6mg/3mg
+  "tesamorelin-ipamorelin-13-3mg": "/products/tesamorelin-ipamorelin-13-3mg-hero.png", // Tesamorelin/Ipamorelin 13mg/3mg
+  "tesamorelin-ipamorelin-6-3mg": "/products/tesamorelin-ipamorelin-6-3mg-hero.png", // Tesamorelin/Ipamorelin 6mg/3mg
   "thymosin-alpha-1": "/products/thymosin-alpha-1-hero.png", // Thymosin Alpha-1
   "tirzepatide-60mg": "/products/tirzepatide-60mg-hero.png", // Tirzepatide 60mg
   "vip-5mg": "/products/vip-5mg-hero.png", // VIP 5mg
