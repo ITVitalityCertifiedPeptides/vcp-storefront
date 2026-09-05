@@ -13,10 +13,7 @@ export const productImages: Record<string, string> = {
   "bpc-157-20mg": "/products/bpc-157-20mg-hero.jpg",
   "dsip-15mg": "/products/dsip-15mg-hero.jpg",
   "ghrp-6-5mg": "/products/ghrp-6-5mg-hero.jpg",
-  // Renamed from "IGF-1 LR3" to "IGF-LR3" at some point - the photo file
-  // is the same shot, just renamed to match the current slug so the
-  // filesystem auto-discovery in product-gallery.ts finds it again.
-  "igf-lr3-1mg": "/products/igf-lr3-1mg-hero.jpg",
+  "igf-1-lr3-1mg": "/products/igf-1-lr3-1mg-hero.jpg",
   "ipamorelin-10mg": "/products/ipamorelin-10mg-hero.jpg",
   "kisspeptin-5mg": "/products/kisspeptin-5mg-hero.jpg",
   "kpv-30mg": "/products/kpv-30mg-hero.jpg",
@@ -60,29 +57,25 @@ export const productImages: Record<string, string> = {
   "ss-31-30mg": "/products/ss-31-30mg-hero.jpg",
   "tesamorelin-20mg": "/products/tesamorelin-20mg-hero.jpg",
   "tesamorelin-ipamorelin-10mg-3mg": "/products/tesamorelin-ipamorelin-10mg-3mg-hero.jpg",
-  // ---- New heroes, 2026-09-01 batch (Josh: "here are the product photos
-  // please add these and remove the product coming soon photos" - only
-  // for products that had no photo yet; Josh: "if there is already a
-  // product photo ignore the new one") ----
+  // Every product now has a 2:3 hero except Bacteriostatic Water 30mL,
+  // which falls back to the drawn vial icon until its image lands.
+
+  // ---- 2026-09-03: full pro photo shoot batch (VCP_All_Product_Hero_Photos),
+  // ported from retail alongside public/products (same source photos,
+  // copied to both repos together). Includes 5 slugs retail added back on
+  // 2026-09-01 that never made it into this repo (5-amino-1mq-50mg,
+  // adamax-10mg/5mg, aod-9604-10mg/2mg) plus everything from the same-day
+  // shoot. Replaces 19 older .jpg heroes (galleryImages() checks jpg before
+  // png, so the stale .jpg was deleted from public/products here too) and
+  // adds heroes for not-yet-live 2026-09-03 candidates and three
+  // already-live-but-photo-less products (SLU-PP-332 5/10mg, Survodutide).
+  // Unlike retail, Circle does NOT hide GLP-1 products, so these heroes are
+  // live-visible here, not just staged for later. ----
   "5-amino-1mq-50mg": "/products/5-amino-1mq-50mg-hero.png",
   "adamax-10mg": "/products/adamax-10mg-hero.png",
   "adamax-5mg": "/products/adamax-5mg-hero.png",
   "aod-9604-10mg": "/products/aod-9604-10mg-hero.png",
   "aod-9604-2mg": "/products/aod-9604-2mg-hero.png",
-  // Every product now has a 2:3 hero except Bacteriostatic Water 30mL,
-  // which falls back to the drawn vial icon until its image lands.
-
-  // ---- 2026-09-03: full pro photo shoot batch (VCP_All_Product_Hero_Photos).
-  // Replaces 19 older heroes (still .jpg from the 2026-08-19/09-01 batches -
-  // the stale .jpg was deleted from public/products alongside this update,
-  // since galleryImages() checks jpg before png and a leftover .jpg would
-  // have silently kept winning) and adds heroes for products that had none
-  // yet, including several not-yet-live 2026-09-03 candidate products and
-  // three already-live-but-photo-less ones (SLU-PP-332 5/10mg, Survodutide).
-  // GLP-1 products (Retatrutide/Tirzepatide/Semaglutide/Cagrilintide/
-  // Survodutide/PX-prefixed) are retail-hidden as of the same-day GLP-1
-  // retail removal - their heroes are here for Inner Circle/Wholesale,
-  // where they still show, and cost nothing sitting unused on retail. ----
   "aod-9604-5mg": "/products/aod-9604-5mg-hero.png",
   "dsip-5mg": "/products/dsip-5mg-hero.png",
   "epitalon-10mg": "/products/epitalon-10mg-hero.png",
@@ -102,12 +95,9 @@ export const productImages: Record<string, string> = {
   "retatrutide-30mg": "/products/retatrutide-30mg-hero.png",
   "semaglutide-10mg": "/products/semaglutide-10mg-hero.png",
   "tirzepatide-10mg": "/products/tirzepatide-10mg-hero.png",
-  // already-live, previously had no hero at all
   "slu-pp-332-5mg": "/products/slu-pp-332-5mg-hero.png",
   "slu-pp-332-10mg": "/products/slu-pp-332-10mg-hero.png",
   "survodutide": "/products/survodutide-hero.png",
-  // not-yet-live candidate products (2026-09-03 batch) - harmless to have
-  // a hero ready now, picked up automatically once each goes active
   "b-12-1mg": "/products/b-12-1mg-hero.png",
   "cagrilintide-10mg": "/products/cagrilintide-10mg-hero.png",
   "cagrilintide-5mg": "/products/cagrilintide-5mg-hero.png",
@@ -137,61 +127,21 @@ export const productImages: Record<string, string> = {
   "tirzepatide-15mg": "/products/tirzepatide-15mg-hero.png",
   "vesugen-20mg": "/products/vesugen-20mg-hero.png",
   "vilon-20mg": "/products/vilon-20mg-hero.png",
-  // NOT applied on 2026-09-03 - no confident product-name match found or a
-  // genuine name collision risk at the time (see delivery notes): Dihexa
-  // 10mg, DSIP 10mg, L-Carnitine, Oxytocin 10mg (candidates only existed as
-  // the nasal-spray SKUs, differently named/slugged), SNAP-8 10/20mg, and
-  // the Selank/Semax "acetylated variant shares the exact same product name
-  // as the original" pairs (10mg/30mg) - picking one file for a shared slug
-  // would silently misattribute a photo to the wrong SKU.
+  // NOT applied on 2026-09-03 - see retail's product-images.ts for the same
+  // list/reasons as of that date (Dihexa 10mg, DSIP 10mg, L-Carnitine,
+  // Oxytocin 10mg, SNAP-8 10/20mg, Selank/Semax acetylated-variant name
+  // collisions).
   //
-  // ---- 2026-09-04: catalog-growth batch (Josh: "lets updated the photos
-  // on all products. i think you have to do this for both circle and
-  // retail"). The VCP_All_Product_Hero_Photos folder grew from ~90 files to
-  // 142 since the 09-03 pass, and the live Swell catalog grew too (now 203
-  // products, pulled fresh via the admin Console) - re-running the
-  // name-match against current data resolves everything the 09-03 pass had
-  // flagged, plus covers ~30 more products the catalog gained since then
-  // (BPC-157 15mg, GHRP-2/6 alternate doses, CJC-1295 No/With-DAC 5/10mg,
-  // Tesamorelin/Ipamorelin combo doses, the Cortagen/Crystagen-style
-  // peptide-bioregulator line at their missing doses, etc). Judgment calls
-  // made rather than guessed blindly - flag to Josh if any should be
-  // reversed:
-  //   - Dihexa 10mg / DSIP 10mg / L-Carnitine / Oxytocin 10mg / Snap8
-  //     10mg+20mg: the 09-03 concern was a possible collision with a
-  //     differently-dosed nasal-spray/capsule SKU of the same name. The
-  //     fresh catalog pull shows each now exists as its own plain-vial
-  //     product with no competing SKU sharing its exact name - safe to map.
-  //   - Selank 10mg / Semax 10mg / Semax 30mg: the photo shoot has TWO
-  //     vial-label photos for each (e.g. "SELANK-10" vs "SELANK-A-10").
-  //     Checked whether the "-A-" file might actually belong to a separate
-  //     acetylated-variant product (as is genuinely the case for Semax
-  //     Acetyl 30mg, which has its own already-mapped photo) - it doesn't:
-  //     no "Selank 10mg (Acetyl)" or "Semax 10mg (Acetyl)" product exists,
-  //     so both photos are the same product, just two label print runs.
-  //     Picked the plain (non "-A-") file for each; the other is still
-  //     sitting in the shoot folder if Josh prefers it instead.
-  //   - GLOW (GHK-Cu/BPC/TB4) 50/10/10mg and KLOW (GHK-Cu/BPC/TB4/KPV)
-  //     50/10/10/10mg: the OLD "glow-70mg"/"klow-80mg" slugs above (still
-  //     .jpg) are orphaned - no product is named exactly "GLOW 70mg" or
-  //     "KLOW 80mg" in the current catalog, so those two keys never match
-  //     anything live and are harmless dead weight (left as-is rather than
-  //     deleted, in case Josh wants to trace them back). The current
-  //     product names slugify to "glow-ghk-cu-bpc-tb4-50-10-10mg" and
-  //     "klow-ghk-cu-bpc-tb4-kpv-50-10-10-10mg" below. The shoot folder has
-  //     a short-named duplicate for each too (Glow-70mg-hero.png,
-  //     KLOW-80mg-hero.png, both same total dose) - used the
-  //     fully-descriptive filename instead since every other file in this
-  //     batch is named to match the current product name, not a stale one.
-  //   - GLOW 100/20/20mg and KLOW 100/20/20/20mg: no prior mapping existed
-  //     at any dose - both are new.
-  //   - "SLU-PP-332 10 mg" has a literal space before "mg" in Swell (a
-  //     product-name typo, not mine) - its slug is "slu-pp-332-10-mg", one
-  //     character off from the already-mapped "slu-pp-332-10mg" above. Both
-  //     keys are harmless to keep; worth fixing the typo in Swell admin if
-  //     Josh wants the cleaner URL.
-  // Public/products in both repos already has every file below (copied
-  // 2026-09-04 from the same shoot folder, renamed to match its slug). ----
+  // ---- 2026-09-04: catalog-growth batch, ported from retail's
+  // product-images.ts alongside public/products (same source photos,
+  // copied to both repos together, same as the 09-03 batch was) - see
+  // retail's file for the full judgment-call notes (why each 09-03
+  // "not applied" item now resolves cleanly, the GLOW/KLOW stale-slug
+  // situation, the Selank/Semax duplicate-photo picks). One difference
+  // from retail: igf-lr3-1mg is new here since this repo never got
+  // retail's 2026-08-19 IGF-1-LR3-to-IGF-LR3 rename fix (this repo's
+  // "igf-1-lr3-1mg" key above is the same kind of orphaned stale slug the
+  // GLOW/KLOW notes describe - harmless, left as-is). ----
   "ahk-cu-100mg": "/products/ahk-cu-100mg-hero.png", // AHK-CU 100mg
   "ahk-cu-50mg": "/products/ahk-cu-50mg-hero.png", // AHK-CU 50mg
   "aod-9604-tesamorelin-5-5mg": "/products/aod-9604-tesamorelin-5-5mg-hero.png", // AOD-9604/Tesamorelin 5/5mg
@@ -221,6 +171,7 @@ export const productImages: Record<string, string> = {
   "glow-ghk-cu-bpc-tb4-100-20-20mg": "/products/glow-ghk-cu-bpc-tb4-100-20-20mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 100/20/20mg
   "glow-ghk-cu-bpc-tb4-50-10-10mg": "/products/glow-ghk-cu-bpc-tb4-50-10-10mg-hero.png", // GLOW (GHK-Cu/BPC/TB4) 50/10/10mg
   "hcg-5000iu": "/products/hcg-5000iu-hero.png", // HCG 5000IU
+  "igf-lr3-1mg": "/products/igf-lr3-1mg-hero.png", // IGF-LR3 1mg
   "ipamorelin-5mg": "/products/ipamorelin-5mg-hero.png", // Ipamorelin 5mg
   "ipamorelin-cjc-1295-10-10mg": "/products/ipamorelin-cjc-1295-10-10mg-hero.png", // Ipamorelin/CJC-1295 10/10mg
   "klow-ghk-cu-bpc-tb4-kpv-100-20-20-20mg": "/products/klow-ghk-cu-bpc-tb4-kpv-100-20-20-20mg-hero.png", // KLOW (GHK-Cu/BPC/TB4/KPV) 100/20/20/20mg
@@ -247,4 +198,33 @@ export const productImages: Record<string, string> = {
   "thymosin-alpha-1": "/products/thymosin-alpha-1-hero.png", // Thymosin Alpha-1
   "tirzepatide-60mg": "/products/tirzepatide-60mg-hero.png", // Tirzepatide 60mg
   "vip-5mg": "/products/vip-5mg-hero.png", // VIP 5mg
+
+  // ---- Nasal Spray batch (2026-09-05) ----
+  // 20 candidate products created 2026-09-03 (create-candidate-products.js),
+  // live on Circle since but showing the "photo coming soon" placeholder -
+  // these are the new marketing-style hero photos (spray bottle + formula
+  // sidebar, same layout as the vial heroes) Josh generated for them.
+  // Slugs are the full Swell product name slugified (e.g. "GHK-Cu - 25mg .
+  // 17mcg/spray" -> ghk-cu-25mg-17mcg-spray), not just compound+dose, since
+  // these product names carry the per-spray mcg dose as part of the name.
+  "ghk-cu-25mg-17mcg-spray": "/products/ghk-cu-25mg-17mcg-spray-hero.png", // GHK-Cu 25mg . 17mcg/spray
+  "melanotan-ii-10mg-7mcg-spray": "/products/melanotan-ii-10mg-7mcg-spray-hero.png", // Melanotan II 10mg . 7mcg/spray
+  "melanotan-ii-15mg-10mcg-spray": "/products/melanotan-ii-15mg-10mcg-spray-hero.png", // Melanotan II 15mg . 10mcg/spray
+  "adamax-10mg-7mcg-spray": "/products/adamax-10mg-7mcg-spray-hero.png", // Adamax 10mg . 7mcg/spray
+  "glutathione-500mg-333mcg-spray": "/products/glutathione-500mg-333mcg-spray-hero.png", // Glutathione 500mg . 333mcg/spray
+  "nadplus-500mg-333mcg-spray": "/products/nadplus-500mg-333mcg-spray-hero.png", // NAD+ 500mg . 333mcg/spray
+  "oxytocin-10mg-7mcg-spray": "/products/oxytocin-10mg-7mcg-spray-hero.png", // Oxytocin 10mg . 7mcg/spray
+  "oxytocin-20mg-13mcg-spray": "/products/oxytocin-20mg-13mcg-spray-hero.png", // Oxytocin 20mg . 13mcg/spray
+  "selank-10mg-7mcg-spray": "/products/selank-10mg-7mcg-spray-hero.png", // Selank 10mg . 7mcg/spray
+  "selank-20mg-13mcg-spray": "/products/selank-20mg-13mcg-spray-hero.png", // Selank 20mg . 13mcg/spray
+  "semax-10mg-7mcg-spray": "/products/semax-10mg-7mcg-spray-hero.png", // Semax 10mg . 7mcg/spray
+  "semax-20mg-13mcg-spray": "/products/semax-20mg-13mcg-spray-hero.png", // Semax 20mg . 13mcg/spray
+  "dsip-pinealon-10mg-7mcg-spray": "/products/dsip-pinealon-10mg-7mcg-spray-hero.png", // DSIP/Pinealon 10mg . 7mcg/spray
+  "pt-141-plus-oxytocin-20-20mg-13-13mcg-per-spray": "/products/pt-141-plus-oxytocin-20-20mg-13-13mcg-per-spray-hero.png", // PT-141 + Oxytocin 20/20mg . 13/13mcg per spray
+  "pt-141-plus-oxytocin-5-10mg-3-7mcg-per-spray": "/products/pt-141-plus-oxytocin-5-10mg-3-7mcg-per-spray-hero.png", // PT-141 + Oxytocin 5/10mg . 3/7mcg per spray
+  "selank-plus-semax-10-10mg-7-7mcg-per-spray": "/products/selank-plus-semax-10-10mg-7-7mcg-per-spray-hero.png", // Selank + Semax 10/10mg . 7/7mcg per spray
+  "wolverine-bpc-157-tb-500-30mg-20mcg-spray": "/products/wolverine-bpc-157-tb-500-30mg-20mcg-spray-hero.png", // Wolverine (BPC-157/TB-500) 30mg . 20mcg/spray
+  "bpc-157-10mg-7mcg-spray": "/products/bpc-157-10mg-7mcg-spray-hero.png", // BPC-157 10mg . 7mcg/spray
+  "thymosin-alpha-1-10mg-7mcg-spray": "/products/thymosin-alpha-1-10mg-7mcg-spray-hero.png", // Thymosin Alpha-1 10mg . 7mcg/spray
+  "pt-141-10mg-7mcg-spray": "/products/pt-141-10mg-7mcg-spray-hero.png", // PT-141 10mg . 7mcg/spray
 };
