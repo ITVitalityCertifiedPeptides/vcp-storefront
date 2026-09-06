@@ -32,7 +32,8 @@
 import { useMemo, useState } from "react";
 import type { Product } from "@/lib/catalog-shared";
 import { displayCategory } from "@/lib/catalog-shared";
-import ProductCard from "./ProductCard";
+import FamilyCard from "./FamilyCard";
+import { groupIntoFamilies } from "@/lib/product-families";
 
 type SortOption = "most_popular" | "name_asc" | "name_desc" | "price_asc" | "price_desc";
 
@@ -49,10 +50,15 @@ export default function FilteredProductGrid({
   const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState<SortOption>("most_popular");
 
+  // 2026-09-06 (Josh): the grid shows product FAMILIES (one tile per
+  // compound-and-form, sizes picked on the product page) instead of one
+  // tile per size. See lib/product-families.ts.
+  const families = useMemo(() => groupIntoFamilies(products), [products]);
+
   const shown = useMemo(() => {
-    let list = products;
+    let list = families;
     if (category !== "all") {
-      list = list.filter((p) => p.areas.includes(category));
+      list = list.filter((f) => f.areas.includes(category));
     }
     list = [...list];
     switch (sort) {
@@ -65,15 +71,15 @@ export default function FilteredProductGrid({
       case "price_asc":
         list.sort(
           (a, b) =>
-            (a.priceFrom ?? a.price ?? Number.POSITIVE_INFINITY) -
-            (b.priceFrom ?? b.price ?? Number.POSITIVE_INFINITY)
+            (a.priceFrom ?? Number.POSITIVE_INFINITY) -
+            (b.priceFrom ?? Number.POSITIVE_INFINITY)
         );
         break;
       case "price_desc":
         list.sort(
           (a, b) =>
-            (b.priceFrom ?? b.price ?? Number.NEGATIVE_INFINITY) -
-            (a.priceFrom ?? a.price ?? Number.NEGATIVE_INFINITY)
+            (b.priceMax ?? Number.NEGATIVE_INFINITY) -
+            (a.priceMax ?? Number.NEGATIVE_INFINITY)
         );
         break;
       case "most_popular":
@@ -83,7 +89,7 @@ export default function FilteredProductGrid({
         list.sort((a, b) => (b.stockLevel ?? 0) - (a.stockLevel ?? 0));
     }
     return list;
-  }, [products, category, sort]);
+  }, [families, category, sort]);
 
   const selectClass =
     "rounded-full border border-line bg-white px-4 py-2 text-sm text-ink focus:outline-none focus:border-gold-deep cursor-pointer";
@@ -125,8 +131,8 @@ export default function FilteredProductGrid({
         <p className="text-ink-soft">No products match these filters.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {shown.map((product) => (
-            <ProductCard key={product.slug} product={product} />
+          {shown.map((family) => (
+            <FamilyCard key={family.slug} family={family} />
           ))}
         </div>
       )}

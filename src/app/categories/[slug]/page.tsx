@@ -11,7 +11,8 @@ import {
 import { hasGlp1Access } from "@/lib/current-session";
 import { breadcrumbSchema } from "@/lib/schema";
 import { siteConfig } from "@/lib/site";
-import ProductCard from "@/components/ProductCard";
+import FamilyCard from "@/components/FamilyCard";
+import { groupIntoFamilies } from "@/lib/product-families";
 
 // 2026-09-05 (GLP-1 login gate): a category page can include GLP-1
 // products (e.g. Metabolic/Weight Loss), so it needs the same
@@ -84,9 +85,9 @@ export default async function CategoryPage({
         research category. For laboratory research use only.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
+        {groupIntoFamilies(products).map((family) => (
+            <FamilyCard key={family.slug} family={family} />
+          ))}
       </div>
     </div>
   );

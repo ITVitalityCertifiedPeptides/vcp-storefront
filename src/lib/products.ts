@@ -1,6 +1,7 @@
 import "server-only";
 import swell from "swell-js";
-import { galleryImages } from "./product-gallery";
+import { galleryImages, familyImage } from "./product-gallery";
+import { familySlugFor, familyNameFor, splitProductName } from "./product-families";
 import { secondaryAreasFor } from "./research-areas";
 import type {
   Product,
@@ -200,6 +201,10 @@ function mapProduct(p: SwellProduct): Product {
     madeInUsa: content.made_in_usa !== false,
     images: galleryImages(slugify(p.name)),
     isGlp1: isGlp1Name(p.name),
+    family: familySlugFor(content.retail_display_name || p.name),
+    familyName: familyNameFor(content.retail_display_name || p.name),
+    sizeLabel: splitProductName(content.retail_display_name || p.name).size,
+    familyImage: familyImage(familySlugFor(content.retail_display_name || p.name)),
   };
 }
 

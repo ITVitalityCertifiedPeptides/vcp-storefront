@@ -3,7 +3,8 @@ import Link from "next/link";
 import { getAllProducts, filterVisible } from "@/lib/products";
 import { hasGlp1Access } from "@/lib/current-session";
 import { displayCategory } from "@/lib/catalog-shared";
-import ProductCard from "@/components/ProductCard";
+import FamilyCard from "@/components/FamilyCard";
+import { groupIntoFamilies } from "@/lib/product-families";
 
 export const metadata: Metadata = {
   title: "Search Products",
@@ -84,8 +85,8 @@ export default async function SearchPage({
 
       {results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {results.map((product) => (
-            <ProductCard key={product.slug} product={product} />
+          {groupIntoFamilies(results).map((family) => (
+            <FamilyCard key={family.slug} family={family} />
           ))}
         </div>
       )}

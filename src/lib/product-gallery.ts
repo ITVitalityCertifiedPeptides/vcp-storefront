@@ -100,3 +100,16 @@ export function galleryImages(slug: string): string[] {
     (x): x is string => Boolean(x)
   );
 }
+
+// Generic family photo for the shop tile: public/products/<family>-generic.*
+// (a vial with no size on the label). Josh drops the file in and it's
+// picked up on the next request/build; nothing to register. Null when
+// absent, and the tile falls back to the primary size's own photo.
+export function familyImage(familySlug: string): string | null {
+  const index = getFileIndex();
+  for (const ext of ["png", "jpg", "jpeg", "webp"]) {
+    const hit = index.get(`${familySlug}-generic.${ext}`);
+    if (hit) return `/products/${hit}`;
+  }
+  return null;
+}

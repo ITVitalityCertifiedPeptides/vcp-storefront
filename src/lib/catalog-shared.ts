@@ -64,6 +64,15 @@ export type Product = {
   // retatrutide, cagrilintide, liraglutide, survodutide) - see
   // products.ts's isGlp1Name() for the exact match.
   isGlp1: boolean;
+  // Family grouping (lib/product-families.ts): one shop tile per
+  // compound-and-form, sizes picked on the product page. familyImage is
+  // the generic no-size photo public/products/<family>-generic.* when one
+  // exists (server-resolved), else null and the tile uses this product's
+  // own photo.
+  family: string;
+  familyName: string;
+  sizeLabel: string;
+  familyImage: string | null;
 };
 
 // Single choke-point every listing surface calls to drop GLP-1 products

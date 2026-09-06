@@ -18,6 +18,8 @@ import ProductGallery from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
 import ProductFaq from "@/components/ProductFaq";
 import BuyBox from "@/components/BuyBox";
+import SizePicker from "@/components/SizePicker";
+import { siblingsOf } from "@/lib/product-families";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -218,6 +220,19 @@ export default async function ProductPage({
               </dd>
             </div>
           </dl>
+
+          {/* 2026-09-06 (Josh): sizes of this compound-and-form, as a
+              picker. Each size is its own Swell product; picking one
+              goes to that product's page. */}
+          <SizePicker
+            current={product.slug}
+            sizes={siblingsOf(product, allProducts).map((s) => ({
+              slug: s.slug,
+              size: s.sizeLabel || s.name,
+              price: s.priceFrom ?? s.price,
+              inStock: s.inStock,
+            }))}
+          />
 
           <BuyBox
             product={{

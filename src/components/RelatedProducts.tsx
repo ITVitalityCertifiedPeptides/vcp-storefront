@@ -14,8 +14,13 @@ export default function RelatedProducts({
   current: Product;
   products: Product[];
 }) {
+  // 2026-09-06: one entry per family (other sizes of THIS compound are in
+  // the size picker, so they're excluded; other compounds show once, not
+  // once per size).
+  const seen = new Set<string>([current.family]);
   const related = products
     .filter((p) => p.category === current.category && p.slug !== current.slug)
+    .filter((p) => (seen.has(p.family) ? false : (seen.add(p.family), true)))
     .slice(0, 4);
 
   if (related.length === 0) return null;
@@ -36,7 +41,7 @@ export default function RelatedProducts({
               className="block border border-line hover:border-gold-deep px-4 py-4 transition-colors"
             >
               <span className="font-medium text-ink text-sm block mb-1">
-                {p.name}
+                {p.familyName}
               </span>
               <span className="text-xs text-ink-soft font-mono">
                 CAS {p.casNumber || "N/A"}

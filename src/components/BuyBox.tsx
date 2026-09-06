@@ -32,6 +32,9 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
     return initial;
   });
   const [justAdded, setJustAdded] = useState(false);
+  // 2026-09-06 (Josh): quantity picker, since many buyers order several
+  // vials of one size at a time.
+  const [quantity, setQuantity] = useState(1);
 
   // Swell option value prices are additive on the base price.
   let unitPrice = product.price;
@@ -48,7 +51,7 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
     try {
       await getSwell().cart.addItem({
         product_id: product.id,
-        quantity: 1,
+        quantity,
         ...(product.options.length > 0
           ? {
               options: Object.entries(selections).map(([name, value]) => ({
@@ -100,7 +103,47 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
       {unitPrice != null && (
         <p className="font-serif-display text-2xl text-ink mb-5">
           {money(unitPrice)}
+          {quantity > 1 && (
+            <span className="ml-3 text-sm font-sans text-ink-soft">
+              {quantity} &times; = {money(unitPrice * quantity)}
+            </span>
+          )}
         </p>
+      )}
+
+      {product.inStock && (
+        <div className="mb-5">
+          <label className="label-eyebrow text-[0.62rem] text-ink-soft block mb-2">Quantity</label>
+          <div className="inline-flex items-center rounded-full border border-line bg-white">
+            <button
+              type="button"
+              aria-label="Decrease quantity"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              className="h-10 w-10 text-lg text-ink hover:text-gold-deep disabled:opacity-40"
+              disabled={quantity <= 1}
+            >
+              &minus;
+            </button>
+            <input
+              type="number"
+              min={1}
+              max={99}
+              inputMode="numeric"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.min(99, Math.max(1, Number(e.target.value) || 1)))}
+              aria-label="Quantity"
+              className="w-12 text-center text-sm font-medium text-ink bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <button
+              type="button"
+              aria-label="Increase quantity"
+              onClick={() => setQuantity((q) => Math.min(99, q + 1))}
+              className="h-10 w-10 text-lg text-ink hover:text-gold-deep"
+            >
+              +
+            </button>
+          </div>
+        </div>
       )}
 
       {!product.inStock ? (
