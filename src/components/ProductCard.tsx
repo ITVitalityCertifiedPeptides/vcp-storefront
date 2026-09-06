@@ -57,11 +57,6 @@ export default function ProductCard({ product }: { product: Product }) {
             range in the header banner), so the badge was making a promise
             the data couldn't back up. Out of Stock stays: that's a real
             inventory fact, not a shipping-time claim. */}
-        {!product.inStock && (
-          <span className="absolute top-1 left-1 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
-            Out of Stock
-          </span>
-        )}
       </div>
       <div className="p-5">
         {product.category && (

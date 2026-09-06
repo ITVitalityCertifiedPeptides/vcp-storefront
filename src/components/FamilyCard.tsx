@@ -41,11 +41,6 @@ export default function FamilyCard({ family }: { family: ProductFamily<Product> 
             Made in USA
           </span>
         )}
-        {!family.inStock && (
-          <span className="absolute top-1 left-1 bg-ink/80 text-cream/90 text-[0.6rem] font-semibold uppercase tracking-wide px-2 py-1">
-            Out of Stock
-          </span>
-        )}
       </div>
       <div className="p-5">
         {p.category && (

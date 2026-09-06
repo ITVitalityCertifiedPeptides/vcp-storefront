@@ -74,7 +74,7 @@ export default function SizePicker({ current, sizes }: { current: string; sizes:
                   aria-pressed={active}
                   disabled={pending}
                   onClick={() => go(s.slug)}
-                  className={pill(active, !s.inStock)}
+                  className={pill(active, false)}
                 >
                   {s.size}
                   {s.price != null && (

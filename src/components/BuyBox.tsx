@@ -170,11 +170,6 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
           actually ship that fast, so this was making a promise the data
           couldn't back up. The header banner's general "1-3 business days"
           range is the only shipping-time claim left on the site. */}
-      {product.inStock && (
-        <p className="text-xs text-ink-soft mt-3">
-          In stock.
-        </p>
-      )}
     </div>
   );
 }

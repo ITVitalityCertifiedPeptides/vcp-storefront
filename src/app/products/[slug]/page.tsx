@@ -207,18 +207,6 @@ export default async function ProductPage({
                 </Link>
               </dd>
             </div>
-            <div>
-              <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">Availability</dt>
-              <dd className="font-medium text-ink flex items-center gap-1.5">
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    product.inStock ? "bg-gold" : "bg-ink-soft/40"
-                  }`}
-                  aria-hidden
-                />
-                {product.inStock ? "In stock" : "Out of stock"}
-              </dd>
-            </div>
           </dl>
 
           {/* 2026-09-06 (Josh): sizes of this compound-and-form, as a
