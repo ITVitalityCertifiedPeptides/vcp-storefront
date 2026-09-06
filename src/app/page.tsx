@@ -97,11 +97,18 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Full-bleed hero with separate desktop and mobile photography. */}
+      {/* Full-bleed hero with separate desktop and mobile photography.
+          2026-09-06 (Josh): both photos replaced with the ChatGPT lab-bench
+          renders (originals in Documents/Peptides/hero-candidates). Desktop
+          keeps its vials in the right half, so the left-side copy sits on
+          empty slate. The mobile shot is busy top to bottom (microscope
+          up top, vials below), so the mobile hero is taller, anchored to
+          the bottom of the photo, and the top carries a heavy fade so the
+          headline reads over the equipment. */}
       <section className="relative bg-black text-cream overflow-hidden border-b border-line">
         <Image
           src="/hero-desktop.jpg"
-          alt="Vitality Certified Peptides vials"
+          alt="Vitality Certified Peptides vials on a lab bench"
           fill
           sizes="100vw"
           className="object-cover object-right hidden sm:block"
@@ -109,10 +116,10 @@ export default async function HomePage() {
         />
         <Image
           src="/hero-mobile.jpg"
-          alt="Vitality Certified Peptides vials"
+          alt="Vitality Certified Peptides vials on a lab bench"
           fill
           sizes="100vw"
-          className="object-cover object-center sm:hidden"
+          className="object-cover object-bottom sm:hidden"
           priority
         />
         <div
@@ -120,10 +127,10 @@ export default async function HomePage() {
           aria-hidden
         />
         <div
-          className="absolute inset-0 sm:hidden bg-gradient-to-b from-black/85 via-black/40 to-transparent"
+          className="absolute inset-0 sm:hidden bg-[linear-gradient(to_bottom,rgba(0,0,0,0.94)_0%,rgba(0,0,0,0.82)_32%,rgba(0,0,0,0.35)_55%,rgba(0,0,0,0)_75%)]"
           aria-hidden
         />
-        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 md:py-32">
+        <div className="relative max-w-6xl mx-auto px-4 pt-12 pb-72 sm:py-24 md:py-32 min-h-[36rem] sm:min-h-0">
           <h1 className="text-[1.7rem] sm:text-3xl md:text-[2.6rem] leading-[1.3] md:leading-[1.25] font-semibold tracking-tight max-w-xl">
             Third-Party Tested
             <br />

@@ -97,13 +97,9 @@ export default async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="bg-ink text-center py-2 px-4">
-        <p className="label-eyebrow text-[0.66rem] tracking-[0.16em] text-gold">
-          Most orders ship within 1-3 business days
-          <span className="text-cream/40 mx-2">&#8226;</span>
-          Free US shipping over $250
-        </p>
-      </div>
+      {/* 2026-09-06 (Josh): the shipping ticker that used to sit above
+          this bar is gone for good ("makes us look cheap"). Free-shipping
+          threshold still shows in the homepage benefit strip and cart. */}
       <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">
         <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
           {/* 2026-08-29 (Josh): search moved next to the wordmark so it's
@@ -117,7 +113,11 @@ export default async function SiteHeader() {
               Catalog row further down still covers narrow screens. */}
           <div className="flex items-center gap-3 md:gap-5 min-w-0">
             <Wordmark />
-            <HeaderSearch products={searchIndex} />
+            {/* Compact inline search from sm up; below sm the full-width
+                row further down carries search instead. */}
+            <div className="hidden sm:block">
+              <HeaderSearch products={searchIndex} />
+            </div>
             <Link
               href="/shop"
               className="hidden sm:inline-flex items-center rounded-full bg-ink text-cream px-5 py-2.5 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors whitespace-nowrap shrink-0"
@@ -179,10 +179,14 @@ export default async function SiteHeader() {
             Shop Catalog button is already visible from sm up, so this
             row only needs to exist below sm - it used to render empty
             padding on tablet widths. */}
-        <div className="sm:hidden max-w-6xl mx-auto px-4 pb-3">
+        {/* 2026-09-06 (Josh): on phones the second row is a full-width
+            search field with Shop Catalog beside it. People arrive
+            knowing the compound name; give them somewhere to type it. */}
+        <div className="sm:hidden max-w-6xl mx-auto px-4 pb-3 flex items-center gap-2">
+          <HeaderSearch products={searchIndex} full />
           <Link
             href="/shop"
-            className="inline-flex items-center rounded-full bg-ink text-cream px-5 py-2 label-eyebrow text-[0.68rem] hover:bg-gold-deep transition-colors"
+            className="inline-flex items-center rounded-full bg-ink text-cream px-4 py-2.5 label-eyebrow text-[0.66rem] hover:bg-gold-deep transition-colors whitespace-nowrap shrink-0"
           >
             Shop Catalog
           </Link>

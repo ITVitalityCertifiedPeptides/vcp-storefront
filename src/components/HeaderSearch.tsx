@@ -21,10 +21,14 @@ export type HeaderSearchProduct = {
   image: string | null;
 };
 
+// full = the mobile header row (2026-09-06, Josh): the field stretches to
+// the row's full width instead of the compact pill used inline on desktop.
 export default function HeaderSearch({
   products,
+  full = false,
 }: {
   products: HeaderSearchProduct[];
+  full?: boolean;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -64,7 +68,7 @@ export default function HeaderSearch({
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className={full ? "relative flex-1 min-w-0" : "relative"}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -92,13 +96,17 @@ export default function HeaderSearch({
             }}
             placeholder="Search products..."
             aria-label="Search products"
-            className="w-28 sm:w-36 md:w-52 lg:w-64 rounded-full border border-line bg-white pl-9 pr-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:border-gold-deep transition-[width] duration-150 focus:w-44 sm:focus:w-56 md:focus:w-64 lg:focus:w-72"
+            className={
+              full
+                ? "w-full rounded-full border border-line bg-white pl-9 pr-3 py-2.5 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:border-gold-deep"
+                : "w-28 sm:w-36 md:w-52 lg:w-64 rounded-full border border-line bg-white pl-9 pr-3 py-2 text-sm text-ink placeholder:text-ink-soft/50 focus:outline-none focus:border-gold-deep transition-[width] duration-150 focus:w-44 sm:focus:w-56 md:focus:w-64 lg:focus:w-72"
+            }
           />
         </div>
       </form>
 
       {open && query.trim() && (
-        <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white border border-line shadow-[0_12px_32px_-16px_rgba(21,19,15,0.35)] z-50 max-h-96 overflow-y-auto">
+        <div className={`absolute top-full mt-2 bg-white ${full ? "left-0 right-0" : "right-0 w-72 sm:w-80"} border border-line shadow-[0_12px_32px_-16px_rgba(21,19,15,0.35)] z-50 max-h-96 overflow-y-auto`}>
           {results.length > 0 ? (
             <>
               <ul>
