@@ -15,6 +15,13 @@ import { getSwell, type SwellCart } from "@/lib/swell-client";
 import { useCart } from "@/components/CartProvider";
 import { trackConversion } from "@/lib/tapfiliate";
 import { isRestrictedState } from "@/lib/restricted-states";
+import { toStateCode } from "@/lib/us-states";
+import StateSelect from "@/components/StateSelect";
+import AddressReview, {
+  checkAddress,
+  type ReviewAddress,
+  type ReviewResult,
+} from "@/components/AddressReview";
 
 function money(n?: number) {
   return typeof n === "number" ? `$${n.toFixed(2)}` : "";
@@ -29,6 +36,9 @@ export default function CheckoutPage() {
   const [asGuest, setAsGuest] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Address validation outcome awaiting the customer's decision (see
+  // components/AddressReview). null = nothing pending.
+  const [review, setReview] = useState<ReviewResult | null>(null);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -78,7 +88,7 @@ export default function CheckoutPage() {
             address1: f.address1 || ship?.address1 || "",
             address2: f.address2 || ship?.address2 || "",
             city: f.city || ship?.city || "",
-            state: f.state || ship?.state || "",
+            state: toStateCode(f.state || ship?.state || ""),
             zip: f.zip || ship?.zip || "",
           }));
         }
@@ -96,6 +106,10 @@ export default function CheckoutPage() {
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
+    // Any edit to the address invalidates a pending validation verdict.
+    if (key === "address1" || key === "address2" || key === "city" || key === "state" || key === "zip") {
+      setReview(null);
+    }
   }
 
   async function submit(e: React.FormEvent) {
@@ -118,8 +132,45 @@ export default function CheckoutPage() {
       );
       return;
     }
+    // Address validation gate (2026-09-06). Runs once per attempt; the
+    // customer's choice in the review panel calls placeOrder directly.
     setSubmitting(true);
     setError(null);
+    const result = await checkAddress({
+      address1: form.address1,
+      address2: form.address2 || undefined,
+      city: form.city,
+      state: form.state,
+      zip: form.zip,
+    });
+    if (result.verdict === "corrected" || result.verdict === "unconfirmed") {
+      setReview(result);
+      setSubmitting(false);
+      return;
+    }
+    await placeOrder(form, false);
+  }
+
+  function applyAddress(a: ReviewAddress) {
+    const next = {
+      ...form,
+      address1: a.address1,
+      address2: a.address2 || "",
+      city: a.city,
+      state: toStateCode(a.state) || a.state,
+      zip: a.zip,
+    };
+    setForm(next);
+    return next;
+  }
+
+  // unverified = the customer chose to use an address USPS couldn't
+  // confirm. The order is flagged so the team confirms it before shipping.
+  async function placeOrder(data: typeof form, unverified: boolean) {
+    setReview(null);
+    setSubmitting(true);
+    setError(null);
+    const form = data;
     try {
       const swell = getSwell();
       const name = `${form.firstName} ${form.lastName}`.trim();
@@ -162,12 +213,16 @@ export default function CheckoutPage() {
           method: "cash",
         },
         comments:
-          "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Venmo / Apple Cash / PayPal). Ship only after payment is confirmed.",
+          "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Venmo / Apple Cash / PayPal). Ship only after payment is confirmed." +
+          (unverified
+            ? " ADDRESS NOT CONFIRMED BY USPS: customer chose to use it anyway. Confirm the shipping address with the customer before shipping."
+            : ""),
         metadata: {
           ruo_attestation: true,
           ruo_attested_at: new Date().toISOString(),
           payment_method: "invoice",
           invoice_pending: true,
+          address_unverified: unverified,
         },
       };
       // Swell's public API rejects account name/phone updates through the
@@ -396,21 +451,41 @@ export default function CheckoutPage() {
               value={form.city}
               onChange={(e) => set("city", e.target.value)}
             />
-            <input
+            <StateSelect
               className={inputClass}
-              placeholder="State"
-              required
               value={form.state}
-              onChange={(e) => set("state", e.target.value)}
+              onChange={(code) => set("state", code)}
             />
             <input
               className={inputClass}
               placeholder="ZIP"
               required
+              inputMode="numeric"
+              pattern="\d{5}(-\d{4})?"
+              title="5-digit ZIP code"
               value={form.zip}
               onChange={(e) => set("zip", e.target.value)}
             />
           </div>
+
+          {review && (
+            <AddressReview
+              result={review}
+              entered={{
+                address1: form.address1,
+                address2: form.address2 || undefined,
+                city: form.city,
+                state: form.state,
+                zip: form.zip,
+              }}
+              busy={submitting}
+              actionLabel="Place Order"
+              onUseCorrected={(a) => placeOrder(applyAddress(a), false)}
+              onKeepEntered={() => placeOrder(form, false)}
+              onEdit={() => setReview(null)}
+              onUseAnyway={() => placeOrder(form, true)}
+            />
+          )}
 
           <label className="flex items-start gap-3 mb-8 cursor-pointer">
             <input

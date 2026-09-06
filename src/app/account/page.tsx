@@ -10,6 +10,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Package, MapPin, ChevronDown } from "lucide-react";
 import { getSwell } from "@/lib/swell-client";
+import { toStateCode } from "@/lib/us-states";
+import StateSelect from "@/components/StateSelect";
+import AddressReview, {
+  checkAddress,
+  type ReviewAddress,
+  type ReviewResult,
+} from "@/components/AddressReview";
 
 type Account = {
   id?: string;
@@ -135,6 +142,7 @@ function AccountContent() {
   const [busy, setBusy] = useState(false);
   const [shippingBusy, setShippingBusy] = useState(false);
   const [shippingSaved, setShippingSaved] = useState(false);
+  const [shipReview, setShipReview] = useState<ReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -150,7 +158,7 @@ function AccountContent() {
       address1: s?.address1 || "",
       address2: s?.address2 || "",
       city: s?.city || "",
-      state: s?.state || "",
+      state: toStateCode(s?.state) || "",
       zip: s?.zip || "",
       phone: s?.phone || acct?.phone || "",
     });
@@ -205,6 +213,7 @@ function AccountContent() {
 
   function setShip<K extends keyof typeof shippingForm>(key: K, value: string) {
     setShippingSaved(false);
+    setShipReview(null);
     setShippingForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -274,21 +283,70 @@ function AccountContent() {
 
   async function saveShipping(e: React.FormEvent) {
     e.preventDefault();
+    // Address validation gate (2026-09-06): standardize or flag before
+    // anything is saved. The review panel's buttons call persistShipping.
+    setShippingBusy(true);
+    setError(null);
+    const result = await checkAddress({
+      address1: shippingForm.address1,
+      address2: shippingForm.address2 || undefined,
+      city: shippingForm.city,
+      state: shippingForm.state,
+      zip: shippingForm.zip,
+    });
+    if (result.verdict === "corrected" || result.verdict === "unconfirmed") {
+      setShipReview(result);
+      setShippingBusy(false);
+      return;
+    }
+    await persistShipping(shippingForm, false);
+  }
+
+  function applyShipping(a: ReviewAddress) {
+    const next = {
+      ...shippingForm,
+      address1: a.address1,
+      address2: a.address2 || "",
+      city: a.city,
+      state: toStateCode(a.state) || a.state,
+      zip: a.zip,
+    };
+    setShippingForm(next);
+    return next;
+  }
+
+  async function persistShipping(data: typeof shippingForm, unverified: boolean) {
+    setShipReview(null);
     setShippingBusy(true);
     setError(null);
     try {
-      const updated = (await getSwell().account.update({
-        shipping: {
-          name: shippingForm.name,
-          address1: shippingForm.address1,
-          address2: shippingForm.address2 || undefined,
-          city: shippingForm.city,
-          state: shippingForm.state,
-          zip: shippingForm.zip,
-          country: "US",
-          phone: shippingForm.phone,
-        },
-      })) as unknown as Account;
+      const shipping = {
+        name: data.name,
+        address1: data.address1,
+        address2: data.address2 || undefined,
+        city: data.city,
+        state: data.state,
+        zip: data.zip,
+        country: "US",
+        phone: data.phone,
+      };
+      // First try to also record the validation outcome as a custom
+      // content field (visible in the Swell admin, so the team knows to
+      // confirm the address before the first shipment). swell-js's Account
+      // type doesn't declare `content`, and the public API may refuse it;
+      // if it does, save the address alone rather than fail the customer.
+      let updated: Account | null = null;
+      try {
+        updated = (await getSwell().account.update({
+          shipping,
+          content: { address_unverified: unverified },
+        } as never)) as unknown as Account;
+      } catch {
+        updated = null;
+      }
+      if (!updated?.email) {
+        updated = (await getSwell().account.update({ shipping })) as unknown as Account;
+      }
       if (updated?.email) {
         setAccount(updated);
         setShippingSaved(true);
@@ -475,21 +533,40 @@ function AccountContent() {
                 value={shippingForm.city}
                 onChange={(e) => setShip("city", e.target.value)}
               />
-              <input
+              <StateSelect
                 className={inputClass}
-                placeholder="State"
-                required
                 value={shippingForm.state}
-                onChange={(e) => setShip("state", e.target.value)}
+                onChange={(code) => setShip("state", code)}
               />
               <input
                 className={inputClass}
                 placeholder="ZIP"
                 required
+                inputMode="numeric"
+                pattern="\d{5}(-\d{4})?"
+                title="5-digit ZIP code"
                 value={shippingForm.zip}
                 onChange={(e) => setShip("zip", e.target.value)}
               />
             </div>
+            {shipReview && (
+              <AddressReview
+                result={shipReview}
+                entered={{
+                  address1: shippingForm.address1,
+                  address2: shippingForm.address2 || undefined,
+                  city: shippingForm.city,
+                  state: shippingForm.state,
+                  zip: shippingForm.zip,
+                }}
+                busy={shippingBusy}
+                actionLabel="Save"
+                onUseCorrected={(a) => persistShipping(applyShipping(a), false)}
+                onKeepEntered={() => persistShipping(shippingForm, false)}
+                onEdit={() => setShipReview(null)}
+                onUseAnyway={() => persistShipping(shippingForm, true)}
+              />
+            )}
             <input
               className={`${inputClass} mb-4`}
               type="tel"
