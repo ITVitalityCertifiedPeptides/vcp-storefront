@@ -17,7 +17,7 @@ export default function FamilyCard({ family }: { family: ProductFamily<Product> 
   const p = family.primary;
   const multi = family.products.length > 1;
   const image =
-    p.familyImage ??
+    family.products.map((m) => m.familyImage).find(Boolean) ??
     p.images?.[0] ??
     productImages[p.slug] ??
     "/products/photo-coming-soon.png";
@@ -60,7 +60,11 @@ export default function FamilyCard({ family }: { family: ProductFamily<Product> 
             one line so the price bar sits at the same height across the
             row (2026-09-05 rule). */}
         <div className="text-xs text-ink-soft mt-1 font-mono truncate">
-          {multi ? family.sizes.join(" · ") : `CAS ${p.casNumber || "N/A"}`}
+          {family.forms.length > 1
+            ? family.forms.join(" · ")
+            : multi
+              ? family.sizes.join(" · ")
+              : `CAS ${p.casNumber || "N/A"}`}
         </div>
         {from != null && (
           <div className="mt-4 pt-3 border-t border-line">
@@ -70,7 +74,11 @@ export default function FamilyCard({ family }: { family: ProductFamily<Product> 
               </span>
               {multi || p.options.length > 0 ? (
                 <span className="inline-flex items-center justify-center rounded-full px-3.5 py-1.5 label-eyebrow text-[0.6rem] bg-gold-deep text-cream group-hover:bg-ink transition-colors">
-                  {multi ? `${family.products.length} Sizes` : "Select Options"}
+                  {family.forms.length > 1
+                    ? `${family.forms.length} Forms`
+                    : multi
+                      ? `${family.products.length} Sizes`
+                      : "Select Options"}
                 </span>
               ) : (
                 <QuickAdd productId={p.id} inStock={p.inStock} />

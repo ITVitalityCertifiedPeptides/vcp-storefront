@@ -1,7 +1,7 @@
 import "server-only";
 import swell from "swell-js";
 import { galleryImages, familyImage } from "./product-gallery";
-import { familySlugFor, familyNameFor, splitProductName } from "./product-families";
+import { familySlugFor, familyNameFor, familyImageSlugs, splitProductName } from "./product-families";
 import { secondaryAreasFor } from "./research-areas";
 import type {
   Product,
@@ -204,7 +204,8 @@ function mapProduct(p: SwellProduct): Product {
     family: familySlugFor(content.retail_display_name || p.name),
     familyName: familyNameFor(content.retail_display_name || p.name),
     sizeLabel: splitProductName(content.retail_display_name || p.name).size,
-    familyImage: familyImage(familySlugFor(content.retail_display_name || p.name)),
+    form: splitProductName(content.retail_display_name || p.name).form,
+    familyImage: familyImageSlugs(content.retail_display_name || p.name).map(familyImage).find(Boolean) ?? null,
   };
 }
 

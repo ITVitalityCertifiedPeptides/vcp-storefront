@@ -1,3 +1,4 @@
+import type { ProductForm } from "./product-families";
 // Catalog types + display helpers shared by server AND client code.
 // products.ts (server-only, talks to Swell) re-exports everything here,
 // so server modules keep importing from "@/lib/products"; client
@@ -72,6 +73,7 @@ export type Product = {
   family: string;
   familyName: string;
   sizeLabel: string;
+  form: ProductForm;
   familyImage: string | null;
 };
 

@@ -229,6 +229,7 @@ export default async function ProductPage({
             sizes={siblingsOf(product, allProducts).map((s) => ({
               slug: s.slug,
               size: s.sizeLabel || s.name,
+              form: s.form,
               price: s.priceFrom ?? s.price,
               inStock: s.inStock,
             }))}

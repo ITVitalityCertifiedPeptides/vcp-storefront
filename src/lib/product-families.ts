@@ -19,10 +19,17 @@
 //   capsules:         "<Base> - <dose> x <count> strips"
 //   Ampules:          "<Base> Cosmetic Ampules x5"
 //
-// A family is base name + form, so "BPC-157" (vials), "BPC-157 Nasal
-// Spray", and "BPC-157 Strips" are three tiles. Sizes within a family
-// fold into one tile. Products whose name carries no size are a family
-// of one and render exactly as before.
+// 2026-09-06 (Josh, second pass): a family is the COMPOUND, across every
+// form. "BPC-157" is one tile covering the vials, the nasal spray, the
+// strips, and the capsules; the product page shows a Form row and then a
+// Size row for the chosen form. Retail's product list already excludes
+// Circle-only items before grouping, so a retail tile only offers the
+// forms retail sells (usually just vials). Blend spellings are
+// normalised for the key ("CJC-1295 + Ipamorelin" strips group with
+// "CJC-1295/Ipamorelin" vials; "Selank + Semax" with "Semax/Selank"),
+// and a parenthetical is ignored ("PX1-SEM (Semaglutide)" = "PX1-SEM").
+// Products whose name carries no size are a family of one and render
+// exactly as before.
 //
 // Pure functions, no I/O, shared verbatim between retail and Circle.
 
@@ -74,9 +81,23 @@ export function splitProductName(name: string): NameParts {
   return { base: n, size: "", form };
 }
 
+// Grouping key for a compound: parenthetical dropped, blend components
+// split on "/" or "+", lower-cased and sorted so spelling order doesn't
+// split a family.
+export function compoundKey(base: string): string {
+  return base
+    .replace(/\s*\([^)]*\)/g, "")
+    .split(/\s*(?:\/|\+)\s*/)
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+    .sort()
+    .join("/");
+}
+
+// Display name a single product contributes for its family (the vial's
+// base wins when the family is assembled; see groupIntoFamilies).
 export function familyNameFor(name: string): string {
-  const { base, form } = splitProductName(name);
-  return form === "Vial" ? base : `${base} ${form}`;
+  return splitProductName(name).base;
 }
 
 export function slugifyFamily(name: string): string {
@@ -87,8 +108,23 @@ export function slugifyFamily(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+// Family identity slug (grouping key), e.g. "bpc-157", "cjc-1295/ipamorelin"
+// -> "cjc-1295-ipamorelin", "semax/selank" -> "selank-semax".
 export function familySlugFor(name: string): string {
-  return slugifyFamily(familyNameFor(name));
+  return slugifyFamily(compoundKey(splitProductName(name).base));
+}
+
+// Candidate filenames for the generic tile photo, most natural first:
+// the base as written on this product ("bpc-157", "cjc-1295-ipamorelin",
+// "semax-selank"), then the sorted key. Josh names the file after the
+// vial's base, so the vial member always resolves; FamilyCard takes the
+// first member that does.
+export function familyImageSlugs(name: string): string[] {
+  const { base } = splitProductName(name);
+  const plain = slugifyFamily(base.replace(/\s*\([^)]*\)/g, ""));
+  const slashed = slugifyFamily(base.replace(/\s*\([^)]*\)/g, "").replace(/\s*\+\s*/g, "/"));
+  const key = familySlugFor(name);
+  return Array.from(new Set([plain, slashed, key]));
 }
 
 // Leading number in the size label, for ordering sizes small to large.
@@ -101,6 +137,8 @@ function sizeRank(size: string): number {
   return v;
 }
 
+const FORM_ORDER: ProductForm[] = ["Vial", "Nasal Spray", "Capsules", "Tablets", "Strips", "Ampules"];
+
 type FamilyInput = {
   name: string;
   slug: string;
@@ -110,6 +148,7 @@ type FamilyInput = {
   inStock: boolean;
   areas?: string[];
   category?: string;
+  form?: ProductForm;
 };
 
 export type ProductFamily<P extends FamilyInput> = {
@@ -117,10 +156,12 @@ export type ProductFamily<P extends FamilyInput> = {
   name: string;
   base: string;
   form: ProductForm;
-  // Sizes small to large.
+  // Grouped by form (vials first), then sizes small to large.
   products: P[];
-  // The product the tile links to and the size picker opens on: cheapest
-  // purchasable size, else cheapest.
+  // Forms present, vials first.
+  forms: ProductForm[];
+  // The product the tile links to and the picker opens on: cheapest
+  // purchasable vial, else cheapest purchasable of any form, else cheapest.
   primary: P;
   priceFrom: number | null;
   priceMax: number | null;
@@ -146,19 +187,28 @@ export function groupIntoFamilies<P extends FamilyInput>(products: P[]): Product
   }
   const out: ProductFamily<P>[] = [];
   for (const [slug, list] of map) {
-    const sorted = [...list].sort(
-      (a, b) => sizeRank(splitProductName(a.name).size) - sizeRank(splitProductName(b.name).size)
-    );
+    const sorted = [...list].sort((a, b) => {
+      const fa = FORM_ORDER.indexOf(splitProductName(a.name).form);
+      const fb = FORM_ORDER.indexOf(splitProductName(b.name).form);
+      if (fa !== fb) return fa - fb;
+      return sizeRank(splitProductName(a.name).size) - sizeRank(splitProductName(b.name).size);
+    });
+    const forms = Array.from(new Set(sorted.map((p) => splitProductName(p.name).form)));
     const purchasable = sorted.filter((p) => p.inStock && priceOf(p) !== Number.POSITIVE_INFINITY);
-    const primary = [...(purchasable.length ? purchasable : sorted)].sort((a, b) => priceOf(a) - priceOf(b))[0];
+    const vials = purchasable.filter((p) => splitProductName(p.name).form === "Vial");
+    const pool = vials.length ? vials : purchasable.length ? purchasable : sorted;
+    const primary = [...pool].sort((a, b) => priceOf(a) - priceOf(b))[0];
     const prices = sorted.map(priceOf).filter((n) => n !== Number.POSITIVE_INFINITY);
-    const { base, form } = splitProductName(sorted[0].name);
+    // Display name: the vial's base when there is one, else the first.
+    const vialMember = sorted.find((p) => splitProductName(p.name).form === "Vial") ?? sorted[0];
+    const base = splitProductName(vialMember.name).base;
     const areas = Array.from(new Set(sorted.flatMap((p) => p.areas ?? (p.category ? [p.category] : []))));
     out.push({
       slug,
-      name: familyNameFor(sorted[0].name),
+      name: base,
       base,
-      form,
+      form: forms[0],
+      forms,
       products: sorted,
       primary,
       priceFrom: prices.length ? Math.min(...prices) : null,
@@ -172,8 +222,9 @@ export function groupIntoFamilies<P extends FamilyInput>(products: P[]): Product
   return out;
 }
 
-// Sizes of every product that shares a family with `product`, in size
-// order, for the product page's size picker.
+// Every product that shares a family with `product` (all forms, all
+// sizes), grouped by form then size, for the product page's Form + Size
+// pickers.
 export function siblingsOf<P extends FamilyInput>(product: P, all: P[]): P[] {
   const key = familySlugFor(product.name);
   return groupIntoFamilies(all.filter((p) => familySlugFor(p.name) === key))[0]?.products ?? [product];
