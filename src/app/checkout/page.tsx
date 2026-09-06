@@ -17,6 +17,7 @@ import { trackConversion } from "@/lib/tapfiliate";
 import { isRestrictedState } from "@/lib/restricted-states";
 import { toStateCode } from "@/lib/us-states";
 import StateSelect from "@/components/StateSelect";
+import ShippingOptions, { type ShippingRate } from "@/components/ShippingOptions";
 import AddressReview, {
   checkAddress,
   type ReviewAddress,
@@ -39,6 +40,10 @@ export default function CheckoutPage() {
   // Address validation outcome awaiting the customer's decision (see
   // components/AddressReview). null = nothing pending.
   const [review, setReview] = useState<ReviewResult | null>(null);
+  // Shipping service the customer picked (components/ShippingOptions).
+  // Defaults to "standard"; ShippingOptions corrects it to the cheapest
+  // live service once Swell returns rates.
+  const [shipping, setShipping] = useState<ShippingRate | null>(null);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -184,15 +189,12 @@ export default function CheckoutPage() {
           zip: form.zip,
           country: "US",
           phone: form.phone,
-          // Swell also won't submit an order without a shipping SERVICE
-          // selected (separate requirement from the billing method below) —
-          // "standard" is the id of "Standard Shipping", the only shipping
-          // service enabled in Settings > Shipping. Confirmed via
-          // swell.cart.getShippingRates() on 2026-08-20, which returned
-          // exactly one service: { id: "standard", name: "Standard
-          // Shipping" }. Without this, submitOrder fails with "Please
-          // select a shipping service."
-          service: "standard",
+          // Swell won't submit an order without a shipping SERVICE. The
+          // customer picks one in <ShippingOptions> (live list from Swell
+          // Settings > Shipping: standard / priority / express as of
+          // 2026-09-06). ShipStation automation rules key off the
+          // service name, so this choice decides the USPS service.
+          service: shipping?.id || "standard",
         },
         // Swell won't submit an order without a billing block + a
         // billing.method that matches a payment method configured in
@@ -370,12 +372,36 @@ export default function CheckoutPage() {
                 </span>
               </div>
             ))}
+            <div className="py-3 flex justify-between text-sm">
+              <span className="label-eyebrow text-[0.68rem] text-ink-soft">
+                Subtotal
+              </span>
+              <span className="font-medium text-ink">
+                {money(cart?.sub_total)}
+              </span>
+            </div>
+            <div className="py-3 flex justify-between text-sm">
+              <span className="label-eyebrow text-[0.68rem] text-ink-soft">
+                Shipping{shipping ? ` (${shipping.name})` : ""}
+              </span>
+              <span className="font-medium text-ink">
+                {typeof cart?.shipment_total === "number"
+                  ? cart.shipment_total === 0
+                    ? "Free"
+                    : money(cart.shipment_total)
+                  : shipping
+                    ? shipping.price === 0
+                      ? "Free"
+                      : money(shipping.price)
+                    : "Calculated below"}
+              </span>
+            </div>
             <div className="py-3 flex justify-between">
               <span className="label-eyebrow text-[0.68rem] text-ink-soft">
-                Subtotal (before shipping)
+                Total
               </span>
               <span className="font-serif-display text-lg text-ink">
-                {money(cart?.sub_total ?? cart?.grand_total)}
+                {money(cart?.grand_total ?? cart?.sub_total)}
               </span>
             </div>
           </div>
@@ -467,6 +493,16 @@ export default function CheckoutPage() {
               onChange={(e) => set("zip", e.target.value)}
             />
           </div>
+
+          <ShippingOptions
+            ready={!loading && !!cart}
+            subTotal={cart?.sub_total ?? 0}
+            value={shipping?.id ?? "standard"}
+            onChange={(rate, fresh) => {
+              setShipping(rate);
+              if (fresh) setCart(fresh);
+            }}
+          />
 
           {review && (
             <AddressReview

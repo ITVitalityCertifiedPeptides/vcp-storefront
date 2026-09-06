@@ -76,7 +76,7 @@ const faqs = [
   {
     question: "Do you offer free shipping?",
     answer:
-      "Yes. US shipping is free on orders over $250. Below that, shipping is calculated when we confirm your order.",
+      "Yes. US shipping is free on orders over $250. Below that, Standard shipping is $11.95, with Priority and Express options at checkout.",
   },
 ];
 

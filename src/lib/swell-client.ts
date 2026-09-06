@@ -40,6 +40,9 @@ export type SwellCart = {
   checkout_url?: string;
   sub_total?: number;
   grand_total?: number;
+  // Shipping charge for the selected shipping service (Settings > Shipping).
+  shipment_total?: number;
+  shipping?: { service?: string; service_name?: string; price?: number };
   items?: SwellCartItem[];
   // Cart-level sum of every item's discount_total. Shown as a "Discount"
   // line on the cart page when > 0.
