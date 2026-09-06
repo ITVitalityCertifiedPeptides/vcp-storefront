@@ -38,11 +38,6 @@ export type ProductOption = {
   values: ProductOptionValue[];
 };
 
-export type SubscriptionPlan = {
-  id: string;
-  name: string;
-};
-
 export type Product = {
   id: string;
   sku: string;
@@ -60,7 +55,6 @@ export type Product = {
   stockStatus: string | null;
   inStock: boolean;
   options: ProductOption[];
-  subscription: SubscriptionPlan[] | null;
   priceFrom: number | null;
   madeInUsa: boolean;
   // Gallery image URLs discovered server-side from public/products

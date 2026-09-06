@@ -1,29 +1,20 @@
 "use client";
 
 // Purchase panel for the product detail page: size/option selector (when
-// the product has options in Swell), a One-time vs Restock & Save toggle
-// (when subscription plans are configured in Swell), and Add to Cart.
-// Everything is data-driven: products without options or plans render a
-// plain price + Add to Cart, and the extra controls appear automatically
-// once the catalog is configured.
+// the product has options in Swell), price, and Add to Cart.
+// 2026-09-06 (Josh): Restock & Save / Autoship removed for good. The store
+// is invoice-only, so there is no recurring billing and nothing to toggle.
 
 import { useState } from "react";
 import { useCart } from "./CartProvider";
 import { getSwell } from "@/lib/swell-client";
-import type { ProductOption, SubscriptionPlan } from "@/lib/products";
-
-// Keep in sync with the recurring discount configured on the Swell
-// subscription plans. This constant only drives the DISPLAYED savings
-// label and estimate; the authoritative price always comes from Swell at
-// cart/checkout time.
-const RESTOCK_DISCOUNT = 0.1;
+import type { ProductOption } from "@/lib/products";
 
 type BuyBoxProduct = {
   id: string;
   price: number | null;
   inStock: boolean;
   options: ProductOption[];
-  subscription: SubscriptionPlan[] | null;
 };
 
 function money(n: number) {
@@ -40,13 +31,7 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
     }
     return initial;
   });
-  const [purchaseType, setPurchaseType] = useState<"standard" | "subscription">(
-    "standard"
-  );
-  const [planId, setPlanId] = useState(product.subscription?.[0]?.id || "");
   const [justAdded, setJustAdded] = useState(false);
-
-  const hasRestock = (product.subscription?.length || 0) > 0;
 
   // Swell option value prices are additive on the base price.
   let unitPrice = product.price;
@@ -58,9 +43,6 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
       if (chosen?.price) unitPrice += chosen.price;
     }
   }
-  const restockPrice =
-    unitPrice != null ? unitPrice * (1 - RESTOCK_DISCOUNT) : null;
-
   async function add() {
     setBusy(true);
     try {
@@ -74,9 +56,6 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
                 value,
               })),
             }
-          : {}),
-        ...(purchaseType === "subscription" && planId
-          ? { purchase_option: { type: "subscription", plan_id: planId } }
           : {}),
       });
       await refresh();
@@ -118,72 +97,10 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
         </div>
       ))}
 
-      {hasRestock && unitPrice != null ? (
-        <div className="border border-line rounded-sm divide-y divide-line mb-5">
-          <label className="flex items-center justify-between gap-3 p-4 cursor-pointer">
-            <span className="flex items-center gap-3">
-              <input
-                type="radio"
-                name="purchase-type"
-                checked={purchaseType === "standard"}
-                onChange={() => setPurchaseType("standard")}
-                className="h-4 w-4 accent-[#a67c24]"
-              />
-              <span className="text-sm font-medium text-ink">
-                One-time purchase
-              </span>
-            </span>
-            <span className="font-semibold text-ink">{money(unitPrice)}</span>
-          </label>
-          <div className="p-4">
-            <label className="flex items-center justify-between gap-3 cursor-pointer">
-              <span className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  name="purchase-type"
-                  checked={purchaseType === "subscription"}
-                  onChange={() => setPurchaseType("subscription")}
-                  className="h-4 w-4 accent-[#a67c24]"
-                />
-                <span className="text-sm font-medium text-ink">
-                  Restock &amp; Save{" "}
-                  <span className="text-gold-deep">
-                    {Math.round(RESTOCK_DISCOUNT * 100)}%
-                  </span>{" "}
-                  with Autoship
-                </span>
-              </span>
-              <span className="font-semibold text-ink">
-                {restockPrice != null ? money(restockPrice) : ""}
-              </span>
-            </label>
-            {purchaseType === "subscription" && (
-              <div className="mt-3 pl-7">
-                <select
-                  value={planId}
-                  onChange={(e) => setPlanId(e.target.value)}
-                  className="rounded-sm border border-line bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:border-gold-deep"
-                >
-                  {(product.subscription || []).map((plan) => (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-ink-soft mt-2">
-                  Cancel or change frequency anytime. Free US shipping on
-                  Restock orders over $75.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        unitPrice != null && (
-          <p className="font-serif-display text-2xl text-ink mb-5">
-            {money(unitPrice)}
-          </p>
-        )
+      {unitPrice != null && (
+        <p className="font-serif-display text-2xl text-ink mb-5">
+          {money(unitPrice)}
+        </p>
       )}
 
       {!product.inStock ? (

@@ -50,7 +50,7 @@ const steps = [
   },
   {
     title: "Get paid monthly",
-    body: "Earn commission on every order your referrals place, including reorders through our Restock autoship program. Payouts run monthly.",
+    body: "Earn commission on every order your referrals place, including their reorders. Payouts run monthly.",
   },
 ];
 

@@ -24,7 +24,7 @@ const sections = [
   },
   {
     heading: "Service and fulfillment",
-    body: "In-stock orders ship within 1 business day, Monday through Friday, from within the United States. Every shipment includes tracking, and US shipping is free on orders over $250 and on Scheduled Restock orders over $75. Questions are answered by a real person, usually within 1 business day.",
+    body: "In-stock orders ship within 1 business day, Monday through Friday, from within the United States. Every shipment includes tracking, and US shipping is free on orders over $250. Questions are answered by a real person, usually within 1 business day.",
   },
   {
     heading: "Third-party testing, not self-grading",

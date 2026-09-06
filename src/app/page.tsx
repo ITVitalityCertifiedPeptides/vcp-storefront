@@ -40,7 +40,7 @@ const benefits = [
     icon: Package,
     label: "Made & Shipped in the USA",
     detail:
-      "Synthesized in a US lab. Free shipping over $250, or over $75 on Scheduled Restock orders.",
+      "Synthesized in a US lab. Free shipping on orders over $250.",
   },
   {
     icon: Tag,
@@ -76,7 +76,7 @@ const faqs = [
   {
     question: "Do you offer free shipping?",
     answer:
-      "Yes. US shipping is free on orders over $250, and on Scheduled Restock orders over $75. Below those, shipping is calculated when we confirm your order.",
+      "Yes. US shipping is free on orders over $250. Below that, shipping is calculated when we confirm your order.",
   },
 ];
 

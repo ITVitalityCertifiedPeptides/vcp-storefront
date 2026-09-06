@@ -14,7 +14,7 @@ const quickLinks = [
   { label: "Refund and Returns", href: "/refund-returns", note: "Damaged or incorrect orders, cancellations, and our quality guarantee." },
   { label: "Quality Assurance", href: "/quality-assurance", note: "How every lot is tested and documented." },
   { label: "Lab Results", href: "/lab-results", note: "Certificates of Analysis by lot." },
-  { label: "Your Account", href: "/account", note: "Order history, tracking, saved shipping details, and autoship." },
+  { label: "Your Account", href: "/account", note: "Order history, tracking, and saved shipping details." },
   { label: "Terms of Service", href: "/terms-of-service", note: "The terms that govern every order." },
 ];
 

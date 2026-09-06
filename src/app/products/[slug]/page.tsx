@@ -225,7 +225,6 @@ export default async function ProductPage({
               price: product.price,
               inStock: product.inStock,
               options: product.options,
-              subscription: product.subscription,
             }}
           />
 

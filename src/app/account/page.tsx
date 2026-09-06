@@ -1,14 +1,14 @@
 "use client";
 
 // Customer account area: sign in / registration / password recovery,
-// order history with items and tracking, saved shipping details (used to
-// pre-fill checkout), and Restock autoship subscriptions (read-only view;
-// changes go through support so cancellations are handled by the team).
+// order history with items and tracking, and saved shipping details (used
+// to pre-fill checkout). 2026-09-06 (Josh): the Restock autoship section
+// is gone; the store is invoice-only with no recurring billing.
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Package, MapPin, RefreshCw, ChevronDown } from "lucide-react";
+import { Package, MapPin, ChevronDown } from "lucide-react";
 import { getSwell } from "@/lib/swell-client";
 
 type Account = {
@@ -83,16 +83,6 @@ type Order = {
   shipments?: { results?: Shipment[] };
 };
 
-type Subscription = {
-  id: string;
-  status?: string;
-  interval?: string;
-  interval_count?: number;
-  date_order_period_end?: string;
-  product?: { name?: string };
-  recurring_total?: number;
-};
-
 function money(n?: number) {
   return typeof n === "number" ? `$${n.toFixed(2)}` : "";
 }
@@ -124,7 +114,6 @@ function AccountContent() {
 
   const [account, setAccount] = useState<Account>(null);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [openOrder, setOpenOrder] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<"signin" | "create" | "forgot">("signin");
@@ -177,16 +166,6 @@ function AccountContent() {
       setOrders(result?.results || []);
     } catch {
       setOrders([]);
-    }
-    try {
-      const subs = (await (
-        swell as unknown as {
-          subscriptions: { list: () => Promise<{ results?: Subscription[] }> };
-        }
-      ).subscriptions.list()) as { results?: Subscription[] } | null;
-      setSubscriptions(subs?.results || []);
-    } catch {
-      setSubscriptions([]);
     }
   }, []);
 
@@ -326,7 +305,6 @@ function AccountContent() {
     await clearGlp1Session();
     setAccount(null);
     setOrders([]);
-    setSubscriptions([]);
     router.push("/");
     router.refresh();
   }
@@ -531,47 +509,6 @@ function AccountContent() {
                   : "Save Shipping Details"}
             </button>
           </form>
-
-          {/* Autoship subscriptions */}
-          <div className="flex items-center gap-2.5 mb-4">
-            <RefreshCw className="h-4 w-4 text-gold-deep" aria-hidden />
-            <h2 className="font-serif-display text-xl text-ink">
-              Restock autoship
-            </h2>
-          </div>
-          {subscriptions.length === 0 ? (
-            <p className="text-ink-soft text-sm mb-10">
-              No active Restock subscriptions. Choose Restock &amp; Save on
-              any product to set one up.
-            </p>
-          ) : (
-            <div className="border-y border-line divide-y divide-line mb-4">
-              {subscriptions.map((sub) => (
-                <div key={sub.id} className="py-4 flex justify-between text-sm">
-                  <div>
-                    <p className="font-medium text-ink">
-                      {sub.product?.name || "Subscription"}
-                    </p>
-                    <p className="text-ink-soft mt-0.5">
-                      {sub.status ? `${sub.status}` : ""}
-                      {sub.date_order_period_end
-                        ? ` · next order ${new Date(sub.date_order_period_end).toLocaleDateString()}`
-                        : ""}
-                    </p>
-                  </div>
-                  <span className="font-semibold text-ink">
-                    {money(sub.recurring_total)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-          {subscriptions.length > 0 && (
-            <p className="text-xs text-ink-soft mb-10">
-              To change frequency, pause, or cancel a Restock subscription,
-              reply to any order email and our team will take care of it.
-            </p>
-          )}
 
           {error && (
             <p className="text-sm text-red-700 mb-6" role="alert">

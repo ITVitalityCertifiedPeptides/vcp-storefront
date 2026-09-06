@@ -40,7 +40,7 @@ export default function FooterSignup() {
         Join Our Priority List
       </p>
       <label className="text-xs text-cream/60 leading-relaxed block mb-2.5">
-        Early access to new compounds, restock notices, and private offers,
+        Early access to new compounds, back-in-stock notices, and private offers,
         delivered to your inbox.
       </label>
       <div className="flex gap-2">

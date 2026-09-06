@@ -5,7 +5,6 @@ import { secondaryAreasFor } from "./research-areas";
 import type {
   Product,
   ProductOption,
-  SubscriptionPlan,
 } from "./catalog-shared";
 
 // Types + display helpers live in catalog-shared.ts (no server-only
@@ -16,7 +15,6 @@ export type {
   Product,
   ProductOption,
   ProductOptionValue,
-  SubscriptionPlan,
 } from "./catalog-shared";
 
 function slugify(name: string): string {
@@ -130,12 +128,6 @@ type SwellProduct = {
     active?: boolean;
     values?: Array<{ id?: string; name?: string; price?: number | null }>;
   }>;
-  purchase_options?: {
-    subscription?: {
-      active?: boolean;
-      plans?: Array<{ id?: string; name?: string; active?: boolean }>;
-    };
-  };
 };
 
 function mapProduct(p: SwellProduct): Product {
@@ -155,18 +147,6 @@ function mapProduct(p: SwellProduct): Product {
         })),
     }));
 
-  // 2026-09-04 (Josh: "we don't take credit cards so we want to remove
-  // that option"): Restock & Save / Autoship (Swell subscriptions)
-  // required a card on file for recurring billing, which this store has
-  // never actually supported (Zelle/Venmo/Apple Cash/PayPal manual
-  // payment only) - forcing this to null turns the purchase option off
-  // everywhere it's read (BuyBox, QuickAdd, ProductCard) without having
-  // to touch each component. Swell's plans may still be configured on
-  // the product; we just stop surfacing them. Account page's existing
-  // "Autoship subscriptions" list is unaffected - that reads live
-  // subscriptions from the customer's Swell account directly, not this
-  // field, so any legacy subscriber can still see/cancel theirs.
-  const subscription: SubscriptionPlan[] | null = null;
 
   // Option value prices are additive on top of the base price; the
   // cheapest selectable configuration is base + the lowest value delta.
@@ -216,7 +196,6 @@ function mapProduct(p: SwellProduct): Product {
     // off, which also means nothing is blocking a sale).
     inStock: p.stock_status !== "out_of_stock",
     options,
-    subscription,
     priceFrom,
     madeInUsa: content.made_in_usa !== false,
     images: galleryImages(slugify(p.name)),

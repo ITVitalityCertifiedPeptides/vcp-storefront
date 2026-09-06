@@ -102,8 +102,6 @@ export default async function SiteHeader() {
           Most orders ship within 1-3 business days
           <span className="text-cream/40 mx-2">&#8226;</span>
           Free US shipping over $250
-          <span className="text-cream/40 mx-2 hidden sm:inline">&#8226;</span>
-          <span className="hidden sm:inline">Restock orders over $75</span>
         </p>
       </div>
       <div className="bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80 border-b border-line">

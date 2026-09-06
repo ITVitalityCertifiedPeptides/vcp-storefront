@@ -285,8 +285,7 @@ export default function CheckoutPage() {
                 Sign in or create an account
               </p>
               <p className="text-sm text-ink-soft leading-relaxed">
-                Track your orders, reuse saved shipping details, and manage
-                Restock autoship in one place.
+                Track your orders and reuse saved shipping details.
               </p>
             </Link>
             <button
