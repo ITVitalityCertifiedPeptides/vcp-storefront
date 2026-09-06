@@ -111,8 +111,7 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
         </p>
       )}
 
-      {product.inStock && (
-        <div className="mb-5">
+      <div className="mb-5">
           <label className="label-eyebrow text-[0.62rem] text-ink-soft block mb-2">Quantity</label>
           <div className="inline-flex items-center rounded-full border border-line bg-white">
             <button
@@ -143,17 +142,11 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
               +
             </button>
           </div>
-        </div>
-      )}
+      </div>
 
-      {!product.inStock ? (
-        <span
-          className="inline-flex items-center justify-center rounded-full px-8 py-3.5 label-eyebrow text-[0.72rem] bg-cream-soft text-ink-soft/70 cursor-not-allowed"
-          aria-disabled
-        >
-          Out of Stock
-        </span>
-      ) : (
+      {/* 2026-09-06 (Josh): no out-of-stock state anywhere. Anything not on
+          hand comes same-day from the local wholesaler, so every product
+          is always orderable; `inStock` stays on the props but is ignored. */}
         <button
           type="button"
           disabled={busy}
@@ -164,7 +157,6 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
         >
           {justAdded ? "Added" : "Add to Cart"}
         </button>
-      )}
       {/* 2026-08-29 (Josh): dropped the "Ships within 1 business day" claim
           here too - product.inStock isn't a reliable signal of which items
           actually ship that fast, so this was making a promise the data
