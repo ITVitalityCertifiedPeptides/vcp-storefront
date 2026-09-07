@@ -45,6 +45,7 @@ import {
 } from "@/lib/swell-backend-notify";
 import { buildPaymentReceivedEmailHtml, buildPaymentReceivedEmailText } from "@/lib/payment-received-email";
 import { sendEmail } from "@/lib/resend";
+import { notifyAdmins } from "@/lib/admin-order-notify";
 
 export async function POST(request: Request) {
   if (!checkAuth(request)) {
@@ -77,6 +78,9 @@ export async function POST(request: Request) {
     } else {
       await alertTeamNoEmail("Paid order", number);
     }
+
+    // Internal copy for the team (never throws).
+    await notifyAdmins("order_paid", order, { customerEmailed: Boolean(email), customerEmail: email });
 
     return Response.json({ ok: true });
   } catch (err) {

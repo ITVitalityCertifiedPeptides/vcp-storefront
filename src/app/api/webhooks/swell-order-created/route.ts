@@ -40,6 +40,7 @@ import {
 } from "@/lib/swell-backend-notify";
 import { buildOrderConfirmationEmailHtml, buildOrderConfirmationEmailText } from "@/lib/order-confirmation-email";
 import { sendEmail } from "@/lib/resend";
+import { notifyAdmins } from "@/lib/admin-order-notify";
 
 export async function POST(request: Request) {
   if (!checkAuth(request)) {
@@ -80,6 +81,9 @@ export async function POST(request: Request) {
     } else {
       await alertTeamNoEmail("Order", number);
     }
+
+    // Internal copy for the team (never throws).
+    await notifyAdmins("order_created", order, { customerEmailed: Boolean(email), customerEmail: email });
 
     return Response.json({ ok: true });
   } catch (err) {

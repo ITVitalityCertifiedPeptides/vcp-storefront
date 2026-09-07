@@ -18,15 +18,17 @@ type SendEmailArgs = {
   html: string;
   text: string;
   replyTo?: string;
+  cc?: string | string[];
+  from?: string;
 };
 
-export async function sendEmail({ to, subject, html, text, replyTo }: SendEmailArgs) {
+export async function sendEmail({ to, subject, html, text, replyTo, cc, from: fromOverride }: SendEmailArgs) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     throw new Error("RESEND_API_KEY is not configured");
   }
   const from =
-    process.env.RESEND_FROM_EMAIL || "Customer Service <customerservice@vitalitycertifiedpeptides.com>";
+    fromOverride || process.env.RESEND_FROM_EMAIL || "Customer Service <customerservice@vitalitycertifiedpeptides.com>";
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -37,6 +39,7 @@ export async function sendEmail({ to, subject, html, text, replyTo }: SendEmailA
     body: JSON.stringify({
       from,
       to,
+      ...(cc && (Array.isArray(cc) ? cc.length > 0 : cc) ? { cc } : {}),
       subject,
       html,
       text,

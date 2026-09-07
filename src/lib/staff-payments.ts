@@ -148,7 +148,18 @@ export async function recordPayment(input: PaymentInput): Promise<PaymentResult>
     note: input.note || null,
   };
 
-  // 1) The payment record. captured:true is what marks the order paid.
+  // 1) Keep the full form on the order: an append-only log in metadata
+  //    plus a one-line human note in comments.
+  const existing = Array.isArray(order.metadata?.payment_log) ? (order.metadata!.payment_log as unknown[]) : [];
+  const line = `[${input.dateReceived}] Payment received via ${sourceLabel}: $${input.grossAmount.toFixed(2)} gross, $${input.fees.toFixed(2)} fees, $${net.toFixed(2)} net. Recorded by ${input.recordedBy}.${input.note ? ` Note: ${input.note}` : ""}`;
+  await swell("PUT", `/orders/${order.id}`, {
+    metadata: { ...(order.metadata || {}), payment_log: [...existing, logEntry] },
+    comments: [order.comments || "", line].filter(Boolean).join("\n"),
+  });
+
+  // 2) The payment record. captured:true is what marks the order paid and
+  //    fires the order.paid webhook, which is why the log above is written
+  //    first: the internal "payment received" email reads it.
   await swell("POST", "/payments", {
     order_id: order.id,
     account_id: order.account_id,
@@ -160,15 +171,6 @@ export async function recordPayment(input: PaymentInput): Promise<PaymentResult>
     date_created: `${input.dateReceived}T12:00:00.000Z`,
     reason_message: `${sourceLabel} received ${input.dateReceived}, gross $${input.grossAmount.toFixed(2)}, fees $${input.fees.toFixed(2)}, net $${net.toFixed(2)}. Logged by ${input.recordedBy} via staff portal.`,
     metadata: { staff_portal: true, ...logEntry },
-  });
-
-  // 2) Keep the full form on the order too: an append-only log in
-  //    metadata plus a one-line human note in comments.
-  const existing = Array.isArray(order.metadata?.payment_log) ? (order.metadata!.payment_log as unknown[]) : [];
-  const line = `[${input.dateReceived}] Payment received via ${sourceLabel}: $${input.grossAmount.toFixed(2)} gross, $${input.fees.toFixed(2)} fees, $${net.toFixed(2)} net. Recorded by ${input.recordedBy}.${input.note ? ` Note: ${input.note}` : ""}`;
-  await swell("PUT", `/orders/${order.id}`, {
-    metadata: { ...(order.metadata || {}), payment_log: [...existing, logEntry] },
-    comments: [order.comments || "", line].filter(Boolean).join("\n"),
   });
 
   return { ok: true, orderNumber: order.number, orderId: order.id, customer: customerName(order), amount: input.grossAmount, net, paidAt: now };

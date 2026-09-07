@@ -32,6 +32,7 @@ import {
 } from "@/lib/swell-backend-notify";
 import { paymentMethodCardsHtml } from "@/lib/order-confirmation-email";
 import { sendEmail } from "@/lib/resend";
+import { notifyAdmins } from "@/lib/admin-order-notify";
 
 export async function POST(request: Request) {
   if (!checkAuth(request)) {
@@ -86,6 +87,9 @@ Vitality Certified Peptides`;
     } else {
       await alertTeamNoEmail("Draft order", number);
     }
+
+    // Internal copy for the team (never throws).
+    await notifyAdmins("draft_invoice_sent", order, { customerEmailed: Boolean(email), customerEmail: email });
 
     return Response.json({ ok: true });
   } catch (err) {

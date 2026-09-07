@@ -32,6 +32,7 @@ import {
   type SwellWebhookBody,
 } from "@/lib/swell-backend-notify";
 import { sendEmail } from "@/lib/resend";
+import { notifyAdmins } from "@/lib/admin-order-notify";
 
 export async function POST(request: Request) {
   if (!checkAuth(request)) {
@@ -84,6 +85,9 @@ Vitality Certified Peptides`;
     } else {
       await alertTeamNoEmail("Shipped order", number);
     }
+
+    // Internal copy for the team (never throws).
+    await notifyAdmins("order_shipped", order, { customerEmailed: Boolean(email), customerEmail: email });
 
     return Response.json({ ok: true });
   } catch (err) {

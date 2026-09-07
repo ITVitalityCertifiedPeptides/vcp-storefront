@@ -58,16 +58,28 @@ export type SwellOrder = {
   id: string;
   number?: string | number;
   email?: string;
-  account?: { email?: string };
-  billing?: { email?: string };
+  account?: { email?: string; first_name?: string; last_name?: string; name?: string; phone?: string; group?: string };
+  account_id?: string;
+  billing?: { email?: string; method?: string; name?: string; first_name?: string; last_name?: string };
   shipping?: {
     email?: string;
     name?: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
     address1?: string;
+    address2?: string;
     city?: string;
     state?: string;
     zip?: string;
+    service_name?: string;
+    service?: string;
   };
+  comments?: string | null;
+  metadata?: { payment_log?: Array<PaymentLogEntry>; [k: string]: unknown } | null;
+  discounts?: Array<{ id?: string; amount?: number; source_id?: string }>;
+  payment_total?: number;
+  payment_balance?: number;
   grand_total?: number;
   sub_total?: number;
   // Order-level promotion discount (Inner Circle member pricing) and the
@@ -88,6 +100,7 @@ export type SwellOrder = {
     product_name?: string;
     quantity?: number;
     price?: number;
+    price_total?: number;
   }>;
   shipments?: Array<{
     id?: string;
@@ -99,6 +112,18 @@ export type SwellOrder = {
     delivered?: boolean;
   }>;
   giftcards?: Array<{ id?: string; amount?: number; code?: string }>;
+};
+
+// One entry per payment logged through the staff portal (see staff-payments.ts).
+export type PaymentLogEntry = {
+  date_received?: string;
+  source?: string;
+  gross_amount?: number;
+  fees?: number;
+  net_amount?: number;
+  recorded_by?: string;
+  recorded_at?: string;
+  note?: string | null;
 };
 
 export type SwellCart = {
