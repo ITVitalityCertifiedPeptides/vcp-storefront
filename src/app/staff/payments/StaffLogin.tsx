@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const NAME_KEY = "vcp_staff_name";
+const NAME_KEY = "vcp_staff_user";
 
 export default function StaffLogin() {
   const router = useRouter();
@@ -32,7 +32,7 @@ export default function StaffLogin() {
       const res = await fetch("/api/staff/portal-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, password }),
+        body: JSON.stringify({ username: name, password }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -51,20 +51,21 @@ export default function StaffLogin() {
   return (
     <form onSubmit={submit} className="max-w-md space-y-4 rounded-2xl border border-line bg-white p-6">
       <div>
-        <label className="block text-sm font-medium" htmlFor="staff-name">Your name</label>
+        <label className="block text-sm font-medium" htmlFor="staff-name">Username</label>
         <input
           id="staff-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          autoComplete="name"
+          autoComplete="username"
+          autoCapitalize="none"
           required
           className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-gold-deep"
-          placeholder="Marina"
+          placeholder="marina"
         />
-        <p className="mt-1 text-xs text-ink-soft">Every payment you log is recorded under this name.</p>
+        <p className="mt-1 text-xs text-ink-soft">Every payment you log is recorded under your name.</p>
       </div>
       <div>
-        <label className="block text-sm font-medium" htmlFor="staff-password">Staff password</label>
+        <label className="block text-sm font-medium" htmlFor="staff-password">Password</label>
         <input
           id="staff-password"
           type="password"
