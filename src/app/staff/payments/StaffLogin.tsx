@@ -51,16 +51,17 @@ export default function StaffLogin() {
   return (
     <form onSubmit={submit} className="max-w-md space-y-4 rounded-2xl border border-line bg-white p-6">
       <div>
-        <label className="block text-sm font-medium" htmlFor="staff-name">Username</label>
+        <label className="block text-sm font-medium" htmlFor="staff-name">Email</label>
         <input
           id="staff-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          type="email"
           autoComplete="username"
           autoCapitalize="none"
           required
           className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-gold-deep"
-          placeholder="marina"
+          placeholder="you@vitalitycertifiedpeptides.com"
         />
         <p className="mt-1 text-xs text-ink-soft">Every payment you log is recorded under your name.</p>
       </div>

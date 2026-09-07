@@ -10,11 +10,11 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
-  const username = (body.username || "").trim().slice(0, 40);
-  if (!username) return NextResponse.json({ error: "Enter your username." }, { status: 400 });
+  const username = (body.username || "").trim().slice(0, 120);
+  if (!username) return NextResponse.json({ error: "Enter your email." }, { status: 400 });
   const name = checkStaffLogin(username, body.password || "");
   if (!name) {
-    return NextResponse.json({ error: "That username or password isn't right." }, { status: 401 });
+    return NextResponse.json({ error: "That email or password isn't right." }, { status: 401 });
   }
   const res = NextResponse.json({ ok: true, name });
   res.cookies.set(STAFF_COOKIE, makeStaffToken(name), {

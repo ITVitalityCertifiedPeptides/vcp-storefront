@@ -1,10 +1,11 @@
 // Staff portal sign-in: each staff member has their own username and
 // password, all in one Vercel env var so nothing is stored in code:
 //
-//   STAFF_PORTAL_USERS = jeff:password1, marina:password2, tom:password3
+//   STAFF_PORTAL_USERS = jeff@vcp.com:password1, marina@vcp.com:password2
 //
-// (username, colon, password; commas between people; usernames are
-// case-insensitive; a password may not contain a comma). A signed,
+// (email, colon, password; commas between people; emails are
+// case-insensitive; a password may not contain a comma). The display name
+// used on the log is the part before the @, capitalized. A signed,
 // HttpOnly cookie carries the username so every payment they log is
 // attributed to them. No Swell account needed for staff.
 
@@ -47,8 +48,8 @@ export function checkStaffLogin(username: string, password: string): string | nu
   const a = Buffer.from(password);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-  const u = username.trim().toLowerCase();
-  return u.charAt(0).toUpperCase() + u.slice(1);
+  const local = username.trim().toLowerCase().split("@")[0];
+  return local.charAt(0).toUpperCase() + local.slice(1);
 }
 
 export function makeStaffToken(name: string): string {
