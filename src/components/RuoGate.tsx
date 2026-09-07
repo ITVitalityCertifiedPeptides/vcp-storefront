@@ -9,13 +9,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "vcp-ruo-acknowledged";
 
 export default function RuoGate() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  // Staff-only pages (/staff/...) are not customer-facing; no gate there.
+  const staffPage = pathname?.startsWith("/staff") ?? false;
 
   useEffect(() => {
+    if (staffPage) return;
     // Deferred a tick so the gate check runs after hydration rather than
     // synchronously inside the effect body.
     const id = window.setTimeout(() => {
@@ -27,7 +32,7 @@ export default function RuoGate() {
       }
     }, 0);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [staffPage]);
 
   function accept() {
     try {
