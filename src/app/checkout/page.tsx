@@ -17,6 +17,7 @@ import { trackConversion } from "@/lib/tapfiliate";
 import { isRestrictedState } from "@/lib/restricted-states";
 import { toStateCode } from "@/lib/us-states";
 import StateSelect from "@/components/StateSelect";
+import OptInCheckboxes, { type OptIn } from "@/components/OptInCheckboxes";
 import ShippingOptions, { type ShippingRate } from "@/components/ShippingOptions";
 import AddressReview, {
   checkAddress,
@@ -44,6 +45,12 @@ export default function CheckoutPage() {
   // Defaults to "standard"; ShippingOptions corrects it to the cheapest
   // live service once Swell returns rates.
   const [shipping, setShipping] = useState<ShippingRate | null>(null);
+  // Marketing opt-in (components/OptInCheckboxes). Recorded on the Swell
+  // account by /api/optin right after the order is placed; never blocks it.
+  const [optIn, setOptIn] = useState<OptIn>({ email: true, sms: false });
+  // What the signed-in account already has on file; boxes already on are
+  // hidden (Josh, 2026-09-07: "know if they already have opted in").
+  const [already, setAlready] = useState<{ email?: boolean; sms?: boolean }>({});
 
   const [form, setForm] = useState({
     firstName: "",
@@ -71,6 +78,8 @@ export default function CheckoutPage() {
           first_name?: string;
           last_name?: string;
           phone?: string;
+          email_optin?: boolean;
+          content?: { sms_optin?: boolean };
           shipping?: {
             name?: string;
             address1?: string;
@@ -83,6 +92,7 @@ export default function CheckoutPage() {
         } | null;
         if (account?.email) {
           setSignedIn(true);
+          setAlready({ email: account.email_optin === true, sms: account.content?.sms_optin === true });
           const ship = account.shipping;
           setForm((f) => ({
             ...f,
@@ -284,6 +294,14 @@ export default function CheckoutPage() {
         order?.sub_total ?? cart?.sub_total ?? 0,
         form.email
       );
+      // Best-effort opt-in record; the order is already placed by now.
+      if ((optIn.email && !already.email) || (optIn.sms && !already.sms)) {
+        fetch("/api/optin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: form.email, phone: form.phone, emailOptin: optIn.email, smsOptin: optIn.sms, source: "checkout" }),
+        }).catch(() => {});
+      }
       await refresh();
       const params = new URLSearchParams();
       if (number) params.set("number", number);
@@ -522,6 +540,8 @@ export default function CheckoutPage() {
               onUseAnyway={() => placeOrder(form, true)}
             />
           )}
+
+          <OptInCheckboxes value={optIn} onChange={setOptIn} already={already} className="mb-6" />
 
           <label className="flex items-start gap-3 mb-8 cursor-pointer">
             <input
