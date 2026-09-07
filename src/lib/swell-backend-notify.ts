@@ -70,6 +70,12 @@ export type SwellOrder = {
   };
   grand_total?: number;
   sub_total?: number;
+  // Order-level promotion discount (Inner Circle member pricing) and the
+  // shipping charge, for the totals breakdown in the confirmation email.
+  discount_total?: number;
+  shipment_total?: number;
+  shipment_price?: number;
+  shipping_service_name?: string;
   currency?: string;
   date_created?: string;
   status?: string;

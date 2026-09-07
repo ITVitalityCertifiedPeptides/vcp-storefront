@@ -67,6 +67,27 @@ function itemsTableHtml(items: SwellOrder["items"], currency: string): string {
   </table>`;
 }
 
+// Subtotal / discount / shipping / total rows under the items table
+// (2026-09-07). Without these a Circle order read as "$285 of items, total
+// $11.95" with nothing in between. The discount line only renders when
+// Swell applied one, so retail emails are unchanged.
+function totalsHtml(order: SwellOrder, currency: string): string {
+  const sub = order.sub_total;
+  if (typeof sub !== "number") return "";
+  const discount = order.discount_total ?? 0;
+  const ship = order.shipment_total ?? order.shipment_price ?? 0;
+  const row = (label: string, value: string, opts?: { bold?: boolean; gold?: boolean }) => `<tr>
+        <td style="padding:6px 8px; font-size:${opts?.bold ? 15 : 13}px; color:${opts?.gold ? GOLD : opts?.bold ? INK : MUTED}; ${opts?.bold ? "font-weight:bold;" : ""}">${label}</td>
+        <td style="padding:6px 8px; font-size:${opts?.bold ? 15 : 13}px; color:${opts?.gold ? GOLD : INK}; text-align:right; ${opts?.bold ? "font-weight:bold;" : ""}">${value}</td>
+      </tr>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:4px 0 8px;">
+      ${row("Subtotal", formatCurrency(sub, currency))}
+      ${discount > 0 ? row("Inner Circle discount", `-${formatCurrency(discount, currency)}`, { gold: true }) : ""}
+      ${row("Shipping", ship > 0 ? formatCurrency(ship, currency) : "Free")}
+      ${row("Total due", formatCurrency(order.grand_total, currency), { bold: true })}
+    </table>`;
+}
+
 function paymentCard(opts: {
   label: string;
   detail: string;
@@ -145,6 +166,7 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
     </table>
 
     ${itemsHtml}
+    ${totalsHtml(order, currency)}
 
     <h3 style="font-size:15px; margin: 24px 0 4px; border-bottom:1px solid ${BORDER}; padding-bottom:8px;">Complete your payment</h3>
     <p style="font-size:14px; color:${MUTED}; margin-top:8px;">Send the total above using <strong>ONE</strong> of the following:</p>
@@ -172,10 +194,18 @@ export function buildOrderConfirmationEmailText(order: SwellOrder): string {
           .join("\n")
       : "";
 
+  const cur = order.currency || "USD";
+  const discount = order.discount_total ?? 0;
+  const ship = order.shipment_total ?? order.shipment_price ?? 0;
+  const totals =
+    typeof order.sub_total === "number"
+      ? `\n  Subtotal: ${formatCurrency(order.sub_total, cur)}${discount > 0 ? `\n  Inner Circle discount: -${formatCurrency(discount, cur)}` : ""}\n  Shipping: ${ship > 0 ? formatCurrency(ship, cur) : "Free"}\n  Total due: ${total}\n`
+      : "";
+
   return `Thanks for your order with Vitality Certified Peptides.
 
 Order #${number}${total ? ` - Total: ${total}` : ""}
-${items ? `\n${items}\n` : ""}
+${items ? `\n${items}\n` : ""}${totals}
 To complete your order, send the total above using ONE of the following:
 Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts) - marina@vitalitycertifiedpeptides.com
 Venmo: @vcpllc (Vitality Certified Peptides LLC)
