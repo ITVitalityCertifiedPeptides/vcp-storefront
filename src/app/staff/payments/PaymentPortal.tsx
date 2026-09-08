@@ -16,7 +16,7 @@ const inputCls = "mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 t
 export default function PaymentPortal({ staffName }: { staffName: string }) {
   const router = useRouter();
   const [dateReceived, setDateReceived] = useState(todayLocal());
-  const [source, setSource] = useState<(typeof PAYMENT_SOURCES)[number]>("Zelle");
+  const [source, setSource] = useState<(typeof PAYMENT_SOURCES)[number] | "">("");
   const [sourceOther, setSourceOther] = useState("");
   const [grossAmount, setGrossAmount] = useState("");
   const [fees, setFees] = useState("");
@@ -68,6 +68,7 @@ export default function PaymentPortal({ staffName }: { staffName: string }) {
         setOrderNumber("");
         setNote("");
         setSourceOther("");
+        setSource("");
         loadRecent();
       }
     } catch {
@@ -101,7 +102,10 @@ export default function PaymentPortal({ staffName }: { staffName: string }) {
           </div>
           <div>
             <label className="block text-sm font-medium" htmlFor="source">Received through</label>
-            <select id="source" value={source} onChange={(e) => setSource(e.target.value as (typeof PAYMENT_SOURCES)[number])} className={inputCls}>
+            <select id="source" value={source} onChange={(e) => setSource(e.target.value as (typeof PAYMENT_SOURCES)[number])} required className={inputCls}>
+              <option value="" disabled>
+                Choose one
+              </option>
               {PAYMENT_SOURCES.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -117,7 +121,7 @@ export default function PaymentPortal({ staffName }: { staffName: string }) {
           )}
           <div>
             <label className="block text-sm font-medium" htmlFor="gross">Amount received (before fees)</label>
-            <input id="gross" inputMode="decimal" value={grossAmount} onChange={(e) => setGrossAmount(e.target.value)} required placeholder="255.00" className={inputCls} />
+            <input id="gross" inputMode="decimal" value={grossAmount} onChange={(e) => setGrossAmount(e.target.value)} required placeholder="0.00" className={inputCls} />
             <p className="mt-1 text-xs text-ink-soft">Must match the order total exactly.</p>
           </div>
           <div>
