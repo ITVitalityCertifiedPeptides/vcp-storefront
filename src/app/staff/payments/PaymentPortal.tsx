@@ -131,7 +131,7 @@ export default function PaymentPortal({ staffName }: { staffName: string }) {
           </div>
           <div>
             <label className="block text-sm font-medium" htmlFor="order">Order number</label>
-            <input id="order" inputMode="numeric" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} required placeholder="100021" className={inputCls} />
+            <input id="order" inputMode="numeric" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} required placeholder="000000" className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium" htmlFor="note">Note (optional)</label>
