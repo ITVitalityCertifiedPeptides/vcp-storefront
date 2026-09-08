@@ -1,6 +1,6 @@
 import "server-only";
 import swell from "swell-js";
-import { galleryImages, familyImage } from "./product-gallery";
+import { familyImage, productImages } from "./product-gallery";
 import { familySlugFor, familyNameFor, familyImageSlugs, splitProductName } from "./product-families";
 import { secondaryAreasFor } from "./research-areas";
 import type {
@@ -133,6 +133,7 @@ type SwellProduct = {
 
 function mapProduct(p: SwellProduct): Product {
   const content = p.content || {};
+  const familyImg = familyImageSlugs(content.retail_display_name || p.name).map(familyImage).find(Boolean) ?? null;
 
   const options: ProductOption[] = (p.options || [])
     .filter((o) => o.active !== false && o.name && (o.values?.length || 0) > 0)
@@ -199,13 +200,18 @@ function mapProduct(p: SwellProduct): Product {
     options,
     priceFrom,
     madeInUsa: content.made_in_usa !== false,
-    images: galleryImages(slugify(p.name)),
+    // Product page gallery: the family's generic photo (vial with no size on
+    // the label) leads, followed by the molecule/sequence cards. The sized
+    // hero for this exact product is only used when the family has no
+    // generic photo yet. Nothing on the site should show a vial with a
+    // quantity on it once every family has a generic.
+    images: productImages(slugify(p.name), familyImg),
     isGlp1: isGlp1Name(p.name),
     family: familySlugFor(content.retail_display_name || p.name),
     familyName: familyNameFor(content.retail_display_name || p.name),
     sizeLabel: splitProductName(content.retail_display_name || p.name).size,
     form: splitProductName(content.retail_display_name || p.name).form,
-    familyImage: familyImageSlugs(content.retail_display_name || p.name).map(familyImage).find(Boolean) ?? null,
+    familyImage: familyImg,
   };
 }
 

@@ -113,3 +113,17 @@ export function familyImage(familySlug: string): string | null {
   }
   return null;
 }
+
+// Product page gallery with the family generic in front. When the family
+// has a generic photo, the sized hero/legacy shot is dropped so no vial with
+// a quantity on the label appears; the molecule cards stay. Without a
+// generic, the normal gallery (sized hero first) is returned unchanged.
+export function productImages(slug: string, familyGeneric: string | null): string[] {
+  const all = galleryImages(slug);
+  if (!familyGeneric) return all;
+  const isSizedShot = (src: string) => {
+    const file = src.split("/").pop()?.toLowerCase() ?? "";
+    return file.startsWith(`${slug.toLowerCase()}-hero.`) || file.startsWith(`${slug.toLowerCase()}.`) || file.startsWith(`${slug.toLowerCase()}-vial.`);
+  };
+  return [familyGeneric, ...all.filter((src) => !isSizedShot(src) && src !== familyGeneric)];
+}
