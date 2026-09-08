@@ -31,8 +31,11 @@ export default function SizePicker({ current, sizes }: { current: string; sizes:
   if (!me || sizes.length < 2) return null;
   const forms = Array.from(new Set(sizes.map((s) => s.form)));
   const inForm = sizes.filter((s) => s.form === me.form);
+  // scroll:false keeps the page where it is when switching size/form. The
+  // default navigation scroll landed at the bottom of the page while the new
+  // product page was still streaming in.
   const go = (slug: string) => {
-    if (slug !== current) startTransition(() => router.push(`/products/${slug}`));
+    if (slug !== current) startTransition(() => router.push(`/products/${slug}`, { scroll: false }));
   };
   // Switching form lands on that form's cheapest in-stock size.
   const firstOf = (form: string) => {
