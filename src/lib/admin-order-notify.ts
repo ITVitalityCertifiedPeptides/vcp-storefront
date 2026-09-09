@@ -119,7 +119,7 @@ function shipmentHtml(o: SwellOrder): string {
 
 const EVENT: Record<AdminEvent, { badge: string; color: string; title: (n: string) => string; lead: string }> = {
   order_created: { badge: "NEW ORDER", color: BRAND.gold, title: (n) => `New order #${n}`, lead: "A new order was placed. The customer has the payment instructions; nothing is paid yet." },
-  order_paid: { badge: "PAYMENT RECEIVED", color: BRAND.green, title: (n) => `Order #${n} marked paid`, lead: "This order is now Paid and has been sent to ShipStation. The packing slip is attached: print it, fill in the lot number, and put it in the box. Then send the COA." },
+  order_paid: { badge: "PAYMENT RECEIVED", color: BRAND.green, title: (n) => `Order #${n} marked paid`, lead: "This order is now Paid and has been sent to ShipStation. The packing slip is attached: print it and put it in the box. Then send the COA." },
   order_shipped: { badge: "SHIPPED", color: BRAND.green, title: (n) => `Order #${n} shipped`, lead: "A label was created and the customer has been sent tracking. Remember the COA email." },
   order_delivered: { badge: "DELIVERED", color: BRAND.green, title: (n) => `Order #${n} delivered`, lead: "The carrier marked this delivered and the customer was notified." },
   shipment_updated: { badge: "SHIPMENT UPDATE", color: BRAND.gold, title: (n) => `Shipment update on order #${n}`, lead: "The carrier posted an update on this shipment." },

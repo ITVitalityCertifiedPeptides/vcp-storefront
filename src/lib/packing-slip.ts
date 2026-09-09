@@ -1,11 +1,10 @@
 import "server-only";
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
 import { LOGO_EMBLEM_URL, type SwellOrder } from "./swell-backend-notify";
 
 // Packing slip PDF, attached to the internal "payment received" email so
 // whoever ships can print it and drop it in the box. Customer-facing: no
-// prices, no payment details, no internal comments. Has a Lot # column and
-// a packed-by line to fill in by hand.
+// prices, no payment details, no internal comments.
 
 const INK = rgb(0.08, 0.075, 0.06);
 const MUTED = rgb(0.42, 0.4, 0.36);
@@ -14,10 +13,6 @@ const LINE = rgb(0.8, 0.73, 0.55);
 const PAGE_W = 612;
 const PAGE_H = 792;
 const M = 48;
-
-function money(n: number | undefined, cur = "USD"): string {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: cur }).format(Number(n ?? 0));
-}
 
 function customerName(order: SwellOrder): string {
   const a = order.account;
@@ -103,13 +98,11 @@ export async function buildPackingSlipPdf(order: SwellOrder): Promise<Uint8Array
   // Items table
   const cQty = M;
   const cItem = M + 48;
-  const cSku = M + 330;
-  const cLot = M + 430;
+  const cSku = M + 400;
   const header = () => {
     text("QTY", cQty, y, sansBold, 8.5, GOLD);
     text("ITEM", cItem, y, sansBold, 8.5, GOLD);
     text("SKU", cSku, y, sansBold, 8.5, GOLD);
-    text("LOT #", cLot, y, sansBold, 8.5, GOLD);
     y -= 6;
     rule(y);
     y -= 16;
@@ -128,33 +121,20 @@ export async function buildPackingSlipPdf(order: SwellOrder): Promise<Uint8Array
     text(String(qty), cQty + 6, y, serifBold, 12);
     text(it.product_name || "Item", cItem, y, serif, 11.5);
     if (it.sku) text(it.sku, cSku, y, sans, 8.5, MUTED);
-    page.drawLine({ start: { x: cLot, y: y - 3 }, end: { x: PAGE_W - M, y: y - 3 }, thickness: 0.6, color: LINE });
     y -= 8;
     rule(y, rgb(0.92, 0.89, 0.82), 0.5);
     y -= 16;
   }
   y -= 2;
   right(`${items.length} line${items.length === 1 ? "" : "s"}  ·  ${units} unit${units === 1 ? "" : "s"}`, PAGE_W - M, y, sans, 9, MUTED);
-  y -= 30;
-
-  // Packer block
-  text("PACKED BY", M, y, sansBold, 8.5, GOLD);
-  text("DATE", M + 180, y, sansBold, 8.5, GOLD);
-  text("COA INCLUDED", M + 330, y, sansBold, 8.5, GOLD);
-  y -= 22;
-  page.drawLine({ start: { x: M, y }, end: { x: M + 150, y }, thickness: 0.8, color: INK });
-  page.drawLine({ start: { x: M + 180, y }, end: { x: M + 300, y }, thickness: 0.8, color: INK });
-  page.drawRectangle({ x: M + 330, y: y - 2, width: 14, height: 14, borderWidth: 0.9, borderColor: INK });
-  text("Yes", M + 350, y + 1, sans, 10);
-  page.drawRectangle({ x: M + 390, y: y - 2, width: 14, height: 14, borderWidth: 0.9, borderColor: INK });
-  text("Sent by email", M + 410, y + 1, sans, 10);
+  y -= 24;
+  text("Thank you for your order.", M, y, serif, 11.5);
 
   // Footer
   const fy = M + 26;
   rule(fy + 18, LINE, 0.8);
   text("All products are for laboratory research use only. Not for human or veterinary use.", M, fy, sansBold, 8.5, INK);
   text("Questions about this order: customerservice@vitalitycertifiedpeptides.com", M, fy - 12, sans, 8.5, MUTED);
-  void money; // (prices intentionally not printed on the packing slip)
 
   return pdf.save();
 }
@@ -162,5 +142,3 @@ export async function buildPackingSlipPdf(order: SwellOrder): Promise<Uint8Array
 export function packingSlipFilename(order: SwellOrder): string {
   return `VCP-packing-slip-${order.number ?? order.id}.pdf`;
 }
-
-export type { PDFPage };
