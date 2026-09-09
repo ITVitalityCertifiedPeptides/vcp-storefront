@@ -69,6 +69,7 @@ export type SwellOrder = {
     phone?: string;
     address1?: string;
     address2?: string;
+    country?: string;
     city?: string;
     state?: string;
     zip?: string;
@@ -98,6 +99,7 @@ export type SwellOrder = {
   paid?: boolean;
   items?: Array<{
     product_name?: string;
+    sku?: string;
     quantity?: number;
     price?: number;
     price_total?: number;

@@ -20,9 +20,11 @@ type SendEmailArgs = {
   replyTo?: string;
   cc?: string | string[];
   from?: string;
+  // Resend attachment: content is base64.
+  attachments?: Array<{ filename: string; content: string }>;
 };
 
-export async function sendEmail({ to, subject, html, text, replyTo, cc, from: fromOverride }: SendEmailArgs) {
+export async function sendEmail({ to, subject, html, text, replyTo, cc, from: fromOverride, attachments }: SendEmailArgs) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     throw new Error("RESEND_API_KEY is not configured");
@@ -44,6 +46,7 @@ export async function sendEmail({ to, subject, html, text, replyTo, cc, from: fr
       html,
       text,
       reply_to: replyTo || "customerservice@vitalitycertifiedpeptides.com",
+      ...(attachments && attachments.length ? { attachments } : {}),
     }),
   });
 

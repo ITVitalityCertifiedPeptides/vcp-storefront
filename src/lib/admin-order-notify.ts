@@ -17,6 +17,7 @@
 // From than customer mail (useful if the company's inbound spam filter
 // treats "from our own domain" mail as spoofing).
 
+import { buildPackingSlipPdf, packingSlipFilename } from "./packing-slip";
 import { sendEmail } from "@/lib/resend";
 import {
   BRAND,
@@ -118,7 +119,7 @@ function shipmentHtml(o: SwellOrder): string {
 
 const EVENT: Record<AdminEvent, { badge: string; color: string; title: (n: string) => string; lead: string }> = {
   order_created: { badge: "NEW ORDER", color: BRAND.gold, title: (n) => `New order #${n}`, lead: "A new order was placed. The customer has the payment instructions; nothing is paid yet." },
-  order_paid: { badge: "PAYMENT RECEIVED", color: BRAND.green, title: (n) => `Order #${n} marked paid`, lead: "This order is now Paid and has been sent to ShipStation. Ship it, then note the lot and send the COA." },
+  order_paid: { badge: "PAYMENT RECEIVED", color: BRAND.green, title: (n) => `Order #${n} marked paid`, lead: "This order is now Paid and has been sent to ShipStation. The packing slip is attached: print it, fill in the lot number, and put it in the box. Then send the COA." },
   order_shipped: { badge: "SHIPPED", color: BRAND.green, title: (n) => `Order #${n} shipped`, lead: "A label was created and the customer has been sent tracking. Remember the COA email." },
   order_delivered: { badge: "DELIVERED", color: BRAND.green, title: (n) => `Order #${n} delivered`, lead: "The carrier marked this delivered and the customer was notified." },
   shipment_updated: { badge: "SHIPMENT UPDATE", color: BRAND.gold, title: (n) => `Shipment update on order #${n}`, lead: "The carrier posted an update on this shipment." },
@@ -184,7 +185,18 @@ ${order.comments ? `<h3 style="margin:18px 0 4px; font-size:13px; letter-spacing
       "", `Open in Swell: ${orderUrl}`,
     ];
 
-    await sendEmail({ to: r.to, cc: r.cc, subject, html, text: textLines.filter((l) => l !== undefined).join("\n"), from: process.env.RESEND_ADMIN_FROM_EMAIL || undefined });
+    // Payment received: attach a printable packing slip for the box.
+    let attachments: Array<{ filename: string; content: string }> | undefined;
+    if (event === "order_paid") {
+      try {
+        const pdf = await buildPackingSlipPdf(order);
+        attachments = [{ filename: packingSlipFilename(order), content: Buffer.from(pdf).toString("base64") }];
+      } catch (err) {
+        console.error("packing slip generation failed; sending notification without it", err);
+      }
+    }
+
+    await sendEmail({ to: r.to, cc: r.cc, subject, html, text: textLines.filter((l) => l !== undefined).join("\n"), from: process.env.RESEND_ADMIN_FROM_EMAIL || undefined, attachments });
   } catch (err) {
     console.error(`admin notification (${event}) failed`, err);
   }
