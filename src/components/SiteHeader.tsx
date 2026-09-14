@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, User } from "lucide-react";
-import { getAllProducts } from "@/lib/products";
+import { getAllProducts, getAllCategories, categorySlug, displayCategory } from "@/lib/products";
+import MobileMenu from "./MobileMenu";
 import { structuralClassFor } from "@/lib/structural-class";
 import { productImages } from "@/lib/product-images";
 import CartButton from "./CartButton";
@@ -86,6 +87,24 @@ export default async function SiteHeader() {
   // catalog-listing pages that already accept that cost. A signed-in
   // visitor can still find and buy GLP-1 products via /shop, a category
   // page, /search, or a direct link - just not this quick dropdown.
+  // Mobile / tablet menu index (2026-09-14).
+  let categories: string[] = [];
+  try {
+    categories = await getAllCategories();
+  } catch {
+    // menu just omits the research-area list
+  }
+  const menuCategories = categories.map((c) => ({ href: `/categories/${categorySlug(c)}`, label: displayCategory(c) || c }));
+  const menuPages = [
+    { href: "/quality-assurance", label: "Quality Assurance" },
+    { href: "/lab-results", label: "Lab Results (COAs)" },
+    { href: "/research", label: "Research Library" },
+    { href: "/about", label: "About" },
+    { href: "/account", label: "My Account" },
+    { href: "/affiliates", label: "Affiliates" },
+  ];
+  const menuLegal = LEGAL_LINKS.map(([href, label]) => ({ href, label }));
+
   const searchIndex = products
     .filter((product) => !product.isGlp1)
     .map((product) => ({
@@ -166,6 +185,7 @@ export default async function SiteHeader() {
               <User className="h-4.5 w-4.5" aria-hidden />
             </Link>
             <CartButton />
+            <MobileMenu categories={menuCategories} pages={menuPages} legal={menuLegal} />
           </div>
         </div>
         {/* 2026-08-29 (Josh): this used to be a row of category chips
