@@ -33,6 +33,8 @@ const PAYPAL_QR_URL = `${siteConfig.url}/email-assets/qr-paypal.png`;
 const ZELLE_QR_URL = `${siteConfig.url}/email-assets/qr-zelle.png`;
 const VENMO_QR_URL = `${siteConfig.url}/email-assets/qr-venmo.png`;
 
+import { WIRE_THRESHOLD, wireCardHtml, wireText } from "./wire-instructions";
+
 const GOLD = "#a67c27";
 const INK = "#1a1a1a";
 const MUTED = "#6b6b6b";
@@ -171,7 +173,7 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
     <h3 style="font-size:15px; margin: 24px 0 4px; border-bottom:1px solid ${BORDER}; padding-bottom:8px;">Complete your payment</h3>
     <p style="font-size:14px; color:${MUTED}; margin-top:8px;">Send the total above using <strong>ONE</strong> of the following:</p>
 
-    ${cards}
+    ${(order.grand_total ?? 0) >= WIRE_THRESHOLD ? wireCardHtml(String(order.number ?? order.id), { ink: INK, muted: MUTED, gold: GOLD, cardBg: CARD_BG, border: BORDER }) : ""}
 
     <p style="margin-top:20px;">Be sure to include your order number, <strong>#${number}</strong>, in the payment note or memo for faster processing. Once sent, reply to this email and let us know which method you used &mdash; our team confirms payments and approves orders Monday through Friday during business hours. Once approved, it's processed the same day, and you'll receive tracking along with the Certificate of Analysis for your exact lot once it ships.</p>
 
@@ -211,6 +213,7 @@ Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts) - marina@vitalitycerti
 Venmo: @vcpllc (Vitality Certified Peptides LLC)
 Apple Cash: (626) 825-2165
 PayPal (Friends & Family only): Marina E Coss - marina@vitalitycertifiedpeptides.com - https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912?utm_source=consapp_download
+${(order.grand_total ?? 0) >= WIRE_THRESHOLD ? wireText(String(order.number ?? order.id)) : ""}
 
 Be sure to include your order number, #${number}, in the payment note or memo for faster processing. Once sent, reply to this email and let us know which method you used - our team confirms payments and approves orders Monday through Friday during business hours. Once approved, it's processed the same day, and you'll receive tracking along with the Certificate of Analysis for your exact lot once it ships.
 
