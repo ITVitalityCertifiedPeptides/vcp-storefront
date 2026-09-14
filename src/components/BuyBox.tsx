@@ -5,7 +5,7 @@
 // 2026-09-06 (Josh): Restock & Save / Autoship removed for good. The store
 // is invoice-only, so there is no recurring billing and nothing to toggle.
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "./CartProvider";
 import { getSwell } from "@/lib/swell-client";
 import type { ProductOption } from "@/lib/products";
@@ -35,6 +35,18 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
   // 2026-09-06 (Josh): quantity picker, since many buyers order several
   // vials of one size at a time.
   const [quantity, setQuantity] = useState(1);
+
+  // Phones: a fixed bottom bar with price + Add to Cart shows whenever the
+  // real button is scrolled out of view (2026-09-14 mobile pass).
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [buttonVisible, setButtonVisible] = useState(true);
+  useEffect(() => {
+    const el = buttonRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([entry]) => setButtonVisible(entry.isIntersecting), { threshold: 0.1 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Swell option value prices are additive on the base price.
   let unitPrice = product.price;
@@ -148,6 +160,7 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
           hand comes same-day from the local wholesaler, so every product
           is always orderable; `inStock` stays on the props but is ignored. */}
         <button
+          ref={buttonRef}
           type="button"
           disabled={busy}
           onClick={add}
@@ -162,6 +175,30 @@ export default function BuyBox({ product }: { product: BuyBoxProduct }) {
           actually ship that fast, so this was making a promise the data
           couldn't back up. The header banner's general "1-3 business days"
           range is the only shipping-time claim left on the site. */}
+
+      {!buttonVisible && (
+        <div className="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/85 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              {unitPrice != null && (
+                <p className="font-serif-display text-xl text-ink leading-tight">
+                  {money(unitPrice * quantity)}
+                  {quantity > 1 && <span className="ml-2 text-xs font-sans text-ink-soft">{quantity} &times; {money(unitPrice)}</span>}
+                </p>
+              )}
+              <p className="text-[0.62rem] text-ink-soft">Qty {quantity}</p>
+            </div>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={add}
+              className={`shrink-0 inline-flex items-center justify-center rounded-full px-6 py-3 label-eyebrow text-[0.7rem] transition-colors ${justAdded ? "bg-ink text-cream" : "bg-gold-deep text-cream"} disabled:opacity-60`}
+            >
+              {justAdded ? "Added" : "Add to Cart"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -42,19 +42,19 @@ export default function FamilyCard({ family }: { family: ProductFamily<Product> 
           </span>
         )}
       </div>
-      <div className="p-5">
+      <div className="p-3 sm:p-5">
         {p.category && (
-          <p className="label-eyebrow text-gold-deep text-[0.65rem] mb-1.5">
+          <p className="hidden sm:block label-eyebrow text-gold-deep text-[0.65rem] mb-1.5">
             {structuralClassFor(p.name)}
           </p>
         )}
-        <div className="font-medium text-[1.05rem] text-ink group-hover:text-gold-deep transition-colors">
+        <div className="font-medium text-[0.92rem] sm:text-[1.05rem] leading-snug text-ink group-hover:text-gold-deep transition-colors">
           {family.name}
         </div>
         {/* Sizes line for multi-size families; CAS for singles. Both are
             one line so the price bar sits at the same height across the
             row (2026-09-05 rule). */}
-        <div className="text-xs text-ink-soft mt-1 font-mono truncate">
+        <div className="text-[0.68rem] sm:text-xs text-ink-soft mt-1 font-mono truncate">
           {family.forms.length > 1
             ? family.forms.join(" · ")
             : multi
@@ -62,13 +62,13 @@ export default function FamilyCard({ family }: { family: ProductFamily<Product> 
               : `CAS ${p.casNumber || "N/A"}`}
         </div>
         {from != null && (
-          <div className="mt-4 pt-3 border-t border-line">
+          <div className="mt-3 sm:mt-4 pt-3 border-t border-line">
             <div className="flex items-center justify-between">
-              <span className="text-ink font-semibold">
+              <span className="text-ink font-semibold text-sm sm:text-base">
                 {range || (!multi && p.priceFrom != null) ? `From $${from.toFixed(2)}` : `$${from.toFixed(2)}`}
               </span>
               {multi || p.options.length > 0 ? (
-                <span className="inline-flex items-center justify-center rounded-full px-3.5 py-1.5 label-eyebrow text-[0.6rem] bg-gold-deep text-cream group-hover:bg-ink transition-colors">
+                <span className="inline-flex items-center justify-center rounded-full px-2.5 sm:px-3.5 py-1.5 label-eyebrow text-[0.55rem] sm:text-[0.6rem] bg-gold-deep text-cream group-hover:bg-ink transition-colors whitespace-nowrap">
                   {family.forms.length > 1
                     ? `${family.forms.length} Forms`
                     : multi

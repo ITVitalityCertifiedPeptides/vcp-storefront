@@ -37,7 +37,7 @@ export default async function SearchPage({
   const results = query
     ? products.filter((p) =>
         matches(query, [
-          searchKeywords(p.name, p.description, p.category),
+          searchKeywords(`${p.name} ${p.slug.replace(/-/g, " ")}`, p.description, p.category),
           displayCategory(p.category),
           p.category,
           p.casNumber,

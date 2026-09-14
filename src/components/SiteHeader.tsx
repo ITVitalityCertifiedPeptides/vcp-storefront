@@ -111,7 +111,7 @@ export default async function SiteHeader() {
       slug: product.slug,
       name: product.name,
       category: structuralClassFor(product.name),
-      keywords: searchKeywords(product.name, product.description, structuralClassFor(product.name)),
+      keywords: searchKeywords(`${product.name} ${product.slug.replace(/-/g, " ")}`, product.description, structuralClassFor(product.name)),
       price: product.priceFrom ?? product.price,
       image: product.images?.[0] || productImages[product.slug] || null,
     }));

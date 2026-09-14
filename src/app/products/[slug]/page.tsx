@@ -146,7 +146,7 @@ export default async function ProductPage({
 
   return (
     <>
-    <div className="max-w-5xl mx-auto px-4 py-12">
+    <div className="max-w-5xl mx-auto px-4 py-12 pb-28 md:pb-12">
       {jsonLd.map((schema, i) => (
         <script
           key={i}
@@ -186,9 +186,9 @@ export default async function ProductPage({
           <h1 className="font-serif-display text-3xl md:text-4xl text-ink mb-4">
             {product.name}
           </h1>
-          <p className="text-ink-soft leading-relaxed mb-8">{product.description}</p>
+          <p className="text-ink-soft leading-relaxed mb-8 order-last md:order-none mt-2 md:mt-0">{product.description}</p>
 
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 mb-8 text-sm border-y border-line py-5">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 mb-8 text-sm border-y border-line py-5 order-last md:order-none">
             <div>
               <dt className="label-eyebrow text-[0.62rem] text-ink-soft mb-1">CAS Number</dt>
               <dd className="font-medium text-ink">{product.casNumber || "N/A"}</dd>

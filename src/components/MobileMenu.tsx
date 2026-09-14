@@ -7,29 +7,28 @@
 // account, and the legal links. Search stays where it is; this is the
 // index next to it.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Menu, X, ChevronRight } from "lucide-react";
 
 export type MenuLink = { href: string; label: string };
 
 export default function MobileMenu({
-  categories,
+  categories = [],
   pages,
   legal,
+  footer,
 }: {
-  categories: MenuLink[];
+  categories?: MenuLink[];
   pages: MenuLink[];
   legal: MenuLink[];
+  // e.g. a Sign out button on the Inner Circle site
+  footer?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
+  const close = () => setOpen(false);
 
-  // Close on navigation and lock page scroll while open.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Lock page scroll while open; Escape closes.
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -85,9 +84,10 @@ export default function MobileMenu({
             <div className="px-5 pb-8">
               <Link
                 href="/shop"
+                onClick={close}
                 className="mt-4 mb-2 inline-flex w-full items-center justify-center rounded-full bg-ink text-cream px-5 py-3 label-eyebrow text-[0.7rem]"
               >
-                Shop Full Catalog
+                Shop Catalog
               </Link>
 
               {categories.length > 0 && (
@@ -96,7 +96,7 @@ export default function MobileMenu({
                   <ul>
                     {categories.map((c) => (
                       <li key={c.href}>
-                        <Link href={c.href} className={row}>
+                        <Link href={c.href} onClick={close} className={row}>
                           <span className="text-[0.95rem]">{c.label}</span>
                           <ChevronRight className="h-4 w-4 text-ink-soft" aria-hidden />
                         </Link>
@@ -110,7 +110,7 @@ export default function MobileMenu({
               <ul>
                 {pages.map((p) => (
                   <li key={p.href}>
-                    <Link href={p.href} className={row}>
+                    <Link href={p.href} onClick={close} className={row}>
                       <span className="text-[0.95rem]">{p.label}</span>
                       <ChevronRight className="h-4 w-4 text-ink-soft" aria-hidden />
                     </Link>
@@ -122,12 +122,14 @@ export default function MobileMenu({
               <ul className="text-sm">
                 {legal.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="block py-2 text-ink-soft hover:text-gold-deep">
+                    <Link href={l.href} onClick={close} className="block py-2 text-ink-soft hover:text-gold-deep">
                       {l.label}
                     </Link>
                   </li>
                 ))}
               </ul>
+
+              {footer ? <div className="mt-6 pt-4 border-t border-line">{footer}</div> : null}
 
               <p className="mt-8 text-[0.7rem] text-ink-soft">
                 For laboratory research use only. Not for human or veterinary use.

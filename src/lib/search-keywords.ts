@@ -36,8 +36,9 @@ export function normalize(s: string): string {
 // the product list is built (server side) and ship the string down.
 export function searchKeywords(name: string, description?: string | null, category?: string | null): string {
   const parts = [name, category || "", stripHtml(description || "")];
+  const probe = `${name} ${stripHtml(description || "")}`;
   for (const [re, words] of BLEND_ALIASES) {
-    if (re.test(name)) parts.push(words);
+    if (re.test(probe)) parts.push(words);
   }
   return parts.join(" ").toLowerCase();
 }
