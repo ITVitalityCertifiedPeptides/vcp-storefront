@@ -5,6 +5,7 @@ import { hasGlp1Access } from "@/lib/current-session";
 import { displayCategory } from "@/lib/catalog-shared";
 import FamilyCard from "@/components/FamilyCard";
 import { groupIntoFamilies } from "@/lib/product-families";
+import { searchKeywords, searchMatches } from "@/lib/search-keywords";
 
 export const metadata: Metadata = {
   title: "Search Products",
@@ -20,8 +21,7 @@ export const metadata: Metadata = {
 // don't already pay - full results, minus GLP-1 for anonymous visitors.
 
 function matches(query: string, haystacks: Array<string | undefined>) {
-  const q = query.toLowerCase();
-  return haystacks.some((h) => h?.toLowerCase().includes(q));
+  return searchMatches(query, haystacks.filter(Boolean).join(" "));
 }
 
 export default async function SearchPage({
@@ -37,7 +37,7 @@ export default async function SearchPage({
   const results = query
     ? products.filter((p) =>
         matches(query, [
-          p.name,
+          searchKeywords(p.name, p.description, p.category),
           displayCategory(p.category),
           p.category,
           p.casNumber,

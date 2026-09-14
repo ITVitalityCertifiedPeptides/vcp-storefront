@@ -6,6 +6,7 @@ import { structuralClassFor } from "@/lib/structural-class";
 import { productImages } from "@/lib/product-images";
 import CartButton from "./CartButton";
 import HeaderSearch from "./HeaderSearch";
+import { searchKeywords } from "@/lib/search-keywords";
 
 const LEGAL_LINKS: [string, string][] = [
   ["/ruo-policy", "RUO Policy"],
@@ -91,6 +92,7 @@ export default async function SiteHeader() {
       slug: product.slug,
       name: product.name,
       category: structuralClassFor(product.name),
+      keywords: searchKeywords(product.name, product.description, structuralClassFor(product.name)),
       price: product.priceFrom ?? product.price,
       image: product.images?.[0] || productImages[product.slug] || null,
     }));

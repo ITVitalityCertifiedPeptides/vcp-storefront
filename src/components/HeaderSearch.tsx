@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import VialIcon from "./VialIcon";
+import { searchMatches } from "@/lib/search-keywords";
 
 export type HeaderSearchProduct = {
   slug: string;
@@ -19,6 +20,8 @@ export type HeaderSearchProduct = {
   category: string;
   price: number | null;
   image: string | null;
+  // name + compounds + description, lowercased (lib/search-keywords.ts)
+  keywords?: string;
 };
 
 // full = the mobile header row (2026-09-06, Josh): the field stretches to
@@ -49,14 +52,10 @@ export default function HeaderSearch({
   }, []);
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = query.trim();
     if (!q) return [];
     return products
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q)
-      )
+      .filter((p) => searchMatches(q, p.keywords || `${p.name} ${p.category}`))
       .slice(0, 6);
   }, [products, query]);
 

@@ -72,6 +72,15 @@ export async function POST(request: Request) {
     const number = order.number ? String(order.number) : order.id;
     const email = customerEmailFor(order);
 
+    // Wholesale orders: the wholesale app already emailed the customer its
+    // own invoice when it created the order, so only the internal
+    // notification goes out here. (2026-09-10: wholesale orders are real
+    // orders now, not drafts, so they reach this webhook.)
+    if ((order.account?.group || "").toLowerCase() === "wholesale") {
+      await notifyAdmins("order_created", order, { customerEmailed: Boolean(email), customerEmail: email });
+      return Response.json({ ok: true, skipped: "wholesale customer email sent by wholesale app" });
+    }
+
     const subject = `Order received - #${number}`;
     const html = buildOrderConfirmationEmailHtml(order);
     const text = buildOrderConfirmationEmailText(order);
