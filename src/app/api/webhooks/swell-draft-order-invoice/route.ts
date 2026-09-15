@@ -76,7 +76,7 @@ ${paymentMethodCardsHtml()}
 
 Your invoice for order #${number}${total ? ` - Total: ${total}` : ""} is ready.
 
-To complete your order, send the total using ONE of: Zelle (vcp-llc), Venmo (@vcpllc), Apple Cash ((626) 825-2165), or PayPal - Friends & Family only (marina@vitalitycertifiedpeptides.com). Include your order number in the payment note.
+To complete your order, send the total using ONE of: Zelle (vcp-llc), Venmo (@Jeffery-Coss), Apple Cash ((626) 825-2165), or PayPal - Friends & Family only (marina@vitalitycertifiedpeptides.com). Include your order number in the payment note.
 
 Reply to this email or contact us at customerservice@vitalitycertifiedpeptides.com with any questions.
 

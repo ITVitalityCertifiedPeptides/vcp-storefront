@@ -124,12 +124,12 @@ export function paymentMethodCardsHtml(): string {
   const zelleUrl =
     "https://enroll.zellepay.com/qr-codes?data=eyJuYW1lIjoiVklUQUxJVFkgQ0VSVElGSUVEIFBFUFRJREVTIExMQyBBY2NvdW50cyIsInRva2VuIjoidmNwLWxsYyJ9";
   const venmoUrl =
-    "https://www.paypal.com/qrcodes/venmocs/f953a8fe-edd4-4225-9c5a-9046eb30cd4f?created=1788015862.237005";
+    "https://venmo.com/u/Jeffery-Coss";
 
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:8px 0 4px;">
     <tr>
       ${paymentCard({ label: "ZELLE", detail: "vcp-llc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC Accounts</span><br/>marina@vitalitycertifiedpeptides.com", qrUrl: ZELLE_QR_URL, linkUrl: zelleUrl, linkLabel: "Scan the QR or tap to pay" })}
-      ${paymentCard({ label: "VENMO", detail: "@vcpllc<br/><span style=\"color:" + MUTED + ";\">Vitality Certified Peptides LLC</span>", qrUrl: VENMO_QR_URL, linkUrl: venmoUrl, linkLabel: "Scan the QR or tap to pay" })}
+      ${paymentCard({ label: "VENMO", detail: "@Jeffery-Coss<br/><span style=\"color:" + MUTED + ";\">Jeffery Coss</span>", qrUrl: VENMO_QR_URL, linkUrl: venmoUrl, linkLabel: "Scan the QR or tap to pay" })}
     </tr>
     <tr>
       ${paymentCard({ label: "APPLE CASH", detail: "(626) 825-2165", linkUrl: "sms:+16268252165", linkLabel: "Open Messages to pay" })}
@@ -210,7 +210,7 @@ Order #${number}${total ? ` - Total: ${total}` : ""}
 ${items ? `\n${items}\n` : ""}${totals}
 To complete your order, send the total above using ONE of the following:
 Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts) - marina@vitalitycertifiedpeptides.com
-Venmo: @vcpllc (Vitality Certified Peptides LLC)
+Venmo: @Jeffery-Coss (Jeffery Coss) - https://venmo.com/u/Jeffery-Coss
 Apple Cash: (626) 825-2165
 PayPal (Friends & Family only): Marina E Coss - marina@vitalitycertifiedpeptides.com - https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912?utm_source=consapp_download
 ${(order.grand_total ?? 0) >= WIRE_THRESHOLD ? wireText(String(order.number ?? order.id)) : ""}
