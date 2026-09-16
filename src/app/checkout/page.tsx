@@ -29,6 +29,23 @@ function money(n?: number) {
   return typeof n === "number" ? `$${n.toFixed(2)}` : "";
 }
 
+// Pull the human-readable reason out of whatever swell-js threw so the
+// customer (and the support inbox) see it instead of a blind generic
+// message. Added 2026-09-16 after an order failed for two days on an
+// out-of-stock block that only showed in the customer's browser console.
+function describeSwellError(err: unknown): string {
+  if (!err) return "";
+  const e = err as { message?: string; errors?: Record<string, { message?: string } | string> };
+  if (e.errors && typeof e.errors === "object") {
+    const parts = Object.entries(e.errors).map(([k, v]) =>
+      typeof v === "string" ? v : v?.message ? `${k}: ${v.message}` : k
+    );
+    if (parts.length) return parts.join("; ");
+  }
+  if (typeof e.message === "string" && e.message.trim()) return e.message.trim();
+  return String(err);
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { refresh } = useCart();
@@ -312,8 +329,10 @@ export default function CheckoutPage() {
       // Keep the user-facing message friendly, but log the real reason so
       // it shows in the browser console for debugging.
       console.error("Checkout failed:", err);
+      const reason = describeSwellError(err);
       setError(
-        "We couldn't place the order. Please try again, or email us and we'll take your order directly."
+        "We couldn't place the order. Please try again, or email us and we'll take your order directly." +
+          (reason ? ` (Details: ${reason})` : "")
       );
       setSubmitting(false);
     }
