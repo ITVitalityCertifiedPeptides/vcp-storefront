@@ -240,6 +240,10 @@ export default function CheckoutPage() {
           country: "US",
           phone: form.phone,
           method: "cash",
+          // A card saved on the account (Swell copies account.billing into
+          // the cart) must never ride along: no cards are charged here.
+          card: null,
+          account_card_id: null,
         },
         comments:
           "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Venmo / Apple Cash / PayPal). Ship only after payment is confirmed." +
