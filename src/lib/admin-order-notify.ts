@@ -17,6 +17,7 @@
 // From than customer mail (useful if the company's inbound spam filter
 // treats "from our own domain" mail as spoofing).
 
+import { paymentMethodLabel, PICKUP_SERVICE_ID } from "./payment-methods";
 import { buildPackingSlipPdf, packingSlipFilename } from "./packing-slip";
 import { sendEmail } from "@/lib/resend";
 import {
@@ -159,7 +160,8 @@ ${kv([
   ["Phone", phone ? esc(phone) : undefined],
   ["Group", esc(order.account?.group || "none (retail)")],
   ["Placed", placed],
-  ["Payment method", esc(order.billing?.method === "invoice" ? "Pay by invoice (Zelle / Venmo / Apple Cash / PayPal)" : order.billing?.method || "")],
+  ["Payment method", esc(paymentMethodLabel(order.metadata?.payment_method as string | undefined) ? `Customer chose ${paymentMethodLabel(order.metadata?.payment_method as string | undefined)} (invoice sent for that method)` : order.billing?.method === "invoice" || order.billing?.method === "cash" ? "Pay by invoice (no method chosen; all options sent)" : order.billing?.method || "")],
+  ["Delivery", order.metadata?.pickup === true || order.shipping?.service === PICKUP_SERVICE_ID ? "LOCAL PICKUP (approved account) - do not ship" : undefined],
   ["Customer emailed", opts.customerEmailed === undefined ? undefined : opts.customerEmailed ? "Yes" : "NO - no email on file, follow up by hand"],
 ])}
 <h3 style="margin:18px 0 4px; font-size:13px; letter-spacing:0.5px; text-transform:uppercase; color:${BRAND.muted};">Items</h3>

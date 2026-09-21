@@ -19,6 +19,8 @@ import { toStateCode } from "@/lib/us-states";
 import StateSelect from "@/components/StateSelect";
 import OptInCheckboxes, { type OptIn } from "@/components/OptInCheckboxes";
 import ShippingOptions, { type ShippingRate } from "@/components/ShippingOptions";
+import PaymentMethodPicker from "@/components/PaymentMethodPicker";
+import { PICKUP_SERVICE_ID, type PaymentMethodId } from "@/lib/payment-methods";
 import AddressReview, {
   checkAddress,
   type ReviewAddress,
@@ -62,6 +64,12 @@ export default function CheckoutPage() {
   // Defaults to "standard"; ShippingOptions corrects it to the cheapest
   // live service once Swell returns rates.
   const [shipping, setShipping] = useState<ShippingRate | null>(null);
+  // How the customer will pay (2026-09-21). Required; no default. Drives
+  // the one-method invoice email (storefront lib/payment-instructions.ts).
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId | null>(null);
+  // Staff-approved for local pickup (Swell account metadata.pickup_approved,
+  // looked up by email via /api/pickup-eligibility).
+  const [pickupApproved, setPickupApproved] = useState(false);
   // Marketing opt-in (components/OptInCheckboxes). Recorded on the Swell
   // account by /api/optin right after the order is placed; never blocks it.
   const [optIn, setOptIn] = useState<OptIn>({ email: true, sms: false });
@@ -136,6 +144,29 @@ export default function CheckoutPage() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    const email = form.email.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return;
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/pickup-eligibility", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const json = (await res.json()) as { approved?: boolean };
+        if (!cancelled) setPickupApproved(json.approved === true);
+      } catch {
+        if (!cancelled) setPickupApproved(false);
+      }
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [form.email]);
+
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
     // Any edit to the address invalidates a pending validation verdict.
@@ -152,10 +183,15 @@ export default function CheckoutPage() {
       );
       return;
     }
+    if (!paymentMethod) {
+      setError("Please choose how you will pay so we can send the right invoice.");
+      return;
+    }
+    const isPickup = shipping?.id === PICKUP_SERVICE_ID && pickupApproved;
     // State shipping restrictions: matches the list published on
     // /ruo-policy (lib/restricted-states.ts is the single source of
     // truth for both).
-    const restricted = isRestrictedState(form.state);
+    const restricted = isPickup ? null : isRestrictedState(form.state);
     if (restricted) {
       setError(
         `We're sorry, but we do not sell or ship to ${restricted.name}. ` +
@@ -246,6 +282,7 @@ export default function CheckoutPage() {
           account_card_id: null,
         },
         comments:
+          (shipping?.id === PICKUP_SERVICE_ID && pickupApproved ? "LOCAL PICKUP (approved account): do not ship. " : "") +
           "RUO attestation accepted at checkout. Invoice-based payment: send the buyer an invoice (Zelle / Venmo / Apple Cash / PayPal). Ship only after payment is confirmed." +
           (unverified
             ? " ADDRESS NOT CONFIRMED BY USPS: customer chose to use it anyway. Confirm the shipping address with the customer before shipping."
@@ -253,8 +290,9 @@ export default function CheckoutPage() {
         metadata: {
           ruo_attestation: true,
           ruo_attested_at: new Date().toISOString(),
-          payment_method: "invoice",
+          payment_method: paymentMethod ?? "invoice",
           invoice_pending: true,
+          pickup: shipping?.id === PICKUP_SERVICE_ID && pickupApproved,
           address_unverified: unverified,
         },
       };
@@ -447,21 +485,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <p className="label-eyebrow text-[0.7rem] text-gold-deep mb-3">
-            Payment Method
-          </p>
-          <div className="border border-line rounded-sm mb-8">
-            <div className="p-4 bg-cream-soft/60">
-              <span className="block text-sm font-medium text-ink">
-                Pay by Invoice
-              </span>
-              <span className="block text-xs text-ink-soft mt-1 leading-relaxed">
-                Place your order now. We send your invoice with payment
-                instructions for Zelle, Venmo, Apple Cash, or PayPal. Your
-                order ships once payment is confirmed.
-              </span>
-            </div>
-          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <input
@@ -536,6 +559,7 @@ export default function CheckoutPage() {
           </div>
 
           <ShippingOptions
+            pickupApproved={pickupApproved}
             ready={!loading && !!cart}
             subTotal={cart?.sub_total ?? 0}
             value={shipping?.id ?? "standard"}
@@ -543,6 +567,12 @@ export default function CheckoutPage() {
               setShipping(rate);
               if (fresh) setCart(fresh);
             }}
+          />
+
+          <PaymentMethodPicker
+            total={cart?.grand_total ?? cart?.sub_total ?? 0}
+            value={paymentMethod}
+            onChange={setPaymentMethod}
           />
 
           {review && (
@@ -595,8 +625,9 @@ export default function CheckoutPage() {
             <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
           <p className="text-xs text-ink-soft mt-4 text-center">
-            Nothing is charged online. Your invoice with payment
-            instructions follows by email.
+            Nothing is charged online. Your invoice with instructions for the
+            payment method you chose follows by email. Your order is not
+            processed until payment is received.
           </p>
         </form>
       )}

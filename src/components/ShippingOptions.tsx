@@ -11,19 +11,33 @@
 // Mail, "express" -> Priority Mail Express). Rename services in Swell and
 // those rules need updating too.
 //
+// Local pickup (2026-09-21): a $0 "pickup" service exists in Swell but is
+// only shown to accounts staff have approved (metadata.pickup_approved on
+// the Swell account; the checkout page looks it up by email through
+// /api/pickup-eligibility). Everyone else sees a one-line note on how to
+// ask for it.
+//
 // If Swell can't return rates (no address on the cart yet, network blip)
-// we fall back to a static copy of the same three services so checkout
-// never dead-ends; the order still carries the chosen service id and
-// Swell recalculates the real charge on submit.
+// we fall back to a static copy of the same services so checkout never
+// dead-ends; the order still carries the chosen service id and Swell
+// recalculates the real charge on submit.
 
 import { useEffect, useRef, useState } from "react";
 import { getSwell, type SwellCart } from "@/lib/swell-client";
+import { PICKUP_REQUEST_EMAIL, PICKUP_SERVICE_ID } from "@/lib/payment-methods";
 
 export type ShippingRate = {
   id: string;
   name: string;
   description?: string;
   price: number;
+};
+
+const PICKUP_RATE: ShippingRate = {
+  id: PICKUP_SERVICE_ID,
+  name: "Local Pickup",
+  description: "Approved accounts only. We email you when your order is ready to collect in San Clemente.",
+  price: 0,
 };
 
 const FALLBACK = (subTotal: number): ShippingRate[] => [
@@ -59,10 +73,12 @@ type Props = {
   value: string;
   // Fires with the chosen rate and the refreshed cart (so totals update).
   onChange: (rate: ShippingRate, cart: SwellCart | null) => void;
+  // Staff-approved for local pickup (see header). Default false.
+  pickupApproved?: boolean;
   className?: string;
 };
 
-export default function ShippingOptions({ ready, subTotal, value, onChange, className }: Props) {
+export default function ShippingOptions({ ready, subTotal, value, onChange, pickupApproved = false, className }: Props) {
   const [rates, setRates] = useState<ShippingRate[] | null>(null);
   const [busy, setBusy] = useState(false);
   const loadedFor = useRef<number | null>(null);
@@ -103,19 +119,33 @@ export default function ShippingOptions({ ready, subTotal, value, onChange, clas
         console.warn("Shipping rates unavailable, using fallback list:", err);
       }
       if (cancelled) return;
-      const final = list ?? FALLBACK(subTotal);
-      setRates(final);
-      // Keep the parent's selection valid; default to the cheapest option.
-      const current = final.find((r) => r.id === value);
-      if (!current) {
-        void select(final[0]);
-      }
+      setRates(list ?? FALLBACK(subTotal));
     })();
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, subTotal]);
+
+  // What the customer may actually pick: pickup only when approved. If
+  // approved and Swell didn't list the service yet, offer it anyway so the
+  // order still carries service "pickup" (Swell prices unknown services at
+  // the store default; the webhook zeroes shipping on pickup orders).
+  const base = rates ?? FALLBACK(subTotal);
+  const visible = pickupApproved
+    ? base.some((r) => r.id === PICKUP_SERVICE_ID)
+      ? base
+      : [...base, PICKUP_RATE]
+    : base.filter((r) => r.id !== PICKUP_SERVICE_ID);
+
+  // Keep the parent's selection valid; default to the cheapest carrier
+  // option (never pickup by default, even when approved).
+  useEffect(() => {
+    if (!ready || rates === null) return;
+    if (visible.some((r) => r.id === value)) return;
+    const first = visible.find((r) => r.id !== PICKUP_SERVICE_ID) ?? visible[0];
+    if (first) void select(first);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, rates, pickupApproved, value]);
 
   async function select(rate: ShippingRate) {
     setBusy(true);
@@ -136,8 +166,8 @@ export default function ShippingOptions({ ready, subTotal, value, onChange, clas
   return (
     <div className={className}>
       <p className="label-eyebrow text-[0.7rem] text-gold-deep mb-3">Shipping Method</p>
-      <div className="border border-line rounded-sm divide-y divide-line mb-8">
-        {(rates ?? FALLBACK(subTotal)).map((rate) => {
+      <div className="border border-line rounded-sm divide-y divide-line mb-3">
+        {visible.map((rate) => {
           const checked = rate.id === value;
           return (
             <label
@@ -165,6 +195,16 @@ export default function ShippingOptions({ ready, subTotal, value, onChange, clas
           );
         })}
       </div>
+      {!pickupApproved && (
+        <p className="text-xs text-ink-soft mb-8 leading-relaxed">
+          Local pickup is available by approval only. Email{" "}
+          <a href={`mailto:${PICKUP_REQUEST_EMAIL}?subject=Local%20pickup%20approval`} className="text-gold-deep underline">
+            {PICKUP_REQUEST_EMAIL}
+          </a>{" "}
+          to request it before placing your order.
+        </p>
+      )}
+      {pickupApproved && <div className="mb-8" />}
     </div>
   );
 }

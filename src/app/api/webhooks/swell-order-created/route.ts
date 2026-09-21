@@ -40,7 +40,8 @@ import {
 } from "@/lib/swell-backend-notify";
 import { buildOrderConfirmationEmailHtml, buildOrderConfirmationEmailText } from "@/lib/order-confirmation-email";
 import { sendEmail } from "@/lib/resend";
-import { WIRE_THRESHOLD, wireAttachment } from "@/lib/wire-instructions";
+import { wireAttachment } from "@/lib/wire-instructions";
+import { wantsWireAttachment } from "@/lib/payment-instructions";
 import { notifyAdmins } from "@/lib/admin-order-notify";
 
 export async function POST(request: Request) {
@@ -87,10 +88,10 @@ export async function POST(request: Request) {
     const text = buildOrderConfirmationEmailText(order);
 
     if (email) {
-      // $1,000+ orders (Josh, 2026-09-14): bank wire block in the email and
-      // the letterhead wiring-instructions PDF attached.
-      const big = (order.grand_total ?? 0) >= WIRE_THRESHOLD;
-      await sendEmail({ to: email, subject, html, text, attachments: big ? [wireAttachment()] : undefined });
+      // Wire PDF rides along when the customer chose bank wire at checkout
+      // (or, for orders with no stored method, when the total is $1,000+).
+      const wire = wantsWireAttachment(order);
+      await sendEmail({ to: email, subject, html, text, attachments: wire ? [wireAttachment()] : undefined });
     } else {
       await alertTeamNoEmail("Order", number);
     }

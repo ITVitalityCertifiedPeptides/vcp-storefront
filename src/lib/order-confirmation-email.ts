@@ -33,7 +33,7 @@ const PAYPAL_QR_URL = `${siteConfig.url}/email-assets/qr-paypal.png`;
 const ZELLE_QR_URL = `${siteConfig.url}/email-assets/qr-zelle.png`;
 const VENMO_QR_URL = `${siteConfig.url}/email-assets/qr-venmo.png`;
 
-import { WIRE_THRESHOLD, wireCardHtml, wireText } from "./wire-instructions";
+import { paymentInstructionsHtml, paymentInstructionsText } from "./payment-instructions";
 
 const GOLD = "#a67c27";
 const INK = "#1a1a1a";
@@ -143,7 +143,6 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
   const currency = order.currency || "USD";
   const total = formatCurrency(order.grand_total, currency);
   const itemsHtml = itemsTableHtml(order.items, currency);
-  const cards = paymentMethodCardsHtml();
 
   return `<div style="font-family: Georgia, 'Times New Roman', serif; max-width: 600px; margin: 0 auto; color: ${INK}; background:#ffffff;">
   <div style="padding: 28px 0 18px; text-align:center; border-bottom: 2px solid ${GOLD};">
@@ -152,7 +151,7 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
   </div>
 
   <div style="padding: 24px 8px; font-size: 15px; line-height: 1.6;">
-    <p style="margin-top:0;">Thanks for your order with Vitality Certified Peptides.</p>
+    <p style="margin-top:0;">Thanks for your order with Vitality Certified Peptides. Below is your invoice. <strong>Your order is not processed until payment is received.</strong></p>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; background:${CARD_BG}; border:1px solid ${BORDER}; border-radius:10px; margin: 16px 0;">
       <tr>
@@ -170,12 +169,7 @@ export function buildOrderConfirmationEmailHtml(order: SwellOrder): string {
     ${itemsHtml}
     ${totalsHtml(order, currency)}
 
-    <h3 style="font-size:15px; margin: 24px 0 4px; border-bottom:1px solid ${BORDER}; padding-bottom:8px;">Complete your payment</h3>
-    <p style="font-size:14px; color:${MUTED}; margin-top:8px;">Send the total above using <strong>ONE</strong> of the following:</p>
-
-    ${(order.grand_total ?? 0) >= WIRE_THRESHOLD ? wireCardHtml(String(order.number ?? order.id), { ink: INK, muted: MUTED, gold: GOLD, cardBg: CARD_BG, border: BORDER }) : ""}
-
-    <p style="margin-top:20px;">Be sure to include your order number, <strong>#${number}</strong>, in the payment note or memo for faster processing. Once sent, reply to this email and let us know which method you used &mdash; our team confirms payments and approves orders Monday through Friday during business hours. Once approved, it's processed the same day, and you'll receive tracking along with the Certificate of Analysis for your exact lot once it ships.</p>
+    ${paymentInstructionsHtml(order)}
 
     <p style="font-size:12px; color:${MUTED}; margin-top:20px;">Reminder: all products are for laboratory research use only and are not for human or veterinary use.</p>
   </div>
@@ -204,18 +198,11 @@ export function buildOrderConfirmationEmailText(order: SwellOrder): string {
       ? `\n  Subtotal: ${formatCurrency(order.sub_total, cur)}${discount > 0 ? `\n  Inner Circle discount: -${formatCurrency(discount, cur)}` : ""}\n  Shipping: ${ship > 0 ? formatCurrency(ship, cur) : "Free"}\n  Total due: ${total}\n`
       : "";
 
-  return `Thanks for your order with Vitality Certified Peptides.
+  return `Thanks for your order with Vitality Certified Peptides. Below is your invoice. Your order is not processed until payment is received.
 
 Order #${number}${total ? ` - Total: ${total}` : ""}
 ${items ? `\n${items}\n` : ""}${totals}
-To complete your order, send the total above using ONE of the following:
-Zelle: vcp-llc (Vitality Certified Peptides LLC Accounts) - marina@vitalitycertifiedpeptides.com
-Venmo: @Jeffery-Coss (Jeffery Coss) - https://venmo.com/u/Jeffery-Coss
-Apple Cash: (626) 825-2165
-PayPal (Friends & Family only): Marina E Coss - marina@vitalitycertifiedpeptides.com - https://www.paypal.com/qrcodes/managed/07ea7259-48c4-4c02-aad0-1aadb5b7f912?utm_source=consapp_download
-${(order.grand_total ?? 0) >= WIRE_THRESHOLD ? wireText(String(order.number ?? order.id)) : ""}
-
-Be sure to include your order number, #${number}, in the payment note or memo for faster processing. Once sent, reply to this email and let us know which method you used - our team confirms payments and approves orders Monday through Friday during business hours. Once approved, it's processed the same day, and you'll receive tracking along with the Certificate of Analysis for your exact lot once it ships.
+${paymentInstructionsText(order)}
 
 Reminder: all products are for laboratory research use only and are not for human or veterinary use.
 
