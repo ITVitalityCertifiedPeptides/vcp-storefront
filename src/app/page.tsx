@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, FlaskConical, Package, Tag } from "lucide-react";
+import { ArrowRight, FlaskConical, Tag } from "lucide-react";
 import {
   getAllCategories,
   getAllProducts,
@@ -35,12 +35,6 @@ const benefits = [
     icon: FlaskConical,
     label: "Third-Party Tested",
     detail: "Every lot verified by an independent lab, COA included.",
-  },
-  {
-    icon: Package,
-    label: "Made & Shipped in the USA",
-    detail:
-      "Synthesized in a US lab. Every order ships with tracking.",
   },
   {
     icon: Tag,
@@ -154,7 +148,7 @@ export default async function HomePage() {
 
       {/* Benefit strip */}
       <section className="border-b border-line bg-white">
-        <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
           {benefits.map((benefit) => (
             <div key={benefit.label} className="flex items-start gap-3.5">
               <benefit.icon
