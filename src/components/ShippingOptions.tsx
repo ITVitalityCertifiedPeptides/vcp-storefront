@@ -1,8 +1,8 @@
 "use client";
 
 // Shipping method picker for checkout. Pulls the live services from Swell
-// (Settings > Shipping: Standard $11.95 free over $250, Priority $16.95,
-// Express $36.95 as of 2026-09-06), lets the customer pick one, and writes
+// (Settings > Shipping: Standard $11.95, Priority $16.95, Express $36.95.
+// The free-over-$250 rule was removed 2026-10-01, so every order pays shipping), lets the customer pick one, and writes
 // the choice onto the cart so Swell's shipment_total / grand_total reflect
 // it before the order is placed.
 //
@@ -44,8 +44,8 @@ const FALLBACK = (subTotal: number): ShippingRate[] => [
   {
     id: "standard",
     name: "Standard Shipping",
-    description: "USPS Ground Advantage, typically 2 to 5 business days. Free on orders over $250.",
-    price: subTotal > 250 ? 0 : 11.95,
+    description: "USPS Ground Advantage, typically 2 to 5 business days.",
+    price: 11.95,
   },
   {
     id: "priority",
@@ -83,8 +83,7 @@ export default function ShippingOptions({ ready, subTotal, value, onChange, pick
   const [busy, setBusy] = useState(false);
   const loadedFor = useRef<number | null>(null);
 
-  // Load rates once the cart is ready, and again if the subtotal crosses
-  // a threshold (the free-over-$250 rule changes Standard's price).
+  // Load rates once the cart is ready, and again if the subtotal changes.
   useEffect(() => {
     if (!ready) return;
     if (loadedFor.current === subTotal) return;

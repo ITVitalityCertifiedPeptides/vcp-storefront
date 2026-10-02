@@ -162,7 +162,7 @@ export default function CartPage() {
             <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
           <p className="text-xs text-ink-soft mt-4 text-center">
-            Free US shipping over $250. Checkout is invoice-based: place
+            Shipping is added at checkout. Checkout is invoice-based: place
             your order and our team sends your invoice and payment details.
           </p>
         </>

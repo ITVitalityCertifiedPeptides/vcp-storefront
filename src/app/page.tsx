@@ -40,7 +40,7 @@ const benefits = [
     icon: Package,
     label: "Made & Shipped in the USA",
     detail:
-      "Synthesized in a US lab. Free shipping on orders over $250.",
+      "Synthesized in a US lab. Every order ships with tracking.",
   },
   {
     icon: Tag,
@@ -74,9 +74,9 @@ const faqs = [
       "Every product page lists its CAS number and research category. You can also browse the full catalog by category.",
   },
   {
-    question: "Do you offer free shipping?",
+    question: "How much is shipping?",
     answer:
-      "Yes. US shipping is free on orders over $250. Below that, Standard shipping is $11.95, with Priority and Express options at checkout.",
+      "Standard US shipping is $11.95 on every order. Priority ($16.95) and Express ($36.95) are available at checkout. Approved accounts can also arrange free local pickup in San Clemente.",
   },
 ];
 
