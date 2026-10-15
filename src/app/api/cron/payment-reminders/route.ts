@@ -1,7 +1,7 @@
 // Hourly payment-reminder sweep (2026-09-21). Vercel Cron hits this on the
 // schedule in vercel.json. For every unpaid, non-draft, non-canceled retail
 // or Inner Circle order placed in the last 72 hours it sends the reminder
-// stage that's due (4h, 12h, 48h after placement; lib/payment-reminder-
+// stage that's due (24h and 48h after placement; lib/payment-reminder-
 // email.ts) and stamps metadata.payment_reminders.<stage> so nothing goes
 // out twice. Wholesale orders are skipped (invoiced by the wholesale app).
 //
@@ -21,6 +21,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const LOOKBACK_HOURS = 72;
+const CC = "info@vitalitycertifiedpeptides.com";
 
 function auth(): string {
   const storeId = process.env.NEXT_PUBLIC_SWELL_STORE_ID || process.env.SWELL_STORE_ID;
@@ -68,6 +69,9 @@ export async function GET(request: Request) {
     if (group === "wholesale") { report.push({ number, skipped: "wholesale" }); continue; }
     const email = customerEmailFor(order);
     if (!email) { report.push({ number, skipped: "no email" }); continue; }
+    // Partially paid orders would show the full total as "amount due", so
+    // leave those to a human.
+    if ((order.payment_total ?? 0) > 0) { report.push({ number, skipped: "partially paid" }); continue; }
     const created = order.date_created ? new Date(order.date_created).getTime() : NaN;
     if (!Number.isFinite(created)) { report.push({ number, skipped: "no date" }); continue; }
     const ageHours = (now - created) / 3600_000;
@@ -80,6 +84,7 @@ export async function GET(request: Request) {
       try {
         await sendEmail({
           to: email,
+          cc: CC,
           subject: due.subject(number),
           html: buildPaymentReminderHtml(order, due),
           text: buildPaymentReminderText(order, due),
