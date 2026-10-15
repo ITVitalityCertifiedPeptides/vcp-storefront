@@ -1,5 +1,5 @@
 // Automated "we haven't received your payment" emails (2026-09-21).
-// Sent by /api/cron/payment-reminders at 4h, 12h and 48h after an unpaid
+// Sent by /api/cron/payment-reminders at 24h and 48h after an unpaid
 // order is placed. Same one-method payment block as the order email
 // (lib/payment-instructions.ts), so the customer sees exactly what they
 // picked at checkout with the amount filled in.
@@ -18,7 +18,7 @@ const BORDER = "#e6e1d6";
 const CARD_BG = "#faf8f3";
 
 export type ReminderStage = {
-  key: "4h" | "12h" | "48h";
+  key: "24h" | "48h";
   hours: number;
   subject: (n: string) => string;
   eyebrow: string;
@@ -27,20 +27,12 @@ export type ReminderStage = {
 
 export const REMINDER_STAGES: ReminderStage[] = [
   {
-    key: "4h",
-    hours: 4,
+    key: "24h",
+    hours: 24,
     subject: (n) => `Payment reminder - order #${n}`,
     eyebrow: "Payment reminder",
     intro:
-      "A quick reminder that we haven't received payment for your order yet. It's on hold until we do. If you've already sent it, please ignore this email; we confirm payments Monday through Friday during business hours and will match it up.",
-  },
-  {
-    key: "12h",
-    hours: 12,
-    subject: (n) => `Still waiting on payment - order #${n}`,
-    eyebrow: "Second reminder",
-    intro:
-      "We're still waiting on payment for your order, so it hasn't been processed. If you've already sent it, please ignore this email. If something didn't work, just reply and we'll help.",
+      "A friendly reminder that we haven't received payment for your order yet, so it's on hold for now. If you've already sent it, please ignore this email; we confirm payments Monday through Friday during business hours and will match it up. Otherwise, you can pay with any of the options below.",
   },
   {
     key: "48h",
@@ -48,7 +40,7 @@ export const REMINDER_STAGES: ReminderStage[] = [
     subject: (n) => `Final reminder - order #${n}`,
     eyebrow: "Final reminder",
     intro:
-      "This is our last reminder about your unpaid order. It stays on hold until payment arrives. If you've already paid, please ignore this. If you'd rather cancel, reply and let us know and we'll release the items.",
+      "This is our last reminder that we haven't received payment for your order. It stays on hold until payment arrives. If you've already paid, please ignore this. If you'd rather cancel, reply and let us know and we'll release the items. Payment options are below.",
   },
 ];
 
