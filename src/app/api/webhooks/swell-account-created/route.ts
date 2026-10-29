@@ -22,6 +22,7 @@
 // native "Customer welcome" notification (Settings > Notifications).
 
 import {
+  ackWebhookFailure,
   checkAuth,
   fetchAccount,
   type SwellWebhookBody,
@@ -40,12 +41,12 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as SwellWebhookBody;
   } catch {
-    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "invalid json" });
   }
 
   const accountId = body?.data?.account_id || body?.data?.id;
   if (!accountId) {
-    return Response.json({ error: "Missing account id in payload" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "missing id in payload" });
   }
 
   try {
@@ -73,6 +74,6 @@ export async function POST(request: Request) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error("swell-account-created webhook failed", err);
-    return Response.json({ error: "Internal error" }, { status: 500 });
+    return ackWebhookFailure("swell-account-created", err, body?.data?.id);
   }
 }

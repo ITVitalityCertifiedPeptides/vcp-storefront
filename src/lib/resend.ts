@@ -19,18 +19,25 @@ type SendEmailArgs = {
   text: string;
   replyTo?: string;
   cc?: string | string[];
+  bcc?: string | string[];
   from?: string;
   // Resend attachment: content is base64.
   attachments?: Array<{ filename: string; content: string }>;
 };
 
-export async function sendEmail({ to, subject, html, text, replyTo, cc, from: fromOverride, attachments }: SendEmailArgs) {
+export async function sendEmail({ to, subject, html, text, replyTo, cc, bcc, from: fromOverride, attachments }: SendEmailArgs) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     throw new Error("RESEND_API_KEY is not configured");
   }
   const from =
     fromOverride || process.env.RESEND_FROM_EMAIL || "Customer Service <customerservice@vitalitycertifiedpeptides.com>";
+
+  // info@ is blind-copied on every email that goes to a customer (2026-10-29).
+  // Internal mail to our own domain is left alone so the team doesn't get two.
+  const INFO_COPY = "info@vitalitycertifiedpeptides.com";
+  const isInternal = to.toLowerCase().endsWith("@vitalitycertifiedpeptides.com");
+  const bccList = [...(Array.isArray(bcc) ? bcc : bcc ? [bcc] : []), ...(isInternal ? [] : [INFO_COPY])];
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -42,6 +49,7 @@ export async function sendEmail({ to, subject, html, text, replyTo, cc, from: fr
       from,
       to,
       ...(cc && (Array.isArray(cc) ? cc.length > 0 : cc) ? { cc } : {}),
+      ...(bccList.length ? { bcc: bccList } : {}),
       subject,
       html,
       text,

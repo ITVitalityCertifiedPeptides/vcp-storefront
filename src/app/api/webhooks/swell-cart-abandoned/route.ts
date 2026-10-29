@@ -22,6 +22,7 @@
 // .../api/webhooks/swell-cart-abandoned?token=<SWELL_WEBHOOK_SECRET>
 
 import {
+  ackWebhookFailure,
   checkAuth,
   fetchCart,
   formatCurrency,
@@ -42,12 +43,12 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as SwellWebhookBody;
   } catch {
-    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "invalid json" });
   }
 
   const cartId = body?.data?.id;
   if (!cartId) {
-    return Response.json({ error: "Missing cart id in payload" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "missing id in payload" });
   }
 
   try {
@@ -81,6 +82,6 @@ Vitality Certified Peptides`;
     return Response.json({ ok: true });
   } catch (err) {
     console.error("swell-cart-abandoned webhook failed", err);
-    return Response.json({ error: "Internal error" }, { status: 500 });
+    return ackWebhookFailure("swell-cart-abandoned", err, body?.data?.id);
   }
 }

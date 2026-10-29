@@ -329,6 +329,32 @@ export function itemsListHtml(items: SwellOrder["items"] | SwellCart["items"], c
   </table>`;
 }
 
+// Swell auto-disables a webhook after repeated non-2xx responses (observed
+// 2026-10-29: order-created and draft-invoice were switched off after ~190
+// failures, so no new-order emails went out). Every route therefore ALWAYS
+// answers 200 once the request is authenticated. Real failures are logged and
+// emailed to the team (who can use "Resend order receipt" in Swell) instead
+// of being reported back to Swell as errors. A 404 from Swell means the id
+// is stale (deleted or test record) and is skipped without an alert.
+export async function ackWebhookFailure(route: string, err: unknown, id?: string): Promise<Response> {
+  console.error(`${route} webhook failed`, err);
+  const message = err instanceof Error ? err.message : String(err);
+  if (/failed: 404\b/.test(message)) {
+    return Response.json({ ok: true, skipped: "record not found" });
+  }
+  try {
+    await sendEmail({
+      to: "customerservice@vitalitycertifiedpeptides.com",
+      subject: `[Action needed] ${route} email failed${id ? ` (${id})` : ""}`,
+      text: `The ${route} webhook failed${id ? ` for record ${id}` : ""}. The customer may not have received this email. Open the order in Swell and use Actions > Resend order receipt, or email them manually. Error: ${message}`,
+      html: `<p>The <strong>${route}</strong> webhook failed${id ? ` for record <strong>${id}</strong>` : ""}. The customer may not have received this email. Open the order in Swell and use Actions &gt; Resend order receipt, or email them manually.</p><p style="color:#6b6b6b">Error: ${message}</p>`,
+    });
+  } catch (alertErr) {
+    console.error(`${route} failure alert also failed`, alertErr);
+  }
+  return Response.json({ ok: false, handled: true });
+}
+
 export function checkAuth(request: Request): boolean {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
