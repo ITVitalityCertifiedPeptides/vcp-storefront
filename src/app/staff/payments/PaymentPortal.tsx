@@ -88,6 +88,10 @@ export default function PaymentPortal({ staffName }: { staffName: string }) {
       <div className="flex items-center justify-between text-sm text-ink-soft">
         <span>
           Signed in as <span className="font-medium text-ink">{staffName}</span>
+          {" · "}
+          <a href="/staff/invoices" className="underline-offset-4 hover:underline">
+            Send an invoice
+          </a>
         </span>
         <button onClick={signOut} className="underline-offset-4 hover:underline">
           Sign out
