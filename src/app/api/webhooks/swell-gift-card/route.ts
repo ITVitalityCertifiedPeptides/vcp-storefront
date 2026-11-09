@@ -20,6 +20,7 @@
 // (Settings > Notifications).
 
 import {
+  ackWebhookFailure,
   checkAuth,
   fetchOrder,
   customerEmailFor,
@@ -42,12 +43,12 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as SwellWebhookBody;
   } catch {
-    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "invalid json" });
   }
 
   const id = body?.data?.id;
   if (!id) {
-    return Response.json({ error: "Missing id in payload" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "missing id in payload" });
   }
 
   try {
@@ -93,6 +94,6 @@ Vitality Certified Peptides`;
     return Response.json({ ok: true });
   } catch (err) {
     console.error("swell-gift-card webhook failed", err);
-    return Response.json({ error: "Internal error" }, { status: 500 });
+    return ackWebhookFailure("swell-gift-card", err, body?.data?.id);
   }
 }

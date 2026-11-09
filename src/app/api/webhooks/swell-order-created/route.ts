@@ -32,6 +32,7 @@
 // again and nobody's confused by Swell's dashboard claiming it "sent".
 
 import {
+  ackWebhookFailure,
   checkAuth,
   fetchOrder,
   customerEmailFor,
@@ -53,12 +54,12 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as SwellWebhookBody;
   } catch {
-    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "invalid json" });
   }
 
   const orderId = body?.data?.id;
   if (!orderId) {
-    return Response.json({ error: "Missing order id in payload" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "missing id in payload" });
   }
 
   try {
@@ -102,6 +103,6 @@ export async function POST(request: Request) {
     return Response.json({ ok: true });
   } catch (err) {
     console.error("swell-order-created webhook failed", err);
-    return Response.json({ error: "Internal error" }, { status: 500 });
+    return ackWebhookFailure("swell-order-created", err, body?.data?.id);
   }
 }

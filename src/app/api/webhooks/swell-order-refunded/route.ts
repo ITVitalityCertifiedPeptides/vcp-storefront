@@ -12,6 +12,7 @@
 // notification (Settings > Notifications).
 
 import {
+  ackWebhookFailure,
   checkAuth,
   fetchOrder,
   formatCurrency,
@@ -36,12 +37,12 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as SwellWebhookBody;
   } catch {
-    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "invalid json" });
   }
 
   const orderId = body?.data?.id;
   if (!orderId) {
-    return Response.json({ error: "Missing order id in payload" }, { status: 400 });
+    return Response.json({ ok: true, skipped: "missing id in payload" });
   }
 
   try {
@@ -78,6 +79,6 @@ Vitality Certified Peptides`;
     return Response.json({ ok: true });
   } catch (err) {
     console.error("swell-order-refunded webhook failed", err);
-    return Response.json({ error: "Internal error" }, { status: 500 });
+    return ackWebhookFailure("swell-order-refunded", err, body?.data?.id);
   }
 }
